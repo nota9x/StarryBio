@@ -10,7 +10,7 @@ It features a dynamic animated starfield background, a real-time status indicato
 
 Check out a live version of the StarryBio template here:
 
-**[https://a9x.pro/](https://a9x.pro/)**
+**[a9x.pro](https://a9x.pro/)**
 
 ---
 
@@ -56,13 +56,19 @@ Download the project files as a ZIP and extract them to a folder on your compute
 
 Open the `config.js` file in a text editor (like VS Code, Sublime Text, or even Notepad). This file contains all the text, links, and settings for your site.
 
-Follow the extensive comments within the file to fill in your own information. You can add your name, bio, social media links, and set up your availability schedule. See the detailed **Configuration** section below for a full guide.
+Follow the extensive comments within the file to fill in your own information. You can add your name, bio, social media links, and set up your availability schedule.
 
 Make sure to then fill in the page title and favicon path in the head of `index.html`.
 
 ### **Step 3: Preview Your Site**
 
 Simply open the `index.html` file in your web browser to see your changes live. As you edit and save the `config.js` file, just refresh the page in your browser to see the updates.
+
+---
+
+## 📚 Learn More in the Wiki
+
+This README provides a quick overview to get you started. For more detailed guides on advanced customization, deployment, and troubleshooting, be sure to check out the **[Official StarryBio Wiki](https://github.com/nota9x/StarryBio/wiki)**!
 
 ---
 

@@ -49,6 +49,7 @@ Download the project files as a ZIP and extract them to a folder on your compute
 |-- style.css
 |-- app.js
 |-- config.js  <-- This is the only file you need to edit!
+```
 
 
 ### **Step 2: Customize Your Content**

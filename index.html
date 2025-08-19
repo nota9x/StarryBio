@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="a9x's personal links page. Connect with me on various platforms.">
+    
+    <title></title> <!-- Add a page title -->
+    
+    <link rel="icon" type="image/webp" href=""> <!-- Upload favicon then add the path here -->
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    
+    <script src="config.js"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=Nunito+Sans:wght@400;700;800;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="style.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="style.css"></noscript>
+</head>
+
+<body>
+    <div class="stars-container" aria-hidden="true"></div>
+
+    <div id="announcement-banner-container"></div>
+
+    <div class="content-wrapper">
+        <!-- This new div allows the card and the credit link to stack vertically while remaining centered on the page -->
+        <div class="w-full flex flex-col items-center">
+            <div class="profile-card">
+                <div class="profile-image-wrapper">
+                    <div class="profile-image-container">
+                        <img id="profileImage" alt="Profile Picture" width="120" height="120" fetchpriority="high">
+                    </div>
+                </div>
+                
+                <h1 id="profileName" class="profile-name"></h1>
+                <p id="profileTitle" class="profile-title"></p>
+
+                <div id="linksContainer" class="links-container mt-8"></div>
+
+                <p id="footerContent" class="footer-text"></p>
+                
+            </div>
+
+            <!-- I would appreciate it if you kept the branding, but it's absolutley not required and can be removed by deleting the next 6 lines of code! :) -->
+            <p class="footer-text text-center mt-4 text-xs">
+                <br>
+                <a href="https://github.com/nota9x/StarryBio" target="_blank" rel="noopener noreferrer" class="hover:underline opacity-75 hover:opacity-100 transition-opacity">
+                    Built with StarryBio v1.0
+                </a>
+            </p>
+        </div>
+    </div>
+    
+    <div id="status-modal" class="hidden">
+        <div id="status-modal-overlay"></div>
+        <div id="status-modal-content">
+            <button id="status-modal-close" class="flex items-center justify-center" aria-label="Close schedule">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h2 id="status-modal-title" class="text-2xl font-bold text-white mb-6 text-center"></h2>
+            <div class="space-y-6">
+                <div>
+                    <h3 id="status-modal-weekday-title" class="text-lg font-semibold text-blue-300 mb-3"></h3>
+                    <ul id="weekday-schedule-list" class="schedule-list bg-black/20 rounded-lg p-1"></ul>
+                </div>
+                 <div>
+                    <h3 id="status-modal-weekend-title" class="text-lg font-semibold text-blue-300 mb-3"></h3>
+                    <ul id="weekend-schedule-list" class="schedule-list bg-black/20 rounded-lg p-1"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+      if (typeof CONFIG !== 'undefined' && CONFIG.profile && CONFIG.profile.profileImage) {
+        document.getElementById('profileImage').src = CONFIG.profile.profileImage;
+      }
+    </script>
+    <script src="app.js" defer></script>
+</body>
+</html>

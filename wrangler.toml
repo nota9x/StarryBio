@@ -1,0 +1,8 @@
+# wrangler.toml
+
+name = "starrybio"
+compatibility_date = "2025-08-18"
+
+[assets]
+directory = "./"
+not_found_handling = "404-page"

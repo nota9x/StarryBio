@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Not Found</title>
+    
+    <link rel="icon" type="image/webp" href="/assets/images/favicon.webp">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=Nunito+Sans:wght@400;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+    <div class="stars-container" aria-hidden="true"></div>
+    <div class="content-wrapper">
+        <div class="w-full flex flex-col items-center">
+            <div class="profile-card">
+                
+                <h1 class="profile-name">404</h1>
+                <p class="profile-title" style="margin-bottom: 2rem;">
+                    Oops! The page you're looking for could not be found.
+                </p>
+
+                <div class="links-container">
+                    <a href="/" class="link-button" style="justify-content: center;">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width: 20px; height: 20px; margin-right: 0.75rem;">
+                            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+                        </svg>
+                        Home
+                    </a>
+                </div>
+            </div>
+
+            <!-- I would appreciate it if you kept the branding, but it's absolutley not required and can be removed by deleting the next 6 lines of code! :) -->
+            <p class="footer-text text-center mt-4 text-xs">
+                <br>
+                <a href="https://github.com/nota9x/StarryBio" target="_blank" rel="noopener noreferrer" class="hover:underline opacity-75 hover:opacity-100 transition-opacity">
+                    Built with StarryBio v1.0
+                </a>
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const starsContainer = document.querySelector('.stars-container');
+            if (!starsContainer) return;
+            
+            const numberOfStars = 120;
+            const allStars = [];
+
+            // Twinkling stars
+            for (let i = 0; i < numberOfStars; i++) {
+                let star = document.createElement('div');
+                star.classList.add('star');
+                const initialLeft = Math.random() * 100, initialTop = Math.random() * 100;
+                const size = Math.random() * 3 + 0.5, duration = Math.random() * 4 + 2, depth = Math.random() * 0.8 + 0.1;
+                star.style.left = initialLeft + 'vw';
+                star.style.top = initialTop + 'vh';
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                star.style.animationDuration = duration + 's';
+                star.style.animationDelay = Math.random() * duration + 's';
+                starsContainer.appendChild(star);
+                allStars.push({ element: star, initialLeft, initialTop, depth });
+            }
+
+            // Shooting stars
+            setInterval(() => {
+                const shootingStar = document.createElement('div');
+                shootingStar.classList.add('shooting-star');
+                shootingStar.style.left = (Math.random() * 50 - 25) + 'vw';
+                shootingStar.style.top = (Math.random() * 50 - 25) + 'vh';
+                shootingStar.style.animationDelay = Math.random() * 2 + 's';
+                starsContainer.appendChild(shootingStar);
+                setTimeout(() => shootingStar.remove(), 3000);
+            }, 5000 + Math.random() * 10000);
+
+            // Parallax mouse move effect
+            let mouseXNorm = 0, mouseYNorm = 0, animationFrameId = null;
+            document.body.addEventListener('mousemove', (e) => {
+                mouseXNorm = (e.clientX / window.innerWidth) - 0.5;
+                mouseYNorm = (e.clientY / window.innerHeight) - 0.5;
+                if (!animationFrameId) animationFrameId = requestAnimationFrame(updateStarPositions);
+            });
+            function updateStarPositions() {
+                allStars.forEach(starData => {
+                    const moveX = mouseXNorm * starData.depth * 40, moveY = mouseYNorm * starData.depth * 25;
+                    starData.element.style.left = `${starData.initialLeft + (moveX * 0.08)}vw`;
+                    starData.element.style.top = `${starData.initialTop + (moveY * 0.08)}vh`;
+                });
+                animationFrameId = null;
+            }
+            
+            document.body.style.opacity = '1';
+        });
+    </script>
+</body>
+</html>

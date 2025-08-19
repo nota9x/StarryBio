@@ -35,6 +35,7 @@ Setting up your StarryBio page is a simple three-step process.
 Download the project files as a ZIP and extract them to a folder on your computer. Your folder should contain the following:
 
 
+```
 /
 |-- assets/
 |   |-- images/

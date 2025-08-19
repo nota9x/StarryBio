@@ -15,13 +15,23 @@ Users are encouraged to pull the latest changes from the `main` branch to ensure
 
 ## Reporting a Vulnerability
 
-Please do **not** report security vulnerabilities through public GitHub issues. Instead, we ask that you report them privately to ensure the security of our users.
+Please do **not** report security vulnerabilities through public GitHub issues.
 
-### **How to Report**
+### **Preferred Method: GitHub Private Vulnerability Report**
 
-Please send an email to **security@a9x.pro** with the details of the potential vulnerability.
+We prefer to receive vulnerability reports via GitHub's private reporting feature. This ensures the report is delivered directly to the maintainers securely.
 
-To help us assess the issue as quickly as possible, please use the following template for your report:
+1.  Navigate to the **[Security Tab](https://github.com/nota9x/StarryBio/security)** on the StarryBio repository.
+2.  Click on **"Report a vulnerability"**.
+3.  Fill out the form with as much detail as possible, following the template below.
+
+### **Alternative Method: Email**
+
+If you are unable to use GitHub's private reporting for any reason, you may send your report via email to **security@a9x.pro**.
+
+### **Reporting Template**
+
+Whichever method you use, please include the following information to help us assess the issue as quickly as possible:
 
 ```markdown
 **Subject: Security Vulnerability in StarryBio**

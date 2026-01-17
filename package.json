@@ -1,0 +1,23 @@
+{
+  "name": "starry-bio",
+  "version": "2.0.0",
+  "description": "A customizable, starry-themed Link-in-Bio page powered by Cloudflare Workers.",
+  "scripts": {
+    "start": "npm run build:css && wrangler dev",
+    "deploy": "npm run build:css && wrangler deploy",
+    "format": "prettier --write .",
+    "build:css": "tailwindcss -i ./src/site/input.css -o ./src/site/style.css",
+    "watch:css": "tailwindcss -i ./src/site/input.css -o ./src/site/style.css --watch"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "latest",
+    "@tailwindcss/cli": "^4.1.18",
+    "autoprefixer": "^10.4.23",
+    "postcss": "^8.5.6",
+    "prettier": "latest",
+    "tailwindcss": "^4.1.18",
+    "typescript": "latest",
+    "wrangler": "latest"
+  },
+  "private": true
+}

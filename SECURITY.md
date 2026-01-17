@@ -1,69 +1,70 @@
 # Security Policy
 
-The security of StarryBio is our top priority. We appreciate the efforts of security researchers and the community to help keep our project safe. If you discover a security vulnerability, we encourage you to report it to us privately following the guidelines below.
+Thank you for your interest in the security of **StarryBio**. We take the security of our software and the privacy of our users very seriously.
 
 ## Supported Versions
 
-StarryBio is a template-based project rather than a versioned software package. Security updates and patches are applied directly to the `main` branch. We always support the latest version of the code available in the main repository.
+We only support the most recent stable release of the project. Please ensure you are testing against the latest version.
 
 | Version | Supported          |
 | ------- | ------------------ |
-| Latest `main` branch | :white_check_mark: |
-| All previous versions | :x:                |
-
-Users are encouraged to pull the latest changes from the `main` branch to ensure they have the most secure and up-to-date version of the template.
+| Latest  | :white_check_mark: |
+| Older   | :x:                |
 
 ## Reporting a Vulnerability
 
-Please do **not** report security vulnerabilities through public GitHub issues.
+If you have discovered a security vulnerability in this project, we appreciate your help in disclosing it to us in a responsible manner.
 
-### **Preferred Method: GitHub Private Vulnerability Report**
+### Method 1: GitHub Private Reporting
 
-We prefer to receive vulnerability reports via GitHub's private reporting feature. This ensures the report is delivered directly to the maintainers securely.
+We have enabled **Private Vulnerability Reporting** for this repository. This is the fastest and most secure way to report issues, as it allows you to discuss vulnerability details privately with us without the risk of a public leak.
 
-1.  Navigate to the **[Security Tab](https://github.com/nota9x/StarryBio/security)** on the StarryBio repository.
-2.  Click on **"Report a vulnerability"**.
-3.  Fill out the form with as much detail as possible, following the template below.
+1.  Navigate to the **Security** tab of this repository (under the repository name).
+2.  Click the **Report a vulnerability** button.
+3.  Fill in the advisory details (title and description).
+4.  Click **Submit report**.
 
-### **Alternative Method: Email**
+**Benefits:**
 
-If you are unable to use GitHub's private reporting for any reason, you may send your report via email to **security@a9x.pro**.
+- This process is fully private.
+- GitHub notifies us directly and immediately.
+- You are automatically added as a collaborator and credited user on the proposed advisory, allowing us to collaborate on a fix securely.
 
-### **Reporting Template**
+### Method 2: Email Reporting
 
-Whichever method you use, please include the following information to help us assess the issue as quickly as possible:
+If you are unable to use the GitHub reporting tool, please send vulnerability reports via email to **<security@a9x.pro>**.
 
-```markdown
-**Subject: Security Vulnerability in StarryBio**
+To ensure your report passes our spam filters and is routed correctly, please follow these steps:
 
-**1. Description:**
-[Please provide a clear and concise description of the vulnerability.]
+1.  **Subject Line:** Must contain `StarryBio` and `vulnerability`.
+    - _Example:_ `StarryBio vulnerability: Possible XSS in search bar`
+2.  **Body Content:**
+    - Type of issue (e.g., buffer overflow, SQL injection, cross-site scripting).
+    - Full paths of source file(s) related to the manifestation of the issue.
+    - Location of the affected source code (tag/branch/commit or direct URL).
+    - Any special configuration required to reproduce the issue.
+    - Step-by-step instructions to reproduce the issue.
+    - Proof-of-concept or exploit code (if available).
+    - Impact of the issue, including how an attacker might exploit it.
 
-**2. Steps to Reproduce:**
-[Provide a step-by-step guide on how to reproduce the vulnerability. Include any specific configurations, links, or code snippets necessary.]
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error/vulnerability
+## What to Expect
 
-**3. Impact:**
-[Briefly describe the potential impact of this vulnerability. For example: "This could allow an attacker to perform cross-site scripting (XSS) by manipulating a link in the config file."]
+1.  **Acknowledgment:** We aim to acknowledge receipt of your report within **48 hours** (or 2 business days).
+2.  **Assessment:** We will triage the vulnerability and determine its impact. We may contact you for further clarification.
+3.  **Resolution:** If confirmed, we will work on a fix. We ask that you maintain confidentiality during this time.
+4.  **Disclosure:** Once the fix is released, we will coordinate a public disclosure (if appropriate) and credit you for the discovery.
 
-**4. Supporting Material/PoC:**
-[Include any screenshots, code snippets, or other proof-of-concept materials that can help us understand the issue.]
+### If You Don't Hear Back (Email Only)
 
-**5. Contact Information:**
-[Please provide your name or alias for recognition, and any social media links if you wish to be credited (e.g., GitHub or Twitter profile).]
-```
+If you reported via email and have not received a reply within **7 days**, please follow up with us again at <security@a9x.pro>. Please ensure the word "vulnerability" is in the subject line.
 
-### **Our Commitment and What to Expect**
+## Responsible Disclosure Guidelines
 
-When you report a vulnerability to a9x Development, you can expect the following:
+To encourage security research and avoid legal complications, we ask that you:
 
-1.  **Acknowledgement:** We will provide an initial acknowledgement of your report within **48 hours**.
-2.  **Initial Triage:** We will conduct an initial assessment of the vulnerability's validity and severity within **5 business days**.
-3.  **Communication:** We will maintain an open line of communication with you, providing updates on our progress as we work to validate and patch the issue.
-4.  **Resolution:** Once the vulnerability is confirmed, we will work to release a patch as quickly as possible. The timeline will depend on the complexity of the issue.
-5.  **Public Disclosure:** After a patch has been released, we are open to coordinating a public disclosure of the vulnerability with you. We kindly ask that you refrain from sharing the issue publicly until we have had a chance to release a fix.
+- **Do not** attempt to access or modify data that does not belong to you.
+- **Do not** execute a Denial of Service (DoS) attack.
+- **Do not** use social engineering or phishing against our employees or users.
+- **Do** give us reasonable time to correct the issue before making any information public.
 
-a9x Development values the work of security researchers and will make every effort to recognize your contribution after the vulnerability has been resolved. Thank you for helping to keep StarryBio secure.
+As long as you comply with these guidelines, we will never take legal action against you regarding your research.

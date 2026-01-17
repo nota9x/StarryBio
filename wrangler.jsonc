@@ -1,0 +1,13 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "starry-bio",
+  "main": "src/worker.ts",
+  "compatibility_date": "2026-01-01",
+  "assets": {
+    "directory": "src/site",
+    "binding": "ASSETS",
+  },
+  "observability": {
+    "enabled": true,
+  },
+}

@@ -160,7 +160,8 @@ document.addEventListener('DOMContentLoaded', () => {
     populatePage(CONFIG);
     document.body.style.opacity = '1';
   } else {
-    console.error('CONFIG object not found.');
+    // Standalone mode (e.g. 404 page)
+    document.body.style.opacity = '1';
   }
 });
 
@@ -194,8 +195,11 @@ function populateProfile(profile) {
     };
   }
 
-  document.getElementById('profileName').textContent = profile.name;
-  document.getElementById('profileTitle').textContent = profile.title;
+  const nameEl = document.getElementById('profileName');
+  if (nameEl) nameEl.textContent = profile.name;
+  
+  const titleEl = document.getElementById('profileTitle');
+  if (titleEl) titleEl.textContent = profile.title;
 }
 
 function populateAnnouncement(announcement) {
@@ -256,12 +260,18 @@ function populateProfile(profile) {
       imgEl.style.display = 'none';
     };
   }
-  document.getElementById('profileName').textContent = profile.name;
-  document.getElementById('profileTitle').textContent = profile.title;
+  
+  const nameEl = document.getElementById('profileName');
+  if (nameEl) nameEl.textContent = profile.name;
+  
+  const titleEl = document.getElementById('profileTitle');
+  if (titleEl) titleEl.textContent = profile.title;
 }
 
 function populateLinks(links) {
   const container = document.getElementById('linksContainer');
+  if (!container) return; 
+
   container.innerHTML = '';
   links.forEach((linkData) => {
     const linkEl = createLinkElement(linkData);
@@ -275,10 +285,12 @@ function populateLinks(links) {
 }
 
 function populateFooter(footer) {
+  const container = document.getElementById('footerContent');
+  if (!container) return;
+
   const currentYear = new Date().getFullYear();
   // footer.copyright can contain {year} placeholder if desired, or just simple text
-  document.getElementById('footerContent').textContent =
-    footer.copyright || `© ${currentYear} Starfield Bio`;
+  container.textContent = footer.copyright || `© ${currentYear} Starfield Bio`;
 }
 
 function createLinkElement(linkData) {
@@ -383,6 +395,8 @@ function initStatusIndicator(statusConfig) {
   if (!document.getElementById('status-indicator-container')) {
     createStatusHtml(statusConfig);
   }
+
+  if (!document.getElementById('status-indicator-container')) return;
 
   const elements = {
     icon: document.getElementById('status-indicator-icon'),

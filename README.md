@@ -32,8 +32,6 @@ A mesmerizing, starry-themed link-in-bio page powered by Cloudflare Workers.
 
     ```bash
     npm run start
-    # OR
-    npx wrangler dev
     ```
 
 4.  **Deployment**:

@@ -435,6 +435,7 @@
   --status-bg: rgba(20, 22, 30, 0.8);
   --modal-bg: rgba(15, 17, 25, 0.9);
   --tooltip-bg: rgba(15, 17, 25, 0.95);
+  --announcement-hover-bg: rgba(255, 255, 255, 0.1);
 }
 [data-theme='bright'] {
   --bg-color: linear-gradient(135deg, #0b1c36 0%, #1a2a4d 40%, #2a3b65 100%);
@@ -452,6 +453,7 @@
   --status-bg: #1a2a4d;
   --modal-bg: rgba(11, 28, 54, 0.8);
   --tooltip-bg: #0b1c36;
+  --announcement-hover-bg: rgba(251, 191, 36, 0.4);
 }
 #announcement-banner-container {
   position: fixed;
@@ -493,7 +495,7 @@
 }
 #announcement-banner:hover {
   transform: translateY(-4px) scale(1.02);
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--announcement-hover-bg);
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.15) inset;
 }
 #announcement-banner::before {
@@ -818,7 +820,7 @@ body {
   box-shadow: 0 8px 20px rgba(176, 196, 222, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
   border-color: rgba(224, 231, 255, 0.6);
 }
-.link-button:hover, .link-button.copy-button-active.copied {
+.link-button.copy-button-active:hover, .link-button.copy-button-active.copied {
   padding-right: 3rem;
 }
 .link-button:active {

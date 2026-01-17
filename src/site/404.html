@@ -14,6 +14,7 @@
     />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/style.css" />
+    <script src="/config.js"></script>
   </head>
 
   <body>
@@ -21,6 +22,7 @@
     <div class="content-wrapper">
       <div class="w-full flex flex-col items-center">
         <div class="profile-card">
+          <div class="card-shine"></div>
           <h1 class="profile-name">404</h1>
           <p class="profile-title" style="margin-bottom: 2rem">
             Oops! The page you're looking for could not be found.
@@ -50,74 +52,12 @@
             rel="noopener noreferrer"
             class="hover:underline opacity-75 hover:opacity-100 transition-opacity"
           >
-            Built with StarryBio v1.0
+            Powered by StarryBio v2.0
           </a>
         </p>
       </div>
     </div>
 
-    <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        const starsContainer = document.querySelector('.stars-container');
-        if (!starsContainer) return;
-
-        const numberOfStars = 120;
-        const allStars = [];
-
-        // Twinkling stars
-        for (let i = 0; i < numberOfStars; i++) {
-          let star = document.createElement('div');
-          star.classList.add('star');
-          const initialLeft = Math.random() * 100,
-            initialTop = Math.random() * 100;
-          const size = Math.random() * 3 + 0.5,
-            duration = Math.random() * 4 + 2,
-            depth = Math.random() * 0.8 + 0.1;
-          star.style.left = initialLeft + 'vw';
-          star.style.top = initialTop + 'vh';
-          star.style.width = size + 'px';
-          star.style.height = size + 'px';
-          star.style.animationDuration = duration + 's';
-          star.style.animationDelay = Math.random() * duration + 's';
-          starsContainer.appendChild(star);
-          allStars.push({ element: star, initialLeft, initialTop, depth });
-        }
-
-        // Shooting stars
-        setInterval(
-          () => {
-            const shootingStar = document.createElement('div');
-            shootingStar.classList.add('shooting-star');
-            shootingStar.style.left = Math.random() * 50 - 25 + 'vw';
-            shootingStar.style.top = Math.random() * 50 - 25 + 'vh';
-            shootingStar.style.animationDelay = Math.random() * 2 + 's';
-            starsContainer.appendChild(shootingStar);
-            setTimeout(() => shootingStar.remove(), 3000);
-          },
-          5000 + Math.random() * 10000
-        );
-
-        // Parallax mouse move effect
-        let mouseXNorm = 0,
-          mouseYNorm = 0,
-          animationFrameId = null;
-        document.body.addEventListener('mousemove', (e) => {
-          mouseXNorm = e.clientX / window.innerWidth - 0.5;
-          mouseYNorm = e.clientY / window.innerHeight - 0.5;
-          if (!animationFrameId) animationFrameId = requestAnimationFrame(updateStarPositions);
-        });
-        function updateStarPositions() {
-          allStars.forEach((starData) => {
-            const moveX = mouseXNorm * starData.depth * 40,
-              moveY = mouseYNorm * starData.depth * 25;
-            starData.element.style.left = `${starData.initialLeft + moveX * 0.08}vw`;
-            starData.element.style.top = `${starData.initialTop + moveY * 0.08}vh`;
-          });
-          animationFrameId = null;
-        }
-
-        document.body.style.opacity = '1';
-      });
-    </script>
+    <script src="/app.js" defer></script>
   </body>
 </html>

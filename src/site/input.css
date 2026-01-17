@@ -415,6 +415,7 @@ body {
   position: relative;
   overflow: hidden;
   text-align: left;
+  cursor: pointer;
 }
 .link-button:focus-visible {
   outline: 2px solid #88a2ff;

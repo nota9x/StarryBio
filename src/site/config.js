@@ -8,18 +8,22 @@ const CONFIG = {
   // ---------------------------------------------------------------------------
   "pageTitle": "StarryBio v2.0",
 
+  // Favicon: Path to your favicon (e.g., "assets/images/favicon.png")
+  // Supports: ico, png, svg, jpg, webp, gif
+  "favicon": "assets/images/favicon.webp",
+
   // Theme: "midnight" (default) or "bright"
   "theme": "midnight",
 
   "profile": {
     "name": "Astronaut",
     "title": "Exploring the Digital Universe",
-    "image": "assets/images/profile.webp", // Local path OR full URL
+    "image": "assets/images/profile.webp", // Supports: webp, png, jpg, gif, svg
   },
 
   // ---------------------------------------------------------------------------
   // 2. LINKS
-  // Icons: Paste an SVG Path (from simpleicons.org) OR a URL to an image.
+  // Icons: Paste an SVG Path (from simpleicons.org) OR a URL to an image (webp, png, jpg, gif, or svg).
   // The system automatically detects which one it is.
   // ---------------------------------------------------------------------------
   "links": [

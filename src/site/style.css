@@ -8,7 +8,6 @@
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
       "Courier New", monospace;
     --color-amber-300: oklch(87.9% 0.169 91.605);
-    --color-blue-300: oklch(80.9% 0.105 251.813);
     --color-slate-200: oklch(92.9% 0.013 255.508);
     --color-slate-300: oklch(86.9% 0.022 252.894);
     --color-slate-400: oklch(70.4% 0.04 256.788);
@@ -110,6 +109,7 @@
   }
   img, svg, video, canvas, audio, iframe, embed, object {
     display: block;
+    vertical-align: middle;
   }
   img, video {
     max-width: 100%;
@@ -192,6 +192,9 @@
   }
   .fixed {
     position: fixed;
+  }
+  .static {
+    position: static;
   }
   .container {
     width: 100%;
@@ -435,7 +438,6 @@
   --status-bg: rgba(20, 22, 30, 0.8);
   --modal-bg: rgba(15, 17, 25, 0.9);
   --tooltip-bg: rgba(15, 17, 25, 0.95);
-  --announcement-hover-bg: rgba(255, 255, 255, 0.1);
 }
 [data-theme='bright'] {
   --bg-color: linear-gradient(135deg, #0b1c36 0%, #1a2a4d 40%, #2a3b65 100%);
@@ -453,7 +455,6 @@
   --status-bg: #1a2a4d;
   --modal-bg: rgba(11, 28, 54, 0.8);
   --tooltip-bg: #0b1c36;
-  --announcement-hover-bg: rgba(251, 191, 36, 0.4);
 }
 #announcement-banner-container {
   position: fixed;
@@ -495,7 +496,7 @@
 }
 #announcement-banner:hover {
   transform: translateY(-4px) scale(1.02);
-  background: var(--announcement-hover-bg);
+  background: rgba(255, 255, 255, 0.1);
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.15) inset;
 }
 #announcement-banner::before {
@@ -743,6 +744,7 @@ body {
   position: relative;
   overflow: hidden;
   text-align: left;
+  cursor: pointer;
 }
 .link-button:focus-visible {
   outline: 2px solid #88a2ff;
@@ -820,7 +822,7 @@ body {
   box-shadow: 0 8px 20px rgba(176, 196, 222, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
   border-color: rgba(224, 231, 255, 0.6);
 }
-.link-button.copy-button-active:hover, .link-button.copy-button-active.copied {
+.link-button:hover, .link-button.copy-button-active.copied {
   padding-right: 3rem;
 }
 .link-button:active {

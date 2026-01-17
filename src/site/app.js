@@ -171,6 +171,11 @@ function populatePage(data) {
 
   document.title = data.pageTitle || 'Starfield Bio';
 
+  // Set Favicon
+  if (data.favicon) {
+    populateFavicon(data.favicon);
+  }
+
   if (data.announcement?.enabled) {
     // Simple check: if text exists, show it.
     populateAnnouncement(data.announcement);
@@ -320,13 +325,42 @@ function createLinkElement(linkData) {
   return linkEl;
 }
 
+function populateFavicon(faviconUrl) {
+  let link = document.querySelector("link[rel~='icon']");
+  if (!link) {
+    link = document.createElement('link');
+    link.rel = 'icon';
+    document.head.appendChild(link);
+  }
+  link.href = faviconUrl;
+
+  // Auto-detect MIME type from extension
+  const ext = faviconUrl.split('.').pop().toLowerCase();
+  const mimeTypes = {
+    ico: 'image/x-icon',
+    png: 'image/png',
+    svg: 'image/svg+xml',
+    jpg: 'image/jpeg',
+    jpeg: 'image/jpeg',
+    gif: 'image/gif',
+    webp: 'image/webp',
+  };
+  
+  if (mimeTypes[ext]) {
+    link.type = mimeTypes[ext];
+  } else {
+    // Remove type if unknown so browser can sniff it, or if it's external URL without extension
+    link.removeAttribute('type');
+  }
+}
+
 // Helper to determine if string is SVG path or Image URL
 function getIconHtml(iconStr) {
   if (!iconStr) return '';
 
   // Simple heuristic: If it starts with 'M' (path command) or '<' (svg tag), treat as SVG.
   // Otherwise treat as image (http..., assets/..., etc)
-  const isSvgPath = iconStr.trim().startsWith('M') || iconStr.trim().startsWith('<path');
+  const isSvgPath = iconStr.trim().toUpperCase().startsWith('M') || iconStr.trim().startsWith('<path');
 
   if (isSvgPath) {
     // Returns an SVG containing the path
@@ -424,12 +458,12 @@ function initStatusIndicator(statusConfig) {
     const message = statusDef.message || '';
 
     // Detect if icon is SVG Path or Image URL
-    const isSvgPath = iconPath.trim().startsWith('M') || iconPath.trim().startsWith('<');
+    const isSvgPath = iconPath.trim().toUpperCase().startsWith('M') || iconPath.trim().startsWith('<');
 
     if (isSvgPath) {
       // SVG Path: Use Mask + Background Color
       let maskUrl = iconPath;
-      if (iconPath.startsWith('M')) {
+      if (iconPath.trim().toUpperCase().startsWith('M')) {
         const svgData = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black'><path d='${iconPath}'/></svg>`;
         maskUrl = `data:image/svg+xml;base64,${btoa(svgData)}`;
       }

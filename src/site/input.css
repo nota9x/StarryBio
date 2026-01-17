@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 :root {
   /* --- MIDNIGHT THEME (Default) --- */
@@ -322,7 +322,6 @@ body {
     0 2px 4px rgba(255, 255, 255, 0.15) inset;
 }
 
-
 @media (min-width: 640px) {
   .profile-card {
     padding: 2.5rem;
@@ -528,7 +527,7 @@ body {
     0 0 0 1px rgba(255, 255, 255, 0.1) inset;
   border-color: rgba(224, 231, 255, 0.6);
 }
-.link-button:hover,
+.link-button:not(.no-hover-shift):hover,
 .link-button.copy-button-active.copied {
   padding-right: 3rem;
 }
@@ -634,7 +633,7 @@ body {
     height: 20px;
     right: 1rem;
   }
-  .link-button:hover,
+  .link-button:not(.no-hover-shift):hover,
   .link-button.discord-copy-button.copied {
     padding-right: 2.5rem;
   }
@@ -742,7 +741,7 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  
+
   min-width: 120px;
   white-space: nowrap;
 

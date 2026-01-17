@@ -202,7 +202,7 @@ function populateProfile(profile) {
 
   const nameEl = document.getElementById('profileName');
   if (nameEl) nameEl.textContent = profile.name;
-  
+
   const titleEl = document.getElementById('profileTitle');
   if (titleEl) titleEl.textContent = profile.title;
 }
@@ -265,17 +265,17 @@ function populateProfile(profile) {
       imgEl.style.display = 'none';
     };
   }
-  
+
   const nameEl = document.getElementById('profileName');
   if (nameEl) nameEl.textContent = profile.name;
-  
+
   const titleEl = document.getElementById('profileTitle');
   if (titleEl) titleEl.textContent = profile.title;
 }
 
 function populateLinks(links) {
   const container = document.getElementById('linksContainer');
-  if (!container) return; 
+  if (!container) return;
 
   container.innerHTML = '';
   links.forEach((linkData) => {
@@ -345,7 +345,7 @@ function populateFavicon(faviconUrl) {
     gif: 'image/gif',
     webp: 'image/webp',
   };
-  
+
   if (mimeTypes[ext]) {
     link.type = mimeTypes[ext];
   } else {
@@ -360,7 +360,8 @@ function getIconHtml(iconStr) {
 
   // Simple heuristic: If it starts with 'M' (path command) or '<' (svg tag), treat as SVG.
   // Otherwise treat as image (http..., assets/..., etc)
-  const isSvgPath = iconStr.trim().toUpperCase().startsWith('M') || iconStr.trim().startsWith('<path');
+  const isSvgPath =
+    iconStr.trim().toUpperCase().startsWith('M') || iconStr.trim().startsWith('<path');
 
   if (isSvgPath) {
     // Returns an SVG containing the path
@@ -458,7 +459,8 @@ function initStatusIndicator(statusConfig) {
     const message = statusDef.message || '';
 
     // Detect if icon is SVG Path or Image URL
-    const isSvgPath = iconPath.trim().toUpperCase().startsWith('M') || iconPath.trim().startsWith('<');
+    const isSvgPath =
+      iconPath.trim().toUpperCase().startsWith('M') || iconPath.trim().startsWith('<');
 
     if (isSvgPath) {
       // SVG Path: Use Mask + Background Color

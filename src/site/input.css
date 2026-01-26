@@ -403,7 +403,7 @@ body {
   background: var(--btn-bg);
   color: #e0e7ff;
   font-weight: 600;
-  padding: 1rem 1.5rem;
+  padding: 1.15rem 1.5rem;
   border-radius: 16px;
   text-decoration: none;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -617,7 +617,7 @@ body {
     letter-spacing: 0.1px;
   }
   .link-button {
-    padding: 0.9rem 1rem;
+    padding: 1rem 1rem;
   }
   .link-button svg,
   .link-button-icon-wrapper {
@@ -797,9 +797,116 @@ body {
   left: 50%;
   margin-left: -6px;
   border-width: 6px;
+
   border-style: solid;
   border-color: rgba(255, 255, 255, 0.1) transparent transparent transparent;
   z-index: 1;
+}
+
+/* --- Horizontal Layout Option --- */
+/* Wrapped in @layer to prevent Tailwind tree-shaking (dynamic class added by JS) */
+@layer components {
+  .profile-card.layout-horizontal {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto auto;
+    align-items: center; /* Center items vertically */
+    column-gap: 1.5rem;
+    text-align: left; /* Back to Left per original request */
+    padding-top: 2rem;
+  }
+
+  .profile-card.layout-horizontal .profile-image-wrapper {
+    grid-column: 1;
+    grid-row: 1 / 2;
+    margin: 0; /* Remove extra bottom margin */
+    width: 110px;
+    height: 110px;
+  }
+
+  .profile-card.layout-horizontal .profile-text-content {
+    grid-column: 2;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Vertical Center */
+    align-items: flex-start; /* Horizontal Left */
+    align-self: stretch; /* Fill grid row height for vertical centering */
+    height: 100%;
+    gap: 0;
+  }
+
+  .profile-card.layout-horizontal .profile-name {
+    margin: 0 !important;
+    padding: 0;
+    line-height: 1.1;
+    font-size: 1.3rem; /* Reduced from 1.5rem */
+  }
+
+  .profile-card.layout-horizontal .profile-description {
+    margin: 0 !important;
+    padding: 0;
+    font-size: 0.8rem; /* Reduced from 0.85rem */
+    line-height: 1.2;
+  }
+
+  .profile-card.layout-horizontal .links-container {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    margin-top: 2.5rem;
+    width: 100%;
+  }
+
+  .profile-card.layout-horizontal .footer-text {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    margin-top: 2.5rem;
+    text-align: center;
+  }
+}
+
+@media (max-width: 450px) {
+  /* Increased breakpoint slightly to avoid cramping */
+  .profile-card.layout-horizontal {
+    grid-template-columns: 1fr;
+    text-align: center;
+    justify-items: center;
+    padding-top: 2rem; /* Revert adjustments for mobile */
+  }
+
+  .profile-card.layout-horizontal .profile-image-wrapper {
+    grid-column: 1;
+    grid-row: 1;
+    margin-bottom: 1rem;
+    width: 120px; /* Revert size */
+    height: 120px;
+  }
+
+  .profile-card.layout-horizontal .profile-name {
+    grid-column: 1;
+    grid-row: 2;
+    align-self: center;
+    margin-bottom: 0.5rem;
+    font-size: 2rem; /* Revert/Keep mobile size */
+  }
+
+  .profile-card.layout-horizontal .profile-title {
+    grid-column: 1;
+    grid-row: 3;
+    align-self: center;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+  }
+
+  .profile-card.layout-horizontal .links-container {
+    grid-row: 4;
+    margin-top: 1rem;
+  }
+
+  .profile-card.layout-horizontal .footer-text {
+    grid-row: 5;
+    margin-top: 2rem;
+  }
 }
 
 #status-modal {

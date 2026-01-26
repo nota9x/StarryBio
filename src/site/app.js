@@ -203,8 +203,8 @@ function populateProfile(profile) {
   const nameEl = document.getElementById('profileName');
   if (nameEl) nameEl.textContent = profile.name;
 
-  const titleEl = document.getElementById('profileTitle');
-  if (titleEl) titleEl.textContent = profile.title;
+  const descEl = document.getElementById('profileDescription');
+  if (descEl) descEl.textContent = profile.description;
 }
 
 function populateAnnouncement(announcement) {
@@ -266,11 +266,24 @@ function populateProfile(profile) {
     };
   }
 
+  // Handle Layout
+  const card = document.querySelector('.profile-card');
+  const textContent = document.querySelector('.profile-text-content');
+  
+  // Only apply layout if the text wrapper exists (not 404 page)
+  if (card && textContent) {
+    if (profile.layout === 'horizontal') {
+      card.classList.add('layout-horizontal');
+    } else {
+      card.classList.remove('layout-horizontal');
+    }
+  }
+
   const nameEl = document.getElementById('profileName');
   if (nameEl) nameEl.textContent = profile.name;
 
-  const titleEl = document.getElementById('profileTitle');
-  if (titleEl) titleEl.textContent = profile.title;
+  const descEl = document.getElementById('profileDescription');
+  if (descEl) descEl.textContent = profile.description;
 }
 
 function populateLinks(links) {

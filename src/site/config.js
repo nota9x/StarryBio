@@ -17,8 +17,9 @@ const CONFIG = {
 
   "profile": {
     "name": "Astronaut",
-    "title": "Exploring the Digital Universe",
+    "description": "Exploring the Digital Universe",
     "image": "assets/images/profile.webp", // Supports: webp, png, jpg, gif, svg
+    "layout": "vertical", // Options: "vertical" (default), "horizontal"
   },
 
   // ---------------------------------------------------------------------------

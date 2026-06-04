@@ -25,12 +25,17 @@ function getCookie(name) {
 
 const starsContainer = document.querySelector('.stars-container');
 const STAR_COLORS = ['#ffffff', '#ffe9c4', '#d4fbff', '#d4fbff', '#b3cde0'];
+const DEFAULT_STAR_COUNT = 200;
+const DEFAULT_REDUCED_MOTION_STAR_COUNT = 80;
+const DEFAULT_SHOOTING_STAR_CHANCE = 0.05;
 const allStars = [];
 let starCanvas = null;
 let starContext = null;
 let starViewportWidth = 0;
 let starViewportHeight = 0;
 let prefersReducedMotionQuery = null;
+let starMultiplier = 1;
+let shootingStarMultiplier = 1;
 let animationFrameId = null;
 let shootingStarTimeoutId = null;
 let animationStarted = false;
@@ -82,7 +87,10 @@ function setupStarCanvas() {
 
 function configureStarfield() {
   const prefersReducedMotion = prefersReducedMotionQuery && prefersReducedMotionQuery.matches;
-  const numberOfStars = prefersReducedMotion ? 80 : 200;
+  const baseStarCount = prefersReducedMotion
+    ? DEFAULT_REDUCED_MOTION_STAR_COUNT
+    : DEFAULT_STAR_COUNT;
+  const numberOfStars = Math.round(baseStarCount * starMultiplier);
 
   stopStarAnimation();
   stopShootingStars();
@@ -128,12 +136,13 @@ function resizeStarCanvas() {
 }
 
 function startShootingStars() {
-  if (shootingStarTimeoutId !== null || !starsContainer) return;
+  if (shootingStarTimeoutId !== null || !starsContainer || shootingStarMultiplier === 0) return;
 
   const spawnShootingStar = () => {
     shootingStarTimeoutId = null;
+    const shootingStarChance = Math.min(DEFAULT_SHOOTING_STAR_CHANCE * shootingStarMultiplier, 1);
 
-    if (!document.hidden && Math.random() <= 0.05) {
+    if (!document.hidden && Math.random() <= shootingStarChance) {
       const shootingStar = document.createElement('div');
       shootingStar.classList.add('shooting-star');
 
@@ -247,6 +256,7 @@ function renderStars({ updatePositions }) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  configureAnimationOptions(typeof CONFIG !== 'undefined' ? CONFIG : {});
   setupAnimations();
 
   if (typeof CONFIG !== 'undefined') {
@@ -255,6 +265,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.body.style.opacity = '1';
 });
+
+function configureAnimationOptions(config) {
+  const animation =
+    config && config.animation && typeof config.animation === 'object' ? config.animation : {};
+
+  starMultiplier = getAnimationMultiplier(animation.starMultiplier, 1, 'starMultiplier');
+  shootingStarMultiplier = getAnimationMultiplier(
+    animation.shootingStarMultiplier,
+    1,
+    'shootingStarMultiplier'
+  );
+}
+
+function getAnimationMultiplier(value, fallback, fieldName) {
+  const multiplier = Number(value);
+
+  if (!Number.isFinite(multiplier) || multiplier < 0) {
+    console.warn(
+      `[StarryBio] animation.${fieldName} must be a number greater than or equal to 0. Falling back to ${fallback}.`
+    );
+    return fallback;
+  }
+
+  return multiplier;
+}
 
 const DEFAULT_SIMPLE_ICON_COLOR = 'fff';
 

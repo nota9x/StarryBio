@@ -40,7 +40,29 @@ const CONFIG = {
   "theme": "midnight",
 
   // ---------------------------------------------------------------------------
-  // 2. PROFILE CARD
+  // 2. BACKGROUND ANIMATION
+  // ---------------------------------------------------------------------------
+  //
+  // starMultiplier:
+  // Controls the number of background stars.
+  // - 1: default density
+  // - 0.5: half as many stars
+  // - 2: twice as many stars
+  // - 0: hide background stars
+  //
+  // shootingStarMultiplier:
+  // Controls how often shooting stars appear.
+  // - 1: default frequency
+  // - 0.5: half as often
+  // - 2: twice as often
+  // - 0: disable shooting stars
+  "animation": {
+    "starMultiplier": 1,
+    "shootingStarMultiplier": 1,
+  },
+
+  // ---------------------------------------------------------------------------
+  // 3. PROFILE CARD
   // ---------------------------------------------------------------------------
   //
   // name:
@@ -66,7 +88,7 @@ const CONFIG = {
   },
 
   // ---------------------------------------------------------------------------
-  // 3. LINKS
+  // 4. LINKS
   // ---------------------------------------------------------------------------
   //
   // Each object in this list creates one button.
@@ -128,7 +150,7 @@ const CONFIG = {
   ],
 
   // ---------------------------------------------------------------------------
-  // 4. STATUS AND SCHEDULE
+  // 5. STATUS AND SCHEDULE
   // ---------------------------------------------------------------------------
   //
   // This feature shows a small status icon on your profile image. Visitors can
@@ -226,7 +248,7 @@ const CONFIG = {
   },
 
   // ---------------------------------------------------------------------------
-  // 5. ANNOUNCEMENT BANNER
+  // 6. ANNOUNCEMENT BANNER
   // ---------------------------------------------------------------------------
   //
   // Shows a dismissible banner at the top of the page.
@@ -248,7 +270,7 @@ const CONFIG = {
   },
 
   // ---------------------------------------------------------------------------
-  // 6. FOOTER
+  // 7. FOOTER
   // ---------------------------------------------------------------------------
   //
   // copyright:

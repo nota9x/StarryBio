@@ -24,7 +24,13 @@ function getCookie(name) {
 }
 
 const starsContainer = document.querySelector('.stars-container');
+const STAR_COLORS = ['#ffffff', '#ffe9c4', '#d4fbff', '#d4fbff', '#b3cde0'];
 const allStars = [];
+let starCanvas = null;
+let starContext = null;
+let starViewportWidth = 0;
+let starViewportHeight = 0;
+let prefersReducedMotionQuery = null;
 let animationFrameId = null;
 let shootingStarTimeoutId = null;
 let animationStarted = false;
@@ -33,50 +39,29 @@ function setupAnimations() {
   if (!starsContainer || animationStarted) return;
 
   animationStarted = true;
+  prefersReducedMotionQuery = window.matchMedia
+    ? window.matchMedia('(prefers-reduced-motion: reduce)')
+    : null;
 
-  const prefersReducedMotion =
-    window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const numberOfStars = prefersReducedMotion ? 80 : 200;
-  const starColors = ['#ffffff', '#ffe9c4', '#d4fbff', '#d4fbff', '#b3cde0'];
+  setupStarCanvas();
+  configureStarfield();
 
-  for (let i = 0; i < numberOfStars; i++) {
-    const star = document.createElement('div');
-    star.classList.add('star');
+  window.addEventListener('resize', resizeStarCanvas);
 
-    const color = starColors[Math.floor(Math.random() * starColors.length)];
-    const size = Math.random() * 2 + 0.5;
-    const depth = Math.random();
-    const x = Math.random() * 100;
-    const y = Math.random() * 100;
+  if (prefersReducedMotionQuery) {
+    const handleMotionPreferenceChange = () => configureStarfield();
 
-    star.style.width = `${size}px`;
-    star.style.height = `${size}px`;
-    star.style.backgroundColor = color;
-    star.style.boxShadow = `0 0 ${size * 2}px ${color}`;
-    star.style.opacity = Math.max(0.25, depth).toString();
-    star.style.transform = `translate3d(${x}vw, ${y}vh, 0)`;
-
-    starsContainer.appendChild(star);
-
-    allStars.push({
-      element: star,
-      baseX: x,
-      baseY: y,
-      depth,
-      driftSpeedX: (Math.random() - 0.5) * 0.02 * (depth + 0.5),
-      driftSpeedY: (Math.random() - 0.5) * 0.02 * (depth + 0.5),
-      twinkleSpeed: Math.random() * 0.02 + 0.005,
-      twinklePhase: Math.random() * Math.PI * 2,
-    });
+    if (prefersReducedMotionQuery.addEventListener) {
+      prefersReducedMotionQuery.addEventListener('change', handleMotionPreferenceChange);
+    } else if (prefersReducedMotionQuery.addListener) {
+      prefersReducedMotionQuery.addListener(handleMotionPreferenceChange);
+    }
   }
 
-  if (prefersReducedMotion) return;
-
-  startShootingStars();
-  startStarAnimation();
-
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
+    const prefersReducedMotion = prefersReducedMotionQuery && prefersReducedMotionQuery.matches;
+
+    if (document.hidden || prefersReducedMotion) {
       stopStarAnimation();
       stopShootingStars();
     } else {
@@ -84,6 +69,62 @@ function setupAnimations() {
       startShootingStars();
     }
   });
+}
+
+function setupStarCanvas() {
+  starCanvas = document.createElement('canvas');
+  starCanvas.className = 'starfield-canvas';
+  starCanvas.setAttribute('aria-hidden', 'true');
+  starsContainer.prepend(starCanvas);
+  starContext = starCanvas.getContext('2d');
+  resizeStarCanvas();
+}
+
+function configureStarfield() {
+  const prefersReducedMotion = prefersReducedMotionQuery && prefersReducedMotionQuery.matches;
+  const numberOfStars = prefersReducedMotion ? 80 : 200;
+
+  stopStarAnimation();
+  stopShootingStars();
+  createStars(numberOfStars);
+  renderStars({ updatePositions: false });
+
+  if (prefersReducedMotion) return;
+
+  startShootingStars();
+  startStarAnimation();
+}
+
+function createStars(numberOfStars) {
+  allStars.length = 0;
+
+  for (let i = 0; i < numberOfStars; i++) {
+    const depth = Math.random();
+
+    allStars.push({
+      baseX: Math.random() * 100,
+      baseY: Math.random() * 100,
+      color: STAR_COLORS[Math.floor(Math.random() * STAR_COLORS.length)],
+      depth,
+      driftSpeedX: (Math.random() - 0.5) * 0.02 * (depth + 0.5),
+      driftSpeedY: (Math.random() - 0.5) * 0.02 * (depth + 0.5),
+      size: Math.random() * 2 + 0.5,
+      twinkleSpeed: Math.random() * 0.02 + 0.005,
+      twinklePhase: Math.random() * Math.PI * 2,
+    });
+  }
+}
+
+function resizeStarCanvas() {
+  if (!starCanvas || !starContext) return;
+
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  starViewportWidth = window.innerWidth;
+  starViewportHeight = window.innerHeight;
+  starCanvas.width = Math.ceil(starViewportWidth * dpr);
+  starCanvas.height = Math.ceil(starViewportHeight * dpr);
+  starContext.setTransform(dpr, 0, 0, dpr, 0, 0);
+  renderStars({ updatePositions: false });
 }
 
 function startShootingStars() {
@@ -113,10 +154,16 @@ function startShootingStars() {
 }
 
 function stopShootingStars() {
-  if (shootingStarTimeoutId === null) return;
+  if (shootingStarTimeoutId !== null) {
+    window.clearTimeout(shootingStarTimeoutId);
+    shootingStarTimeoutId = null;
+  }
 
-  window.clearTimeout(shootingStarTimeoutId);
-  shootingStarTimeoutId = null;
+  if (!starsContainer) return;
+
+  for (const shootingStar of starsContainer.querySelectorAll('.shooting-star')) {
+    shootingStar.remove();
+  }
 }
 
 let mouseX = 0;
@@ -131,7 +178,7 @@ document.body.addEventListener('mousemove', (event) => {
 });
 
 function startStarAnimation() {
-  if (animationFrameId !== null) return;
+  if (animationFrameId !== null || !starContext) return;
 
   const animate = () => {
     if (document.hidden) {
@@ -139,29 +186,7 @@ function startStarAnimation() {
       return;
     }
 
-    mouseX += (targetMouseX - mouseX) * 0.05;
-    mouseY += (targetMouseY - mouseY) * 0.05;
-    animationTime += 1;
-
-    for (const star of allStars) {
-      star.baseX += star.driftSpeedX;
-      star.baseY += star.driftSpeedY;
-
-      if (star.baseX > 105) star.baseX = -5;
-      if (star.baseX < -5) star.baseX = 105;
-      if (star.baseY > 105) star.baseY = -5;
-      if (star.baseY < -5) star.baseY = 105;
-
-      const parallaxX = mouseX * star.depth * 10;
-      const parallaxY = mouseY * star.depth * 10;
-      const twinkleVal = Math.sin(animationTime * star.twinkleSpeed + star.twinklePhase);
-      const scale = 1 + twinkleVal * 0.3;
-      const opacity = Math.max(0.1, Math.min(1, star.depth + 0.2 + twinkleVal * 0.3));
-
-      star.element.style.transform = `translate3d(${star.baseX + parallaxX}vw, ${star.baseY + parallaxY}vh, 0) scale(${scale})`;
-      star.element.style.opacity = opacity.toString();
-    }
-
+    renderStars({ updatePositions: true });
     animationFrameId = requestAnimationFrame(animate);
   };
 
@@ -173,6 +198,52 @@ function stopStarAnimation() {
 
   cancelAnimationFrame(animationFrameId);
   animationFrameId = null;
+}
+
+function renderStars({ updatePositions }) {
+  if (!starContext) return;
+
+  starContext.clearRect(0, 0, starViewportWidth, starViewportHeight);
+
+  if (updatePositions) {
+    mouseX += (targetMouseX - mouseX) * 0.05;
+    mouseY += (targetMouseY - mouseY) * 0.05;
+    animationTime += 1;
+  }
+
+  for (const star of allStars) {
+    if (updatePositions) {
+      star.baseX += star.driftSpeedX;
+      star.baseY += star.driftSpeedY;
+
+      if (star.baseX > 105) star.baseX = -5;
+      if (star.baseX < -5) star.baseX = 105;
+      if (star.baseY > 105) star.baseY = -5;
+      if (star.baseY < -5) star.baseY = 105;
+    }
+
+    const parallaxX = mouseX * star.depth * 10;
+    const parallaxY = mouseY * star.depth * 10;
+    const twinkleVal = Math.sin(animationTime * star.twinkleSpeed + star.twinklePhase);
+    const scale = updatePositions ? 1 + twinkleVal * 0.3 : 1;
+    const opacity = updatePositions
+      ? Math.max(0.1, Math.min(1, star.depth + 0.2 + twinkleVal * 0.3))
+      : Math.max(0.25, star.depth);
+    const x = ((star.baseX + parallaxX) / 100) * starViewportWidth;
+    const y = ((star.baseY + parallaxY) / 100) * starViewportHeight;
+    const radius = (star.size * scale) / 2;
+
+    starContext.globalAlpha = opacity;
+    starContext.fillStyle = star.color;
+    starContext.shadowBlur = star.size * 2;
+    starContext.shadowColor = star.color;
+    starContext.beginPath();
+    starContext.arc(x, y, radius, 0, Math.PI * 2);
+    starContext.fill();
+  }
+
+  starContext.globalAlpha = 1;
+  starContext.shadowBlur = 0;
 }
 
 document.addEventListener('DOMContentLoaded', () => {

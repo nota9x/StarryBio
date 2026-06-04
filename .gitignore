@@ -26,3 +26,10 @@ yarn-error.log*
 # OS/editor files
 .DS_Store
 Thumbs.db
+
+# Development
+qa-screenshots/
+
+# IDE files
+.vscode/
+.idea/

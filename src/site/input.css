@@ -566,21 +566,6 @@ body {
     transform 0.3s ease;
 }
 
-.link-button .roblox-logo-single,
-.link-button .paypal-logo-single {
-  filter: none;
-  transform: scale(1);
-  transition:
-    filter 0.3s ease,
-    transform 0.3s ease;
-}
-.link-button:hover .roblox-logo-single,
-.link-button:hover .paypal-logo-single {
-  filter: grayscale(100%) brightness(250%) contrast(100%)
-    drop-shadow(0 0 6px rgba(224, 231, 255, 0.5));
-  transform: scale(1.15);
-}
-
 .button-text-wrapper {
   display: flex;
   flex-direction: column;
@@ -633,8 +618,7 @@ body {
     height: 20px;
     right: 1rem;
   }
-  .link-button:not(.no-hover-shift):hover,
-  .link-button.discord-copy-button.copied {
+  .link-button:not(.no-hover-shift):hover {
     padding-right: 2.5rem;
   }
 }
@@ -646,12 +630,6 @@ body {
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-@keyframes ripple {
-  to {
-    transform: translate(-50%, -50%) scale(4);
-    opacity: 0;
   }
 }
 .profile-card {

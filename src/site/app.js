@@ -1,4 +1,3 @@
-// --- COOKIE HELPER FUNCTIONS ---
 function setCookie(name, value, days) {
   let expires = '';
   if (days) {
@@ -6,255 +5,205 @@ function setCookie(name, value, days) {
     date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
     expires = '; expires=' + date.toUTCString();
   }
-  document.cookie = name + '=' + (value || '') + expires + '; path=/; SameSite=Lax';
+
+  document.cookie = `${encodeURIComponent(name)}=${encodeURIComponent(value || '')}${expires}; path=/; SameSite=Lax`;
 }
 
 function getCookie(name) {
-  const nameEQ = name + '=';
-  const ca = document.cookie.split(';');
-  for (let i = 0; i < ca.length; i++) {
-    let c = ca[i];
-    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-    if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+  const nameEQ = `${encodeURIComponent(name)}=`;
+  const cookies = document.cookie.split(';');
+
+  for (const cookie of cookies) {
+    const trimmedCookie = cookie.trim();
+    if (trimmedCookie.startsWith(nameEQ)) {
+      return decodeURIComponent(trimmedCookie.substring(nameEQ.length));
+    }
   }
+
   return null;
 }
 
-// --- CORE UI/ANIMATION LOGIC (UNCHANGED) ---
-// ... (this section is the same)
 const starsContainer = document.querySelector('.stars-container');
-const numberOfStars = 200;
 const allStars = [];
+let animationFrameId = null;
+let shootingStarTimeoutId = null;
+let animationStarted = false;
 
 function setupAnimations() {
-  // Defines colors for stars: cool blues, purples, and whites
+  if (!starsContainer || animationStarted) return;
+
+  animationStarted = true;
+
+  const prefersReducedMotion =
+    window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const numberOfStars = prefersReducedMotion ? 80 : 200;
   const starColors = ['#ffffff', '#ffe9c4', '#d4fbff', '#d4fbff', '#b3cde0'];
 
-  // Create Stars
   for (let i = 0; i < numberOfStars; i++) {
-    let star = document.createElement('div');
+    const star = document.createElement('div');
     star.classList.add('star');
 
-    // Random Position
-    let x = Math.random() * 100;
-    let y = Math.random() * 100;
-
-    // Random visual properties
     const color = starColors[Math.floor(Math.random() * starColors.length)];
-    const size = Math.random() * 2 + 0.5; // 0.5px to 2.5px
-    const opacity = Math.random() * 0.5 + 0.3;
-
-    star.style.width = size + 'px';
-    star.style.height = size + 'px';
-    star.style.backgroundColor = color;
-    // star.style.opacity = opacity; // Set in animate loop
-    star.style.boxShadow = `0 0 ${size * 2}px ${color}`; // Glow matches color
-
-    // Random Physics
-    // depth: 0.1 (far) to 1.0 (near). Affects speed and parallax.
+    const size = Math.random() * 2 + 0.5;
     const depth = Math.random();
-    const driftSpeedX = (Math.random() - 0.5) * 0.02 * (depth + 0.5); // Slow drift
-    const driftSpeedY = (Math.random() - 0.5) * 0.02 * (depth + 0.5);
+    const x = Math.random() * 100;
+    const y = Math.random() * 100;
+
+    star.style.width = `${size}px`;
+    star.style.height = `${size}px`;
+    star.style.backgroundColor = color;
+    star.style.boxShadow = `0 0 ${size * 2}px ${color}`;
+    star.style.opacity = Math.max(0.25, depth).toString();
+    star.style.transform = `translate3d(${x}vw, ${y}vh, 0)`;
 
     starsContainer.appendChild(star);
+
     allStars.push({
       element: star,
       baseX: x,
       baseY: y,
       depth,
-      driftSpeedX,
-      driftSpeedY,
+      driftSpeedX: (Math.random() - 0.5) * 0.02 * (depth + 0.5),
+      driftSpeedY: (Math.random() - 0.5) * 0.02 * (depth + 0.5),
       twinkleSpeed: Math.random() * 0.02 + 0.005,
       twinklePhase: Math.random() * Math.PI * 2,
     });
   }
 
-  // Shooting Star Logic
-  function spawnShootingStar() {
-    if (Math.random() > 0.05) {
-      // 95% chance to skip (make it rare/special)
-      // Check again soon
+  if (prefersReducedMotion) return;
+
+  startShootingStars();
+  startStarAnimation();
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      stopStarAnimation();
+      stopShootingStars();
     } else {
+      startStarAnimation();
+      startShootingStars();
+    }
+  });
+}
+
+function startShootingStars() {
+  if (shootingStarTimeoutId !== null || !starsContainer) return;
+
+  const spawnShootingStar = () => {
+    shootingStarTimeoutId = null;
+
+    if (!document.hidden && Math.random() <= 0.05) {
       const shootingStar = document.createElement('div');
       shootingStar.classList.add('shooting-star');
 
-      // Spawn logic: "Across the sky"
-      // Pick a start point anywhere on the left edge
-      const startY = Math.random() * 100; // 0-100% of screen height
-      const startX = -10; // Start off-screen left
-
-      shootingStar.style.left = startX + 'vw';
-      shootingStar.style.top = startY + 'vh';
-
-      // Angle: Slight pitch down (2 to 10 degrees)
-      const angle = 2 + Math.random() * 8;
-      shootingStar.style.setProperty('--angle', angle + 'deg');
-
-      // Random speed/size variation
-      const duration = 1.5 + Math.random() * 1.5; // Faster: 1.5s to 3s
-      shootingStar.style.animationDuration = duration + 's';
+      const duration = 1.5 + Math.random() * 1.5;
+      shootingStar.style.left = '-10vw';
+      shootingStar.style.top = `${Math.random() * 100}vh`;
+      shootingStar.style.setProperty('--angle', `${2 + Math.random() * 8}deg`);
+      shootingStar.style.animationDuration = `${duration}s`;
 
       starsContainer.appendChild(shootingStar);
-      setTimeout(() => shootingStar.remove(), duration * 1000);
+      window.setTimeout(() => shootingStar.remove(), duration * 1000);
     }
 
-    // Check frequently, but spawn rarely
-    setTimeout(spawnShootingStar, 500);
-  }
-  setTimeout(spawnShootingStar, 2000);
+    shootingStarTimeoutId = window.setTimeout(spawnShootingStar, 500);
+  };
 
-  // Mouse Parallax & Animation Loop
-  let mouseX = 0,
-    mouseY = 0;
-  let targetMouseX = 0,
-    targetMouseY = 0;
+  shootingStarTimeoutId = window.setTimeout(spawnShootingStar, 2000);
+}
 
-  document.body.addEventListener('mousemove', (e) => {
-    targetMouseX = e.clientX / window.innerWidth - 0.5;
-    targetMouseY = e.clientY / window.innerHeight - 0.5;
-  });
+function stopShootingStars() {
+  if (shootingStarTimeoutId === null) return;
 
-  let time = 0;
-  function animate() {
+  window.clearTimeout(shootingStarTimeoutId);
+  shootingStarTimeoutId = null;
+}
+
+let mouseX = 0;
+let mouseY = 0;
+let targetMouseX = 0;
+let targetMouseY = 0;
+let animationTime = 0;
+
+document.body.addEventListener('mousemove', (event) => {
+  targetMouseX = event.clientX / window.innerWidth - 0.5;
+  targetMouseY = event.clientY / window.innerHeight - 0.5;
+});
+
+function startStarAnimation() {
+  if (animationFrameId !== null) return;
+
+  const animate = () => {
+    if (document.hidden) {
+      animationFrameId = null;
+      return;
+    }
+
     mouseX += (targetMouseX - mouseX) * 0.05;
     mouseY += (targetMouseY - mouseY) * 0.05;
-    time += 1;
+    animationTime += 1;
 
-    allStars.forEach((star) => {
-      // Update Base Position
+    for (const star of allStars) {
       star.baseX += star.driftSpeedX;
       star.baseY += star.driftSpeedY;
 
-      // Wrap logic for transform-based drift
       if (star.baseX > 105) star.baseX = -5;
       if (star.baseX < -5) star.baseX = 105;
       if (star.baseY > 105) star.baseY = -5;
       if (star.baseY < -5) star.baseY = 105;
 
-      const parallaxX = mouseX * star.depth * 10; // Increased effect
+      const parallaxX = mouseX * star.depth * 10;
       const parallaxY = mouseY * star.depth * 10;
-
-      // USE TRANSFORM FOR SMOOTHNESS instead of top/left
-      const x = star.baseX + parallaxX;
-      const y = star.baseY + parallaxY;
-
-      const twinkleVal = Math.sin(time * star.twinkleSpeed + star.twinklePhase);
+      const twinkleVal = Math.sin(animationTime * star.twinkleSpeed + star.twinklePhase);
       const scale = 1 + twinkleVal * 0.3;
       const opacity = Math.max(0.1, Math.min(1, star.depth + 0.2 + twinkleVal * 0.3));
 
-      // Combine translation and scale into one transform
-      star.element.style.transform = `translate3d(${x}vw, ${y}vh, 0) scale(${scale})`;
-      star.element.style.opacity = opacity;
-    });
+      star.element.style.transform = `translate3d(${star.baseX + parallaxX}vw, ${star.baseY + parallaxY}vh, 0) scale(${scale})`;
+      star.element.style.opacity = opacity.toString();
+    }
 
-    requestAnimationFrame(animate);
-  }
-  animate();
+    animationFrameId = requestAnimationFrame(animate);
+  };
+
+  animationFrameId = requestAnimationFrame(animate);
 }
 
-// --- DATA LOADING AND PAGE POPULATION ---
+function stopStarAnimation() {
+  if (animationFrameId === null) return;
+
+  cancelAnimationFrame(animationFrameId);
+  animationFrameId = null;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   setupAnimations();
 
   if (typeof CONFIG !== 'undefined') {
     populatePage(CONFIG);
-    document.body.style.opacity = '1';
-  } else {
-    // Standalone mode (e.g. 404 page)
-    document.body.style.opacity = '1';
   }
+
+  document.body.style.opacity = '1';
 });
 
 function populatePage(data) {
-  // Set Theme
   document.documentElement.setAttribute('data-theme', data.theme || 'midnight');
-
   document.title = data.pageTitle || 'Starfield Bio';
 
-  // Set Favicon
   if (data.favicon) {
     populateFavicon(data.favicon);
   }
 
-  if (data.announcement?.enabled) {
-    // Simple check: if text exists, show it.
+  if (data.announcement?.enabled && data.announcement.text) {
     populateAnnouncement(data.announcement);
   }
 
-  populateProfile(data.profile);
-  populateLinks(data.links);
-  populateFooter(data.footer);
+  populateProfile(data.profile || {});
+  populateLinks(Array.isArray(data.links) ? data.links : []);
+  populateFooter(data.footer || {});
 
   if (data.status?.enabled) {
     initStatusIndicator(data.status);
   }
-}
-
-function populateProfile(profile) {
-  // The main 'src' is set by the fast inline script. This only handles the fallback.
-  const profileImg = document.getElementById('profileImage');
-  if (profileImg) {
-    profileImg.onerror = function () {
-      this.onerror = null;
-      this.src = profile.profileImageFallback;
-    };
-  }
-
-  const nameEl = document.getElementById('profileName');
-  if (nameEl) nameEl.textContent = profile.name;
-
-  const descEl = document.getElementById('profileDescription');
-  if (descEl) descEl.textContent = profile.description;
-}
-
-function populateAnnouncement(announcement) {
-  const container = document.getElementById('announcement-banner-container');
-  if (!container) return;
-
-  const bannerLink = document.createElement(announcement.url ? 'a' : 'div');
-  bannerLink.id = 'announcement-banner';
-  if (announcement.url) {
-    bannerLink.href = announcement.url;
-    bannerLink.target = '_blank';
-    bannerLink.rel = 'noopener noreferrer';
-  }
-
-  const contentWrapper = document.createElement('div');
-  contentWrapper.className = 'announcement-content';
-  contentWrapper.innerHTML = `
-        <svg class="announcement-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M21.74 18.5L14.16 4.42C13.12 2.53 10.88 2.53 9.84 4.42L2.26 18.5C1.22 20.39 2.96 22 4.42 22H19.58C21.04 22 22.78 20.39 21.74 18.5Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-            <path d="M12 9V13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-            <path d="M12 17H12.01" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
-        </svg>
-        <span class="announcement-text">${announcement.text}</span>
-    `;
-
-  const closeButton = document.createElement('button');
-  closeButton.id = 'announcement-close-btn';
-  closeButton.setAttribute('aria-label', 'Dismiss announcement');
-  closeButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
-
-  closeButton.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    // MODIFIED: Set a cookie that expires in 7 days
-    setCookie('announcementDismissed', 'true', 7);
-
-    bannerLink.classList.add('closing');
-    bannerLink.addEventListener(
-      'animationend',
-      () => {
-        bannerLink.remove();
-      },
-      { once: true }
-    );
-  });
-
-  bannerLink.appendChild(contentWrapper);
-  bannerLink.appendChild(closeButton);
-  container.appendChild(bannerLink);
 }
 
 function populateProfile(profile) {
@@ -266,40 +215,108 @@ function populateProfile(profile) {
     };
   }
 
-  // Handle Layout
   const card = document.querySelector('.profile-card');
   const textContent = document.querySelector('.profile-text-content');
-  
-  // Only apply layout if the text wrapper exists (not 404 page)
   if (card && textContent) {
-    if (profile.layout === 'horizontal') {
-      card.classList.add('layout-horizontal');
-    } else {
-      card.classList.remove('layout-horizontal');
-    }
+    card.classList.toggle('layout-horizontal', profile.layout === 'horizontal');
   }
 
   const nameEl = document.getElementById('profileName');
-  if (nameEl) nameEl.textContent = profile.name;
+  if (nameEl) nameEl.textContent = profile.name || '';
 
   const descEl = document.getElementById('profileDescription');
-  if (descEl) descEl.textContent = profile.description;
+  if (descEl) descEl.textContent = profile.description || '';
+}
+
+function populateAnnouncement(announcement) {
+  if (getCookie('announcementDismissed') === 'true') return;
+
+  const container = document.getElementById('announcement-banner-container');
+  if (!container) return;
+
+  const bannerLink = document.createElement(announcement.url ? 'a' : 'div');
+  bannerLink.id = 'announcement-banner';
+
+  if (announcement.url) {
+    bannerLink.href = announcement.url;
+    bannerLink.target = '_blank';
+    bannerLink.rel = 'noopener noreferrer';
+  }
+
+  const contentWrapper = document.createElement('div');
+  contentWrapper.className = 'announcement-content';
+
+  contentWrapper.appendChild(
+    createSvgElement({
+      className: 'announcement-icon',
+      viewBox: '0 0 24 24',
+      fill: 'none',
+      paths: [
+        {
+          d: 'M21.74 18.5L14.16 4.42C13.12 2.53 10.88 2.53 9.84 4.42L2.26 18.5C1.22 20.39 2.96 22 4.42 22H19.58C21.04 22 22.78 20.39 21.74 18.5Z',
+          stroke: 'white',
+          strokeWidth: '2',
+          strokeLinecap: 'round',
+          strokeLinejoin: 'round',
+        },
+        {
+          d: 'M12 9V13',
+          stroke: 'white',
+          strokeWidth: '2',
+          strokeLinecap: 'round',
+          strokeLinejoin: 'round',
+        },
+        {
+          d: 'M12 17H12.01',
+          stroke: 'white',
+          strokeWidth: '2.5',
+          strokeLinecap: 'round',
+          strokeLinejoin: 'round',
+        },
+      ],
+    })
+  );
+
+  const announcementText = document.createElement('span');
+  announcementText.className = 'announcement-text';
+  announcementText.textContent = announcement.text;
+  contentWrapper.appendChild(announcementText);
+
+  const closeButton = document.createElement('button');
+  closeButton.id = 'announcement-close-btn';
+  closeButton.type = 'button';
+  closeButton.setAttribute('aria-label', 'Dismiss announcement');
+  closeButton.appendChild(createCloseIcon());
+
+  closeButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    setCookie('announcementDismissed', 'true', 7);
+
+    bannerLink.classList.add('closing');
+    bannerLink.addEventListener('animationend', () => bannerLink.remove(), { once: true });
+  });
+
+  bannerLink.appendChild(contentWrapper);
+  bannerLink.appendChild(closeButton);
+  container.appendChild(bannerLink);
 }
 
 function populateLinks(links) {
   const container = document.getElementById('linksContainer');
   if (!container) return;
 
-  container.innerHTML = '';
-  links.forEach((linkData) => {
+  container.replaceChildren();
+
+  for (const linkData of links) {
     const linkEl = createLinkElement(linkData);
     container.appendChild(linkEl);
 
-    // Handle special "copy" type
     if (linkData.specialType === 'copy' && linkData.copyValue) {
       initializeCopyButton(linkEl, linkData.copyValue, linkData.subtitle);
     }
-  });
+  }
 }
 
 function populateFooter(footer) {
@@ -307,34 +324,48 @@ function populateFooter(footer) {
   if (!container) return;
 
   const currentYear = new Date().getFullYear();
-  // footer.copyright can contain {year} placeholder if desired, or just simple text
-  container.textContent = footer.copyright || `© ${currentYear} Starfield Bio`;
+  const copyright = footer.copyright || `© ${currentYear} Starfield Bio`;
+  container.textContent = copyright.replace('{year}', currentYear);
 }
 
 function createLinkElement(linkData) {
   const isLink = linkData.url && linkData.url !== '#';
-  const tag = isLink ? 'a' : 'button';
-  const linkEl = document.createElement(tag);
+  const linkEl = document.createElement(isLink ? 'a' : 'button');
 
   if (isLink) {
     linkEl.href = linkData.url;
     linkEl.target = '_blank';
     linkEl.rel = 'noopener noreferrer';
+  } else {
+    linkEl.type = 'button';
   }
+
   linkEl.className = 'link-button';
 
   if (linkData.specialType === 'copy') {
-    linkEl.classList.add('copy-button-active'); // Marker class
+    linkEl.classList.add('copy-button-active');
   }
 
-  const iconHtml = getIconHtml(linkData.icon);
+  const iconEl = createIconElement(linkData.icon);
+  if (iconEl) {
+    linkEl.appendChild(iconEl);
+  }
 
-  linkEl.innerHTML = `
-        ${iconHtml}
-        <div class="button-text-wrapper">
-            <span class="button-main-text">${linkData.text}</span>
-            <span class="button-subtitle">${linkData.subtitle || ''}</span>
-        </div>`;
+  const textWrapper = document.createElement('div');
+  textWrapper.className = 'button-text-wrapper';
+
+  const mainText = document.createElement('span');
+  mainText.className = 'button-main-text';
+  mainText.textContent = linkData.text || '';
+
+  const subtitle = document.createElement('span');
+  subtitle.className = 'button-subtitle';
+  subtitle.textContent = linkData.subtitle || '';
+
+  textWrapper.appendChild(mainText);
+  textWrapper.appendChild(subtitle);
+  linkEl.appendChild(textWrapper);
+
   return linkEl;
 }
 
@@ -345,9 +376,9 @@ function populateFavicon(faviconUrl) {
     link.rel = 'icon';
     document.head.appendChild(link);
   }
+
   link.href = faviconUrl;
 
-  // Auto-detect MIME type from extension
   const ext = faviconUrl.split('.').pop().toLowerCase();
   const mimeTypes = {
     ico: 'image/x-icon',
@@ -362,137 +393,126 @@ function populateFavicon(faviconUrl) {
   if (mimeTypes[ext]) {
     link.type = mimeTypes[ext];
   } else {
-    // Remove type if unknown so browser can sniff it, or if it's external URL without extension
     link.removeAttribute('type');
   }
 }
 
-// Helper to determine if string is SVG path or Image URL
-function getIconHtml(iconStr) {
-  if (!iconStr) return '';
+function createIconElement(iconStr) {
+  if (!iconStr) return null;
 
-  // Simple heuristic: If it starts with 'M' (path command) or '<' (svg tag), treat as SVG.
-  // Otherwise treat as image (http..., assets/..., etc)
-  const isSvgPath =
-    iconStr.trim().toUpperCase().startsWith('M') || iconStr.trim().startsWith('<path');
-
-  if (isSvgPath) {
-    // Returns an SVG containing the path
-    return `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
-            <path d="${iconStr}"/>
-        </svg>`;
-  } else {
-    // Image tag
-    return `<span class="link-button-icon-wrapper"><img src="${iconStr}" alt="icon" class="link-button-icon"></span>`;
+  const pathData = getSvgPathData(iconStr);
+  if (pathData) {
+    return createSvgElement({
+      viewBox: '0 0 24 24',
+      fill: 'currentColor',
+      paths: [{ d: pathData }],
+    });
   }
+
+  const wrapper = document.createElement('span');
+  wrapper.className = 'link-button-icon-wrapper';
+
+  const img = document.createElement('img');
+  img.src = iconStr;
+  img.alt = '';
+  img.className = 'link-button-icon';
+
+  wrapper.appendChild(img);
+  return wrapper;
 }
 
-// Generic Copy Logic
+function getSvgPathData(iconStr) {
+  const trimmedIcon = iconStr.trim();
+
+  if (trimmedIcon.toUpperCase().startsWith('M')) {
+    return trimmedIcon;
+  }
+
+  if (trimmedIcon.startsWith('<path')) {
+    const match = trimmedIcon.match(/\sd=(["'])(.*?)\1/i);
+    return match ? match[2] : '';
+  }
+
+  return '';
+}
+
 function initializeCopyButton(buttonElement, textToCopy, originalSubtitle) {
   if (!buttonElement) return;
+
   const subtitleElement = buttonElement.querySelector('.button-subtitle');
 
-  buttonElement.addEventListener('click', (e) => {
-    e.preventDefault();
+  buttonElement.addEventListener('click', (event) => {
+    event.preventDefault();
 
-    // Prevent clicking while animating
-    if (buttonElement.classList.contains('animating')) return;
+    if (buttonElement.classList.contains('animating') || !navigator.clipboard) return;
 
     navigator.clipboard.writeText(textToCopy).then(() => {
-      if (subtitleElement) {
-        const oldText = subtitleElement.textContent;
-        buttonElement.classList.add('animating');
+      if (!subtitleElement) return;
 
-        // 1. Fade Out
-        buttonElement.classList.add('fading-out');
+      const oldText = subtitleElement.textContent;
+      buttonElement.classList.add('animating', 'fading-out');
 
-        setTimeout(() => {
-          // 2. Switch Content (Fast, while invisible)
-          subtitleElement.textContent = 'Copied!';
-          buttonElement.classList.add('show-copied-feedback');
+      window.setTimeout(() => {
+        subtitleElement.textContent = 'Copied!';
+        buttonElement.classList.add('show-copied-feedback');
+        buttonElement.classList.remove('fading-out');
 
-          // 3. Fade In
-          buttonElement.classList.remove('fading-out');
+        window.setTimeout(() => {
+          buttonElement.classList.add('fading-out');
 
-          // 4. Wait, then Reverse
-          setTimeout(() => {
-            // 5. Fade Out again
-            buttonElement.classList.add('fading-out');
-
-            setTimeout(() => {
-              // 6. Revert Content
-              subtitleElement.textContent = originalSubtitle || oldText;
-              buttonElement.classList.remove('show-copied-feedback');
-
-              // 7. Fade In original
-              buttonElement.classList.remove('fading-out');
-              buttonElement.classList.remove('animating');
-            }, 300); // Transition time
-          }, 2000); // Display time
-        }, 300); // Transition time
-      }
+          window.setTimeout(() => {
+            subtitleElement.textContent = originalSubtitle || oldText;
+            buttonElement.classList.remove('show-copied-feedback', 'fading-out', 'animating');
+          }, 300);
+        }, 2000);
+      }, 300);
     });
   });
 }
 
-// --- STATUS INDICATOR AND SCHEDULING LOGIC ---
-
-// --- STATUS INDICATOR AND SCHEDULING LOGIC ---
-
 function initStatusIndicator(statusConfig) {
-  if (!document.getElementById('status-indicator-container')) {
-    createStatusHtml(statusConfig);
-  }
+  const normalizedStatusConfig = normalizeStatusConfig(statusConfig);
 
-  if (!document.getElementById('status-indicator-container')) return;
+  if (!document.getElementById('status-indicator-container')) {
+    createStatusHtml();
+  }
 
   const elements = {
     icon: document.getElementById('status-indicator-icon'),
     tooltipStatus: document.getElementById('tooltip-status'),
-    tooltipTimeLabel: document.getElementById('tooltip-time-label'),
     tooltipTime: document.getElementById('tooltip-time'),
     tooltipAvailability: document.getElementById('tooltip-availability'),
-    modal: document.getElementById('status-modal'),
   };
 
-  // Populate Modal with LOCALLY converted times
-  populateScheduleModal(statusConfig);
+  if (!elements.icon) return;
 
-  // Update Loop
+  populateScheduleModal(normalizedStatusConfig);
+
   function updateLoop() {
-    const currentStatus = determineCurrentStatus(statusConfig);
+    const currentStatus = determineCurrentStatus(normalizedStatusConfig);
+    const statusDef =
+      normalizedStatusConfig.types[currentStatus] || normalizedStatusConfig.default || {};
+    const defaultStatus = normalizedStatusConfig.default || {};
 
-    // Update Icon & Color
-    let statusDef = statusConfig.types[currentStatus] || statusConfig.default;
-
-    // Fallback if specific status type is missing color/text
-    const color = statusDef.color || statusConfig.default.color;
-    const text = statusDef.text || statusConfig.default.text;
-    const iconPath = statusDef.icon || statusConfig.default.icon;
+    const color = statusDef.color || defaultStatus.color || '#6B7280';
+    const text = statusDef.text || defaultStatus.text || 'Offline';
+    const iconPath = statusDef.icon || defaultStatus.icon || '';
     const message = statusDef.message || '';
+    const iconPathData = getSvgPathData(iconPath);
 
-    // Detect if icon is SVG Path or Image URL
-    const isSvgPath =
-      iconPath.trim().toUpperCase().startsWith('M') || iconPath.trim().startsWith('<');
-
-    if (isSvgPath) {
-      // SVG Path: Use Mask + Background Color
-      let maskUrl = iconPath;
-      if (iconPath.trim().toUpperCase().startsWith('M')) {
-        const svgData = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black'><path d='${iconPath}'/></svg>`;
-        maskUrl = `data:image/svg+xml;base64,${btoa(svgData)}`;
-      }
+    if (iconPathData) {
+      const svgData = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black'><path d='${iconPathData}'/></svg>`;
+      const maskUrl = `data:image/svg+xml;base64,${btoa(svgData)}`;
 
       elements.icon.style.backgroundColor = color;
       elements.icon.style.webkitMaskImage = `url('${maskUrl}')`;
       elements.icon.style.maskImage = `url('${maskUrl}')`;
       elements.icon.style.backgroundImage = 'none';
     } else {
-      // Image URL: Use Background Image (Full Color)
-      elements.icon.style.backgroundColor = 'transparent'; // Show image colors, not tint
+      elements.icon.style.backgroundColor = 'transparent';
       elements.icon.style.webkitMaskImage = 'none';
       elements.icon.style.maskImage = 'none';
-      elements.icon.style.backgroundImage = `url('${iconPath}')`;
+      elements.icon.style.backgroundImage = iconPath ? `url('${iconPath}')` : 'none';
       elements.icon.style.backgroundSize = 'contain';
       elements.icon.style.backgroundRepeat = 'no-repeat';
       elements.icon.style.backgroundPosition = 'center';
@@ -501,114 +521,242 @@ function initStatusIndicator(statusConfig) {
     if (elements.tooltipStatus) elements.tooltipStatus.textContent = text;
 
     if (elements.tooltipAvailability) {
-      if (message) {
-        elements.tooltipAvailability.textContent = message;
-        elements.tooltipAvailability.classList.remove('hidden');
-      } else {
-        elements.tooltipAvailability.classList.add('hidden');
-      }
+      elements.tooltipAvailability.textContent = message;
+      elements.tooltipAvailability.classList.toggle('hidden', !message);
     }
 
-    // Owner's Time
-    // We use the timezone from config to show "Owner's Time"
-    const now = new Date();
-    const ownerTimeStr = now.toLocaleTimeString('en-US', {
-      timeZone: statusConfig.ownerTimeZone,
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-    });
-
-    if (elements.tooltipTime) elements.tooltipTime.textContent = ownerTimeStr;
+    if (elements.tooltipTime) {
+      elements.tooltipTime.textContent = getOwnerTime(normalizedStatusConfig.ownerTimeZone);
+    }
   }
 
-  setInterval(updateLoop, 1000);
+  window.setInterval(updateLoop, 1000);
   updateLoop();
 }
 
-function createStatusHtml(config) {
+function getOwnerTime(timeZone) {
+  const options = {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  };
+
+  try {
+    return new Date().toLocaleTimeString('en-US', { ...options, timeZone });
+  } catch {
+    return new Date().toLocaleTimeString('en-US', options);
+  }
+}
+
+function normalizeStatusConfig(config) {
+  const types = config.types || {};
+  const defaultStatus = config.default || {
+    text: 'Offline',
+    color: '#6B7280',
+    icon: '',
+  };
+  const ownerTimeZone = isValidTimeZone(config.ownerTimeZone) ? config.ownerTimeZone : undefined;
+  const schedule = normalizeSchedule(config.schedule, types);
+
+  if (config.ownerTimeZone && !ownerTimeZone) {
+    console.warn(
+      `[StarryBio] Invalid status.ownerTimeZone "${config.ownerTimeZone}". Falling back to the visitor's local time.`
+    );
+  }
+
+  return {
+    ...config,
+    default: defaultStatus,
+    ownerTimeZone,
+    schedule,
+    types,
+  };
+}
+
+function normalizeSchedule(schedule, types) {
+  if (!Array.isArray(schedule)) {
+    console.warn('[StarryBio] status.schedule must be an array. Falling back to default status.');
+    return [];
+  }
+
+  return schedule.reduce((validItems, item, index) => {
+    const normalizedItem = normalizeScheduleItem(item, types, index);
+    if (normalizedItem) validItems.push(normalizedItem);
+    return validItems;
+  }, []);
+}
+
+function normalizeScheduleItem(item, types, index) {
+  if (!item || typeof item !== 'object') {
+    console.warn(`[StarryBio] Ignoring schedule item ${index}: expected an object.`);
+    return null;
+  }
+
+  if (!isValidScheduleDay(item.days)) {
+    console.warn(
+      `[StarryBio] Ignoring schedule item ${index}: days must be "daily", "weekdays", or "weekends".`
+    );
+    return null;
+  }
+
+  if (!item.status || !types[item.status]) {
+    console.warn(`[StarryBio] Ignoring schedule item ${index}: unknown status "${item.status}".`);
+    return null;
+  }
+
+  const startMins = parseTimeToMinutes(item.start);
+  const endMins = parseTimeToMinutes(item.end);
+
+  if (startMins === null || endMins === null || startMins === endMins) {
+    console.warn(
+      `[StarryBio] Ignoring schedule item ${index}: start and end must be different HH:MM values.`
+    );
+    return null;
+  }
+
+  return {
+    ...item,
+    startMins,
+    endMins,
+    wrapsMidnight: startMins > endMins,
+  };
+}
+
+function isValidScheduleDay(days) {
+  return days === 'daily' || days === 'weekdays' || days === 'weekends';
+}
+
+function isValidTimeZone(timeZone) {
+  if (!timeZone) return false;
+
+  try {
+    new Intl.DateTimeFormat('en-US', { timeZone }).format();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function createStatusHtml() {
   const profileImageWrapper = document.querySelector('.profile-image-wrapper');
   if (!profileImageWrapper) return;
 
-  // 1. Insert structure into profile card
-  profileImageWrapper.insertAdjacentHTML(
-    'beforeend',
-    `
-       <div id="status-indicator-container">
-           <div id="status-indicator-icon"></div>
-           <div id="status-tooltip">
-               <div id="tooltip-status" class="font-bold text-sm mb-1 text-center"></div>
-               <div class="flex items-center justify-center gap-1.5 text-xs text-slate-300">
-                   <svg class="status-clock-icon w-3.5 h-3.5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                   <span id="tooltip-time" class="font-mono opacity-90"></span>
-               </div>
-               <div id="tooltip-availability" class="text-[0.65rem] italic text-amber-300/90 mt-1.5 pt-1.5 border-t border-white/10 text-center hidden"></div>
-           </div>
-       </div>
-   `
-  );
+  const container = document.createElement('div');
+  container.id = 'status-indicator-container';
 
-  // 2. Elements
-  const container = document.getElementById('status-indicator-container');
+  const icon = document.createElement('div');
+  icon.id = 'status-indicator-icon';
+
+  const tooltip = document.createElement('div');
+  tooltip.id = 'status-tooltip';
+
+  const tooltipStatus = document.createElement('div');
+  tooltipStatus.id = 'tooltip-status';
+  tooltipStatus.className = 'font-bold text-sm mb-1 text-center';
+
+  const timeRow = document.createElement('div');
+  timeRow.className = 'flex items-center justify-center gap-1.5 text-xs text-slate-300';
+
+  const clockIcon = createSvgElement({
+    className: 'status-clock-icon w-3.5 h-3.5 opacity-70',
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: 'currentColor',
+    paths: [
+      {
+        d: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
+        strokeLinecap: 'round',
+        strokeLinejoin: 'round',
+        strokeWidth: '2',
+      },
+    ],
+  });
+
+  const tooltipTime = document.createElement('span');
+  tooltipTime.id = 'tooltip-time';
+  tooltipTime.className = 'font-mono opacity-90';
+
+  const tooltipAvailability = document.createElement('div');
+  tooltipAvailability.id = 'tooltip-availability';
+  tooltipAvailability.className =
+    'text-[0.65rem] italic text-amber-300/90 mt-1.5 pt-1.5 border-t border-white/10 text-center hidden';
+
+  timeRow.appendChild(clockIcon);
+  timeRow.appendChild(tooltipTime);
+  tooltip.appendChild(tooltipStatus);
+  tooltip.appendChild(timeRow);
+  tooltip.appendChild(tooltipAvailability);
+  container.appendChild(icon);
+  container.appendChild(tooltip);
+  profileImageWrapper.appendChild(container);
+
   const modal = document.getElementById('status-modal');
   const closeBtn = document.getElementById('status-modal-close');
   const overlay = document.getElementById('status-modal-overlay');
 
-  // Event listeners for modal
-  container.addEventListener('click', () => modal.classList.remove('hidden'));
-  closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
-  overlay.addEventListener('click', () => modal.classList.add('hidden'));
+  if (modal) {
+    container.addEventListener('click', () => modal.classList.remove('hidden'));
+  }
+
+  if (modal && closeBtn) {
+    closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
+  }
+
+  if (modal && overlay) {
+    overlay.addEventListener('click', () => modal.classList.add('hidden'));
+  }
 }
 
-// Check current time against schedule (All calculations in UTC)
-function determineCurrentStatus(config) {
-  const now = new Date();
-  const utcDay = now.getUTCDay(); // 0 (Sun) - 6 (Sat)
+function determineCurrentStatus(config, now = new Date()) {
+  const utcDay = now.getUTCDay();
   const currentUtcMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
 
-  const isWeekend = utcDay === 0 || utcDay === 6;
-
-  // Find matching schedule item
-  for (const item of config.schedule) {
-    // Does this item apply to today?
-    let applies = false;
-    if (item.days === 'daily') applies = true;
-    if (item.days === 'weekends' && isWeekend) applies = true;
-    if (item.days === 'weekdays' && !isWeekend) applies = true;
-
-    if (!applies) continue;
-
-    // Parse Start/End (HH:MM) to minutes
-    const startMins = parseTime(item.start);
-    const endMins = parseTime(item.end);
-
-    // Handle wrap-around (e.g. 21:00 to 05:00)
-    if (startMins > endMins) {
-      // range crosses midnight
-      if (currentUtcMinutes >= startMins || currentUtcMinutes < endMins) {
-        return item.status;
-      }
-    } else {
-      // standard range
-      if (currentUtcMinutes >= startMins && currentUtcMinutes < endMins) {
-        return item.status;
-      }
+  for (const item of config.schedule || []) {
+    if (scheduleItemMatchesNow(item, utcDay, currentUtcMinutes)) {
+      return item.status;
     }
   }
 
   return 'default';
 }
 
-function parseTime(timeStr) {
-  const [h, m] = timeStr.split(':').map(Number);
-  return h * 60 + m;
+function scheduleItemMatchesNow(item, utcDay, currentUtcMinutes) {
+  if (!item.wrapsMidnight) {
+    return appliesToUtcDay(item.days, utcDay) && isInMinuteRange(currentUtcMinutes, item);
+  }
+
+  if (currentUtcMinutes >= item.startMins) {
+    return appliesToUtcDay(item.days, utcDay);
+  }
+
+  const previousUtcDay = (utcDay + 6) % 7;
+  return currentUtcMinutes < item.endMins && appliesToUtcDay(item.days, previousUtcDay);
+}
+
+function isInMinuteRange(currentUtcMinutes, item) {
+  return currentUtcMinutes >= item.startMins && currentUtcMinutes < item.endMins;
+}
+
+function appliesToUtcDay(days, utcDay) {
+  if (days === 'daily') return true;
+
+  const isWeekend = utcDay === 0 || utcDay === 6;
+  return days === 'weekends' ? isWeekend : !isWeekend;
+}
+
+function parseTimeToMinutes(timeStr) {
+  if (typeof timeStr !== 'string') return null;
+
+  const match = timeStr.match(/^([01]\d|2[0-3]):([0-5]\d)$/);
+  if (!match) return null;
+
+  return Number(match[1]) * 60 + Number(match[2]);
 }
 
 function populateScheduleModal(config) {
   const weekdayList = document.getElementById('weekday-schedule-list');
   const weekendList = document.getElementById('weekend-schedule-list');
 
-  // Set Static Titles
   const titleEl = document.getElementById('status-modal-title');
   if (titleEl) titleEl.textContent = 'Schedule';
 
@@ -618,56 +766,139 @@ function populateScheduleModal(config) {
   const weekendTitleEl = document.getElementById('status-modal-weekend-title');
   if (weekendTitleEl) weekendTitleEl.textContent = 'Weekends';
 
-  // Clear lists
-  if (weekdayList) weekdayList.innerHTML = '';
-  if (weekendList) weekendList.innerHTML = '';
+  if (weekdayList) weekdayList.replaceChildren();
+  if (weekendList) weekendList.replaceChildren();
 
-  // Process items.
-  // KEY: We want to convert the UTC Start/End times to the VISITOR'S local time.
-
-  config.schedule.forEach((item) => {
-    const itemHtml = createScheduleItemHtml(item, config);
+  for (const item of config.schedule || []) {
+    const scheduleItem = createScheduleItemElement(item, config);
+    if (!scheduleItem) continue;
 
     if (item.days === 'daily') {
-      if (weekdayList) weekdayList.innerHTML += itemHtml;
-      if (weekendList) weekendList.innerHTML += itemHtml;
-    } else if (item.days === 'weekdays') {
-      if (weekdayList) weekdayList.innerHTML += itemHtml;
-    } else if (item.days === 'weekends') {
-      if (weekendList) weekendList.innerHTML += itemHtml;
+      if (weekdayList) weekdayList.appendChild(scheduleItem.cloneNode(true));
+      if (weekendList) weekendList.appendChild(scheduleItem);
+    } else if (item.days === 'weekdays' && weekdayList) {
+      weekdayList.appendChild(scheduleItem);
+    } else if (item.days === 'weekends' && weekendList) {
+      weekendList.appendChild(scheduleItem);
     }
-  });
+  }
 }
 
-function createScheduleItemHtml(item, config) {
-  const statusDef = config.types[item.status];
-  if (!statusDef) return '';
+function createScheduleItemElement(item, config) {
+  const statusDef = config.types?.[item.status];
+  if (!statusDef) return null;
 
-  // Convert UTC time string "HH:MM" to Local Time String
-  const localRange = formatUtcRangeToLocal(item.start, item.end);
+  const listItem = document.createElement('li');
+  listItem.className =
+    'flex items-center justify-between p-3 border-b border-white/10 last:border-0';
 
-  return `
-    <li class="flex items-center justify-between p-3 border-b border-white/10 last:border-0">
-        <div class="flex items-center gap-3">
-            <div class="w-3 h-3 rounded-full" style="background-color: ${statusDef.color};"></div>
-            <span class="font-medium text-slate-200">${statusDef.text}</span>
-        </div>
-        <span class="text-sm text-slate-400 font-mono">${localRange}</span>
-    </li>
-    `;
+  const statusWrapper = document.createElement('div');
+  statusWrapper.className = 'flex items-center gap-3';
+
+  const colorDot = document.createElement('div');
+  colorDot.className = 'w-3 h-3 rounded-full';
+  colorDot.style.backgroundColor = statusDef.color || '#6B7280';
+
+  const label = document.createElement('span');
+  label.className = 'font-medium text-slate-200';
+  label.textContent = statusDef.text || item.status;
+
+  const timeRange = document.createElement('span');
+  timeRange.className = 'text-sm text-slate-400 font-mono';
+  timeRange.textContent = formatUtcRangeToLocal(item);
+
+  statusWrapper.appendChild(colorDot);
+  statusWrapper.appendChild(label);
+  listItem.appendChild(statusWrapper);
+  listItem.appendChild(timeRange);
+
+  return listItem;
 }
 
-function formatUtcRangeToLocal(utcStart, utcEnd) {
-  // Create date objects for today at those UTC times
+function formatUtcRangeToLocal(item) {
   const d1 = new Date();
-  const [h1, m1] = utcStart.split(':');
+  const [h1, m1] = item.start.split(':');
   d1.setUTCHours(h1, m1, 0, 0);
 
   const d2 = new Date();
-  const [h2, m2] = utcEnd.split(':');
+  const [h2, m2] = item.end.split(':');
   d2.setUTCHours(h2, m2, 0, 0);
 
-  // Format to local string
+  if (item.wrapsMidnight) {
+    d2.setUTCDate(d2.getUTCDate() + 1);
+  }
+
   const timeOpt = { hour: 'numeric', minute: '2-digit', hour12: true };
-  return `${d1.toLocaleTimeString([], timeOpt)} - ${d2.toLocaleTimeString([], timeOpt)}`;
+  const startTime = d1.toLocaleTimeString([], timeOpt);
+  const endTime = d2.toLocaleTimeString([], timeOpt);
+  const crossesLocalDay = getLocalDateKey(d1) !== getLocalDateKey(d2);
+
+  return crossesLocalDay ? `${startTime} - ${endTime} (next day)` : `${startTime} - ${endTime}`;
+}
+
+function getLocalDateKey(date) {
+  return date.toLocaleDateString([], {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
+}
+
+function createCloseIcon() {
+  const svg = createSvgElement({
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: 'currentColor',
+    paths: [],
+  });
+
+  svg.setAttribute('width', '16');
+  svg.setAttribute('height', '16');
+  svg.setAttribute('stroke-width', '3');
+  svg.setAttribute('stroke-linecap', 'round');
+  svg.setAttribute('stroke-linejoin', 'round');
+
+  const firstLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  firstLine.setAttribute('x1', '18');
+  firstLine.setAttribute('y1', '6');
+  firstLine.setAttribute('x2', '6');
+  firstLine.setAttribute('y2', '18');
+
+  const secondLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  secondLine.setAttribute('x1', '6');
+  secondLine.setAttribute('y1', '6');
+  secondLine.setAttribute('x2', '18');
+  secondLine.setAttribute('y2', '18');
+
+  svg.appendChild(firstLine);
+  svg.appendChild(secondLine);
+
+  return svg;
+}
+
+function createSvgElement({ className, viewBox, fill, stroke, paths }) {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', viewBox);
+  svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+
+  if (className) svg.setAttribute('class', className);
+  if (fill) svg.setAttribute('fill', fill);
+  if (stroke) svg.setAttribute('stroke', stroke);
+
+  for (const pathDefinition of paths) {
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', pathDefinition.d);
+
+    if (pathDefinition.stroke) path.setAttribute('stroke', pathDefinition.stroke);
+    if (pathDefinition.strokeWidth) path.setAttribute('stroke-width', pathDefinition.strokeWidth);
+    if (pathDefinition.strokeLinecap)
+      path.setAttribute('stroke-linecap', pathDefinition.strokeLinecap);
+    if (pathDefinition.strokeLinejoin) {
+      path.setAttribute('stroke-linejoin', pathDefinition.strokeLinejoin);
+    }
+
+    svg.appendChild(path);
+  }
+
+  return svg;
 }

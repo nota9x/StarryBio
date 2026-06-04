@@ -14,47 +14,60 @@ Demo: [a9x.pro](https://a9x.pro)
 
 ## Setup
 
+This project uses pnpm and Wrangler 4, which requires a current Node.js release. Node.js 20.3 or newer is recommended.
+
 1.  **Install Dependencies**:
 
     ```bash
-    npm install
+    pnpm install
     ```
 
 2.  **Generate Styles**:
     The project uses Tailwind CSS. You must generate the static CSS file before running the server.
 
     ```bash
-    npm run build:css
+    pnpm run build:css
     ```
 
-    > **Note:** For real-time CSS updates during development, run `npm run watch:css` in a separate terminal.
+    > **Note:** For real-time CSS updates during development, run `pnpm run watch:css` in a separate terminal.
 
 3.  **Development**:
     Start the local development server:
 
     ```bash
-    npm run start
+    pnpm run start
     ```
 
 4.  **Deployment**:
     Deploy to Cloudflare:
+
     ```bash
-    npx wrangler deploy
+    pnpm run deploy
     ```
+
+    You can also run `pnpm exec wrangler deploy` directly after generating `src/site/style.css`.
 
 ## Configuration
 
 Navigate to `src/site/config.js`.
 
-- **Profile**: Update name, title, and images.
+- **Profile**: Update name, description, image path, and layout.
 - **Links**: Add buttons with SVG paths (from [SimpleIcons](https://simpleicons.org)) or Image URLs.
 - **Status**: Set your `ownerTimeZone`, define your `schedule` (in UTC), and point to your custom status icons.
 - **Announcement**: Configure the banner text, URL, and enable/disable it.
 - **Footer**: Custom copyright text.
 
+The example config points to common customizable assets such as a profile image and favicon. Add those files under `src/site/assets/images/`, or update the paths in `config.js` to match your own hosted images.
+
 ## Styling
 
-To customize colors or styles beyond the config, modify `src/site/input.css` and re-run `npm run build:css`.
+To customize colors or styles beyond the config, modify `src/site/input.css` and re-run `pnpm run build:css`.
+
+To check the Worker TypeScript without deploying, run:
+
+```bash
+pnpm run typecheck
+```
 
 ## Project Structure
 

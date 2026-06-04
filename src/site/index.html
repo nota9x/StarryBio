@@ -24,8 +24,7 @@
       rel="stylesheet"
     />
 
-    <link rel="stylesheet" href="style.css" media="print" onload="this.media = 'all'" />
-    <noscript><link rel="stylesheet" href="style.css" /></noscript>
+    <link rel="stylesheet" href="style.css" />
   </head>
 
   <body>
@@ -106,11 +105,6 @@
       </div>
     </div>
 
-    <script>
-      if (typeof CONFIG !== 'undefined' && CONFIG.profile && CONFIG.profile.profileImage) {
-        document.getElementById('profileImage').src = CONFIG.profile.profileImage;
-      }
-    </script>
     <script src="app.js" defer></script>
   </body>
 </html>

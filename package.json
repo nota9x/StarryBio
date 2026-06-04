@@ -2,12 +2,14 @@
   "name": "starry-bio",
   "version": "2.0.0",
   "description": "A customizable, starry-themed Link-in-Bio page powered by Cloudflare Workers.",
-  "packageManager": "pnpm@11.5.0",
+  "packageManager": "pnpm@11.5.1",
   "scripts": {
-    "start": "pnpm run build:css && wrangler dev",
-    "deploy": "pnpm run build:css && wrangler deploy",
+    "start": "pnpm run build && wrangler dev",
+    "deploy": "pnpm run build && wrangler deploy",
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit",
+    "build": "pnpm run build:icons && pnpm run build:css",
+    "build:icons": "node ./scripts/build-simple-icons.mjs",
     "build:css": "tailwindcss -i ./src/site/input.css -o ./src/site/style.css",
     "watch:css": "tailwindcss -i ./src/site/input.css -o ./src/site/style.css --watch"
   },

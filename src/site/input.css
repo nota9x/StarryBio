@@ -559,11 +559,21 @@ body {
 .link-button-icon {
   width: 100%;
   height: 100%;
-  object-fit: contain;
   display: block;
+  background-color: currentColor;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
   transition:
     filter 0.3s ease,
     transform 0.3s ease;
+}
+.link-button:hover .link-button-icon {
+  transform: scale(1.15);
+  filter: drop-shadow(0 0 6px rgba(224, 231, 255, 0.6));
 }
 
 .button-text-wrapper {

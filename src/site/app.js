@@ -185,6 +185,8 @@ document.addEventListener('DOMContentLoaded', () => {
   document.body.style.opacity = '1';
 });
 
+const DEFAULT_SIMPLE_ICON_COLOR = 'fff';
+
 function populatePage(data) {
   document.documentElement.setAttribute('data-theme', data.theme || 'midnight');
   document.title = data.pageTitle || 'Starfield Bio';
@@ -398,9 +400,10 @@ function populateFavicon(faviconUrl) {
 }
 
 function createIconElement(iconStr) {
-  if (!iconStr) return null;
+  const iconSource = resolveIconSource(iconStr);
+  if (!iconSource) return null;
 
-  const pathData = getSvgPathData(iconStr);
+  const pathData = getSvgPathData(iconSource);
   if (pathData) {
     return createSvgElement({
       viewBox: '0 0 24 24',
@@ -412,16 +415,17 @@ function createIconElement(iconStr) {
   const wrapper = document.createElement('span');
   wrapper.className = 'link-button-icon-wrapper';
 
-  const img = document.createElement('img');
-  img.src = iconStr;
-  img.alt = '';
-  img.className = 'link-button-icon';
+  const icon = document.createElement('span');
+  icon.className = 'link-button-icon';
+  setMaskedIcon(icon, iconSource, 'currentColor');
 
-  wrapper.appendChild(img);
+  wrapper.appendChild(icon);
   return wrapper;
 }
 
 function getSvgPathData(iconStr) {
+  if (typeof iconStr !== 'string') return '';
+
   const trimmedIcon = iconStr.trim();
 
   if (trimmedIcon.toUpperCase().startsWith('M')) {
@@ -434,6 +438,98 @@ function getSvgPathData(iconStr) {
   }
 
   return '';
+}
+
+function resolveIconSource(iconConfig) {
+  if (!iconConfig) return '';
+
+  if (typeof iconConfig === 'string') {
+    return iconConfig;
+  }
+
+  const simpleIconPath = getSimpleIconAssetPath(iconConfig);
+  return simpleIconPath || '';
+}
+
+function getSimpleIconAssetPath(iconConfig) {
+  const spec = normalizeSimpleIconSpec(iconConfig);
+  if (!spec) return '';
+
+  return `assets/icons/simple-icons/${getSimpleIconFilename(spec)}`;
+}
+
+function normalizeSimpleIconSpec(iconConfig) {
+  if (!iconConfig || typeof iconConfig !== 'object' || Array.isArray(iconConfig)) {
+    return null;
+  }
+
+  const brand = getString(iconConfig.simpleIcon) || getString(iconConfig.brand);
+  const slug = getString(iconConfig.slug) || (brand ? brandNameToSimpleIconSlug(brand) : '');
+
+  if (!brand && !slug) {
+    return null;
+  }
+
+  return {
+    slug,
+    color: normalizeColor(iconConfig.color) || DEFAULT_SIMPLE_ICON_COLOR,
+    darkColor: normalizeColor(iconConfig.darkColor),
+    viewbox: getString(iconConfig.viewbox),
+    size: getString(iconConfig.size),
+  };
+}
+
+function getSimpleIconFilename(spec) {
+  const parts = [spec.slug];
+
+  if (spec.color) parts.push(spec.color);
+  if (spec.darkColor) parts.push(spec.darkColor);
+  if (spec.viewbox) parts.push(`viewbox-${spec.viewbox}`);
+  if (spec.size) parts.push(`size-${spec.size}`);
+
+  return `${parts.map(sanitizeFilenamePart).join('--')}.svg`;
+}
+
+function brandNameToSimpleIconSlug(brandName) {
+  return brandName
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/ı/g, 'i')
+    .replace(/đ/g, 'd')
+    .replace(/ħ/g, 'h')
+    .toLowerCase()
+    .replace(/\+/g, 'plus')
+    .replace(/\./g, 'dot')
+    .replace(/&/g, 'and')
+    .replace(/#/g, 'sharp')
+    .replace(/[^a-z0-9]/g, '');
+}
+
+function normalizeColor(color) {
+  const value = getString(color);
+  if (!value) return '';
+
+  return value.startsWith('#') ? value.slice(1) : value;
+}
+
+function getString(value) {
+  if (typeof value === 'string') return value.trim();
+  if (typeof value === 'number') return String(value);
+  return '';
+}
+
+function sanitizeFilenamePart(value) {
+  return value.toLowerCase().replace(/[^a-z0-9_-]/g, '-');
+}
+
+function setMaskedIcon(element, iconUrl, color) {
+  element.style.backgroundColor = color;
+  element.style.webkitMaskImage = iconUrl ? `url('${cssEscapeUrl(iconUrl)}')` : 'none';
+  element.style.maskImage = iconUrl ? `url('${cssEscapeUrl(iconUrl)}')` : 'none';
+}
+
+function cssEscapeUrl(url) {
+  return String(url).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
 }
 
 function initializeCopyButton(buttonElement, textToCopy, originalSubtitle) {
@@ -496,7 +592,7 @@ function initStatusIndicator(statusConfig) {
 
     const color = statusDef.color || defaultStatus.color || '#6B7280';
     const text = statusDef.text || defaultStatus.text || 'Offline';
-    const iconPath = statusDef.icon || defaultStatus.icon || '';
+    const iconPath = resolveIconSource(statusDef.icon || defaultStatus.icon || '');
     const message = statusDef.message || '';
     const iconPathData = getSvgPathData(iconPath);
 
@@ -504,18 +600,11 @@ function initStatusIndicator(statusConfig) {
       const svgData = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black'><path d='${iconPathData}'/></svg>`;
       const maskUrl = `data:image/svg+xml;base64,${btoa(svgData)}`;
 
-      elements.icon.style.backgroundColor = color;
-      elements.icon.style.webkitMaskImage = `url('${maskUrl}')`;
-      elements.icon.style.maskImage = `url('${maskUrl}')`;
+      setMaskedIcon(elements.icon, maskUrl, color);
       elements.icon.style.backgroundImage = 'none';
     } else {
-      elements.icon.style.backgroundColor = 'transparent';
-      elements.icon.style.webkitMaskImage = 'none';
-      elements.icon.style.maskImage = 'none';
-      elements.icon.style.backgroundImage = iconPath ? `url('${iconPath}')` : 'none';
-      elements.icon.style.backgroundSize = 'contain';
-      elements.icon.style.backgroundRepeat = 'no-repeat';
-      elements.icon.style.backgroundPosition = 'center';
+      setMaskedIcon(elements.icon, iconPath, color);
+      elements.icon.style.backgroundImage = 'none';
     }
 
     if (elements.tooltipStatus) elements.tooltipStatus.textContent = text;

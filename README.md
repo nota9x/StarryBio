@@ -8,6 +8,7 @@ Demo: [a9x.pro](https://a9x.pro)
 
 - **Deep Space Animation**: Interactive starfield with shooting stars and parallax depth.
 - **Fully Configurable**: Edit `src/site/config.js` to change your profile, links, icons, and schedule.
+- **Simple Icons Fetching**: Specify a brand name in config and download matching SVGs from the Simple Icons CDN during build.
 - **Smart Scheduling**: Define your availability in UTC, and visitors automatically see it in their local time.
 - **Status Icons**: Support for both monochromatic SVG masks and full-color images.
 - **Cloudflare Worker**: Edge-hosted for speed and scalability.
@@ -22,11 +23,11 @@ This project uses pnpm and Wrangler 4, which requires a current Node.js release.
     pnpm install
     ```
 
-2.  **Generate Styles**:
-    The project uses Tailwind CSS. You must generate the static CSS file before running the server.
+2.  **Build Assets**:
+    This downloads configured Simple Icons and generates the static CSS file before running the server.
 
     ```bash
-    pnpm run build:css
+    pnpm run build
     ```
 
     > **Note:** For real-time CSS updates during development, run `pnpm run watch:css` in a separate terminal.
@@ -52,16 +53,34 @@ This project uses pnpm and Wrangler 4, which requires a current Node.js release.
 Navigate to `src/site/config.js`.
 
 - **Profile**: Update name, description, image path, and layout.
-- **Links**: Add buttons with SVG paths (from [SimpleIcons](https://simpleicons.org)) or Image URLs.
+- **Links**: Add buttons with Simple Icons brand names, SVG paths, or image URLs.
 - **Status**: Set your `ownerTimeZone`, define your `schedule` (in UTC), and point to your custom status icons.
 - **Announcement**: Configure the banner text, URL, and enable/disable it.
 - **Footer**: Custom copyright text.
+
+Simple Icons are fetched as white SVGs at build time from the [Simple Icons CDN](https://github.com/LitoMore/simple-icons-cdn). Use a brand name in `src/site/config.js`:
+
+```js
+"icon": { "simpleIcon": "GitHub" }
+```
+
+Optional color fields are supported when you want a different downloaded color:
+
+```js
+"icon": { "simpleIcon": "Discord", "color": "5865F2" }
+```
+
+If a brand's generated slug does not match Simple Icons, provide the slug explicitly:
+
+```js
+"icon": { "simpleIcon": "Node.js", "slug": "nodedotjs" }
+```
 
 The example config points to common customizable assets such as a profile image and favicon. Add those files under `src/site/assets/images/`, or update the paths in `config.js` to match your own hosted images.
 
 ## Styling
 
-To customize colors or styles beyond the config, modify `src/site/input.css` and re-run `pnpm run build:css`.
+To customize colors or styles beyond the config, modify `src/site/input.css` and re-run `pnpm run build`.
 
 To check the Worker TypeScript without deploying, run:
 

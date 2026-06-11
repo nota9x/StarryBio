@@ -1,5 +1,7 @@
 ---
+import { Image } from 'astro:assets';
 import type { NormalizedStarryBioConfig } from '../config/schema';
+import { isImageMetadata, resolveImageAsset } from '../config/image-assets';
 import FeaturedCards from './FeaturedCards.astro';
 import LinkSections from './LinkSections.astro';
 import StatusIndicator from './StatusIndicator.astro';
@@ -28,6 +30,7 @@ const qrHref = config.qr?.enabled ? toPublicUrl(config.qr.output, 'public/qr.png
 const contactHref = config.contactCard?.enabled
   ? toPublicUrl(config.contactCard.output, 'public/contact.vcf')
   : '';
+const profileImage = resolveImageAsset(config.profile.image);
 
 function toPublicUrl(output: string | undefined, fallback: string): string {
   const value = output || fallback;
@@ -42,15 +45,31 @@ function toPublicUrl(output: string | undefined, fallback: string): string {
     <header class="profile-header">
       <div class="profile-image-wrapper">
         <div class="profile-image-container">
-          <img
-            src={config.profile.image.startsWith('/')
-              ? config.profile.image
-              : `/${config.profile.image}`}
-            alt={config.profile.name}
-            width="120"
-            height="120"
-            fetchpriority="high"
-          />
+          {
+            isImageMetadata(profileImage) ? (
+              <Image
+                src={profileImage}
+                alt={config.profile.name}
+                width={120}
+                height={120}
+                fit="cover"
+                layout="fixed"
+                loading="eager"
+                fetchpriority="high"
+              />
+            ) : (
+              <Image
+                src={profileImage}
+                alt={config.profile.name}
+                width={120}
+                height={120}
+                fit="cover"
+                layout="fixed"
+                loading="eager"
+                fetchpriority="high"
+              />
+            )
+          }
         </div>
         <StatusIndicator status={config.status} />
       </div>
@@ -64,7 +83,13 @@ function toPublicUrl(output: string | undefined, fallback: string): string {
     <div class="profile-actions" aria-label="Profile actions">
       {
         qrHref && (
-          <a href={qrHref} class="mini-action mini-action-icon" aria-label="Download QR code" download data-astro-reload>
+          <a
+            href={qrHref}
+            class="mini-action mini-action-icon"
+            aria-label="Download QR code"
+            download
+            data-astro-reload
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="20"

@@ -25,7 +25,7 @@ export type FeaturedPosition = 'above-links' | 'below-links';
 export type ProfileLayout = 'vertical' | 'horizontal';
 export type ScheduleDays = 'daily' | 'weekdays' | 'weekends';
 export type LinkSpecialType = 'copy';
-export type AnalyticsProvider = 'none' | 'cloudflare' | 'plausible' | 'umami' | 'custom';
+export type AnalyticsProvider = 'none' | 'cloudflare' | 'google' | 'plausible' | 'umami' | 'custom';
 
 export interface SimpleIconConfig {
   simpleIcon?: string;
@@ -136,6 +136,13 @@ export interface ContactCardConfig {
 export type AnalyticsConfig =
   | { provider?: 'none' }
   | { provider: 'cloudflare'; token: string }
+  | {
+      provider: 'google';
+      measurementId: string;
+      scriptSrc?: string;
+      sendPageView?: boolean;
+      config?: Record<string, string | number | boolean>;
+    }
   | { provider: 'plausible'; domain: string; scriptSrc?: string }
   | { provider: 'umami'; websiteId: string; scriptSrc: string }
   | { provider: 'custom'; scriptSrc: string; dataAttributes?: Record<string, string> };
@@ -266,6 +273,7 @@ const SCHEDULE_DAYS = new Set<ScheduleDays>(['daily', 'weekdays', 'weekends']);
 const ANALYTICS_PROVIDERS = new Set<AnalyticsProvider>([
   'none',
   'cloudflare',
+  'google',
   'plausible',
   'umami',
   'custom',
@@ -728,6 +736,15 @@ function validateAnalytics(value: unknown, path: string, issues: string[]): void
   }
 
   if (provider === 'cloudflare') requiredString(value, `${path}.token`, issues);
+  if (provider === 'google') {
+    requiredString(value, `${path}.measurementId`, issues);
+    optionalString(value, `${path}.scriptSrc`, issues);
+    optionalBoolean(value, `${path}.sendPageView`, issues);
+    validateUrl(value.scriptSrc, `${path}.scriptSrc`, issues, { optional: true, allowHash: false });
+    if (value.config !== undefined && !isAnalyticsConfigRecord(value.config)) {
+      issues.push(`${path}.config must be an object of string, number, or boolean values.`);
+    }
+  }
   if (provider === 'plausible') {
     requiredString(value, `${path}.domain`, issues);
     validateUrl(value.scriptSrc, `${path}.scriptSrc`, issues, { optional: true, allowHash: false });
@@ -974,6 +991,17 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function isStringRecord(value: unknown): value is Record<string, string> {
   return isRecord(value) && Object.values(value).every((item) => typeof item === 'string');
+}
+
+function isAnalyticsConfigRecord(
+  value: unknown
+): value is Record<string, string | number | boolean> {
+  return (
+    isRecord(value) &&
+    Object.values(value).every(
+      (item) => typeof item === 'string' || typeof item === 'number' || typeof item === 'boolean'
+    )
+  );
 }
 
 function isValidTimeZone(timeZone: string): boolean {

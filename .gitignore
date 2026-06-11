@@ -8,6 +8,10 @@ build/
 coverage/
 public/style.css
 public/assets/icons/simple-icons/
+src/assets/images/
+public/og.png
+public/qr.png
+public/contact.vcf
 
 # Cloudflare local state
 .wrangler/

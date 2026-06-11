@@ -1,5 +1,7 @@
 ---
+import { Image } from 'astro:assets';
 import type { FeaturedCard } from '../config/schema';
+import { isImageMetadata, resolveImageAsset } from '../config/image-assets';
 import Icon from './Icon.astro';
 
 interface Props {
@@ -7,21 +9,39 @@ interface Props {
 }
 
 const { featured } = Astro.props;
+const featuredCards = featured.map((card) => ({
+  ...card,
+  resolvedImage: card.image ? resolveImageAsset(card.image) : undefined,
+}));
 ---
 
 {
   featured.length > 0 && (
     <section class="featured-grid" aria-label="Featured">
-      {featured.map((card) => (
+      {featuredCards.map((card) => (
         <a href={card.url} target="_blank" rel="noopener noreferrer" class="featured-card">
-          {card.image && (
-            <img
-              class="featured-image"
-              src={card.image.startsWith('/') ? card.image : `/${card.image}`}
-              alt=""
-              loading="lazy"
-            />
-          )}
+          {card.resolvedImage &&
+            (isImageMetadata(card.resolvedImage) ? (
+              <Image
+                class="featured-image"
+                src={card.resolvedImage}
+                alt=""
+                width={360}
+                height={240}
+                fit="cover"
+                loading="lazy"
+              />
+            ) : (
+              <Image
+                class="featured-image"
+                src={card.resolvedImage}
+                alt=""
+                width={360}
+                height={240}
+                fit="cover"
+                loading="lazy"
+              />
+            ))}
           <div class="featured-card-body">
             <div class="featured-card-meta">
               {card.icon && <Icon icon={card.icon} />}

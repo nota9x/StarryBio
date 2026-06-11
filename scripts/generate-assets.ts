@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from 'node:fs/promises';
+import { cp, mkdir, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import config from '../config/starrybio.config';
 import { resolveOutputPath } from './config-utils';
@@ -11,6 +11,21 @@ async function main() {
   await generateOgImage(siteConfig);
   await generateQrCode(siteConfig);
   await generateContactCard(siteConfig);
+  await syncImageOptimizationAssets();
+}
+
+async function syncImageOptimizationAssets() {
+  const publicImages = path.resolve('public/assets/images');
+  const optimizedImages = path.resolve('src/assets/images');
+
+  await rm(optimizedImages, { recursive: true, force: true });
+  await mkdir(path.dirname(optimizedImages), { recursive: true });
+  await cp(publicImages, optimizedImages, {
+    recursive: true,
+    filter: (source) => !path.basename(source).startsWith('.'),
+  });
+
+  console.log('✓ Synced image assets for Astro optimization');
 }
 
 async function generateOgImage(siteConfig: ReturnType<typeof normalizeStarryBioConfig>) {

@@ -8,35 +8,56 @@ interface Props {
 const { analytics } = Astro.props;
 const provider = analytics?.provider || 'none';
 
-const script =
+const externalScript =
   provider === 'cloudflare' && analytics && 'token' in analytics
     ? {
         src: 'https://static.cloudflareinsights.com/beacon.min.js',
         attrs: { 'data-cf-beacon': JSON.stringify({ token: analytics.token }) },
       }
-    : provider === 'plausible' && analytics && 'domain' in analytics
+    : provider === 'google' && analytics && 'measurementId' in analytics
       ? {
-          src: analytics.scriptSrc || 'https://plausible.io/js/script.js',
-          attrs: { 'data-domain': analytics.domain },
+          src:
+            analytics.scriptSrc ||
+            `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(
+              analytics.measurementId
+            )}`,
+          attrs: { async: true },
         }
-      : provider === 'umami' && analytics && 'websiteId' in analytics
+      : provider === 'plausible' && analytics && 'domain' in analytics
         ? {
-            src: analytics.scriptSrc,
-            attrs: { 'data-website-id': analytics.websiteId },
+            src: analytics.scriptSrc || 'https://plausible.io/js/script.js',
+            attrs: { 'data-domain': analytics.domain },
           }
-        : analytics?.provider === 'custom'
+        : provider === 'umami' && analytics && 'websiteId' in analytics
           ? {
               src: analytics.scriptSrc,
-              attrs: analytics.dataAttributes
-                ? Object.fromEntries(
-                    Object.entries(analytics.dataAttributes).map(([key, value]) => [
-                      `data-${key}`,
-                      value,
-                    ])
-                  )
-                : {},
+              attrs: { 'data-website-id': analytics.websiteId },
             }
-          : null;
+          : analytics?.provider === 'custom'
+            ? {
+                src: analytics.scriptSrc,
+                attrs: analytics.dataAttributes
+                  ? Object.fromEntries(
+                      Object.entries(analytics.dataAttributes).map(([key, value]) => [
+                        `data-${key}`,
+                        value,
+                      ])
+                    )
+                  : {},
+              }
+            : null;
+
+const googleInit =
+  provider === 'google' && analytics && 'measurementId' in analytics
+    ? `window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', ${JSON.stringify(analytics.measurementId)}, ${JSON.stringify({
+        send_page_view: analytics.sendPageView ?? true,
+        ...(analytics.config || {}),
+      })});`
+    : null;
 ---
 
-{script && <script is:inline defer src={script.src} {...script.attrs} />}
+{externalScript && <script is:inline defer src={externalScript.src} {...externalScript.attrs} />}
+{googleInit && <script is:inline set:html={googleInit} />}

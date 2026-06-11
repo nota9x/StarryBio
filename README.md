@@ -14,7 +14,7 @@ Demo: [a9x.pro](https://a9x.pro)
 - Featured cards for projects, releases, services, or posts.
 - SEO, Open Graph, Twitter card, canonical URL, favicon, and theme-color tags.
 - Optional build-time OG image, QR code, and vCard/contact export generation.
-- Optional privacy-friendly analytics for Cloudflare, Plausible, Umami, or a custom script.
+- Optional analytics for Google Analytics 4, Cloudflare, Plausible, Umami, or a custom script.
 - Improved smart status with owner time, visitor time, next availability, and response text.
 - Custom 404 page with the same persistent starfield and smooth transition back home.
 
@@ -58,7 +58,7 @@ pnpm run deploy
 
 ## Commands
 
-- `pnpm run dev`: validate config, build CSS, start Astro dev server.
+- `pnpm run dev`: validate config, generate optional assets, build CSS, start Astro dev server.
 - `pnpm run build`: validate config, fetch Simple Icons, generate optional assets, build CSS, build Astro.
 - `pnpm run preview`: build and run `wrangler dev`.
 - `pnpm run validate`: validate the config only.
@@ -87,7 +87,6 @@ Use a preset and optional accent override:
 ```ts
 theme: {
   preset: 'nebula',
-  accent: '#a78bfa',
   mode: 'dark',
   buttonStyle: 'glass',
   background: 'starfield',
@@ -95,7 +94,7 @@ theme: {
 }
 ```
 
-Themes work through CSS custom properties, so users do not need to edit CSS for normal customization. Reduced-motion preferences are respected.
+Themes work through CSS custom properties, so users do not need to edit CSS for normal customization. `accent` is optional; omit it to use the refined preset color. Reduced-motion preferences are respected.
 
 ## Layout Modes
 
@@ -177,7 +176,6 @@ status: {
   enabled: true,
   ownerTimeZone: 'America/New_York',
   showLocalTime: true,
-  showVisitorTime: true,
   showNextAvailable: true,
   responseText: 'Usually replies within a few hours',
   schedule: [
@@ -211,7 +209,7 @@ ogImage: {
 }
 ```
 
-OG generation uses build-time `@resvg/resvg-js`. It is not shipped to the browser.
+OG generation uses build-time `@resvg/resvg-js`. It is not shipped to the browser. Generated `public/og.png` is ignored by git by default.
 
 ## QR Code
 
@@ -224,6 +222,7 @@ qr: {
 ```
 
 If `qr.url` is omitted, `seo.canonicalUrl` is used. QR generation uses the build-time `qrcode` package and adds a download link when enabled.
+Generated `public/qr.png` is ignored by git by default.
 
 ## Analytics
 
@@ -235,9 +234,21 @@ analytics: {
 }
 ```
 
-Supported providers are `cloudflare`, `plausible`, `umami`, and `custom`. No analytics script is emitted unless explicitly enabled. Plausible, Umami, and custom providers send page-view data to third-party infrastructure; choose providers and retention settings according to your privacy needs.
+Supported providers are `google`, `cloudflare`, `plausible`, `umami`, and `custom`. No analytics script is emitted unless explicitly enabled. Google Analytics, Plausible, Umami, and custom providers send page-view data to third-party infrastructure; choose providers and retention settings according to your privacy needs.
 
-The default CSP allows Cloudflare Web Analytics, Plausible, and the default Umami host. Custom script hosts may require updating `public/_headers`.
+Google Analytics 4 uses a GA4 measurement ID:
+
+```ts
+analytics: {
+  provider: 'google',
+  measurementId: 'G-XXXXXXXXXX',
+  sendPageView: false,
+}
+```
+
+Set `sendPageView: false` if you want to initialize gtag without the automatic page view. Use `config` for additional GA4 `gtag('config', ...)` parameters.
+
+The default CSP allows Google Analytics, Cloudflare Web Analytics, Plausible, and the default Umami host. Custom script hosts may require updating `public/_headers`.
 
 ## Contact Card
 
@@ -252,6 +263,7 @@ contactCard: {
 ```
 
 When enabled, the build generates a `.vcf` file and the homepage shows an “Add Contact” download link. StarryBio intentionally does not include a contact form.
+Generated `public/contact.vcf` is ignored by git by default.
 
 ## 404 Transition
 

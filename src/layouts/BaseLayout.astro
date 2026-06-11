@@ -1,8 +1,16 @@
 ---
 import { ClientRouter } from 'astro:transitions';
+import { getImage } from 'astro:assets';
 import Analytics from '../components/Analytics.astro';
 import SEO from '../components/SEO.astro';
-import type { NormalizedStarryBioConfig } from '../config/schema';
+import type { NormalizedStarryBioConfig, StatusDefinition } from '../config/schema';
+import {
+  isImageMetadata,
+  isLocalImagePath,
+  isSvgImagePath,
+  resolveImageAsset,
+  toAbsoluteAssetPath,
+} from '../config/image-assets';
 import { getThemeStyle } from '../config/themes';
 
 interface Props {
@@ -14,13 +22,51 @@ interface Props {
 
 const { config, title, description, includeStatus = true } = Astro.props;
 
-const toAbsoluteAssetPath = (assetPath?: string) => {
-  if (!assetPath) return '';
-  if (/^(?:https?:|data:|\/)/.test(assetPath)) return assetPath;
-  return `/${assetPath}`;
-};
-
 const animation = config.animation;
+const statusConfig = includeStatus ? await optimizeStatusImageAssets(config.status) : undefined;
+
+async function optimizeStatusImageAssets(status: NormalizedStarryBioConfig['status']) {
+  if (!status?.enabled) return status;
+
+  return {
+    ...status,
+    default: await optimizeStatusDefinition(status.default),
+    types: Object.fromEntries(
+      await Promise.all(
+        Object.entries(status.types).map(async ([name, definition]) => [
+          name,
+          await optimizeStatusDefinition(definition),
+        ])
+      )
+    ),
+  };
+}
+
+async function optimizeStatusDefinition(definition: StatusDefinition): Promise<StatusDefinition> {
+  if (typeof definition.icon !== 'string') return definition;
+  if (!isLocalImagePath(definition.icon) || isSvgImagePath(definition.icon)) return definition;
+
+  const resolvedIcon = resolveImageAsset(definition.icon);
+  if (!isImageMetadata(resolvedIcon)) {
+    return {
+      ...definition,
+      icon: toAbsoluteAssetPath(definition.icon),
+    };
+  }
+
+  const optimizedIcon = await getImage({
+    src: resolvedIcon,
+    width: 48,
+    height: 48,
+    format: 'webp',
+    quality: 82,
+  });
+
+  return {
+    ...definition,
+    icon: optimizedIcon.src,
+  };
+}
 ---
 
 <!doctype html>
@@ -66,8 +112,8 @@ const animation = config.animation;
     <slot />
 
     {
-      includeStatus && config.status?.enabled && (
-        <template id="starrybio-status-config">{JSON.stringify(config.status)}</template>
+      statusConfig?.enabled && (
+        <template id="starrybio-status-config">{JSON.stringify(statusConfig)}</template>
       )
     }
     <script is:inline src="/app.js" defer></script>

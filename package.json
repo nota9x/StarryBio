@@ -4,7 +4,7 @@
   "description": "A customizable, build-time generated Astro link-in-bio page for Cloudflare Workers.",
   "packageManager": "pnpm@11.5.3+sha512.7ac1c919341c213a34dc0d02afb7143c5c26ac26ee8c4782deea821b8ac64d2134a081fd8941dae6e29bbb48f58dfc2b7fbceeccc07cb2f09d219d342a4969ed",
   "scripts": {
-    "dev": "pnpm run validate && pnpm run build:css && astro dev",
+    "dev": "pnpm run validate && pnpm run generate && pnpm run build:css && astro dev",
     "start": "pnpm run dev",
     "preview": "pnpm run build && wrangler dev",
     "deploy": "pnpm run build && wrangler deploy",
@@ -44,6 +44,7 @@
     "prettier": "^3.8.3",
     "prettier-plugin-astro": "^0.14.1",
     "qrcode": "^1.5.4",
+    "sharp": "^0.34.5",
     "tailwindcss": "^4.3.0",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3",

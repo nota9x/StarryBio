@@ -1,0 +1,40 @@
+---
+import type { NormalizedLink } from '../config/schema';
+import Icon from './Icon.astro';
+
+interface Props {
+  link: NormalizedLink;
+}
+
+const { link } = Astro.props;
+const isCopyButton = link.specialType === 'copy';
+const isLink = Boolean(link.url && link.url !== '#' && !isCopyButton);
+const classes = ['link-button', isCopyButton ? 'copy-button-active' : ''].filter(Boolean).join(' ');
+---
+
+{
+  isLink ? (
+    <a href={link.url} target="_blank" rel="noopener noreferrer" class={classes}>
+      <Icon icon={link.icon} />
+      <div class="button-text-wrapper">
+        <span class="button-main-text">{link.label}</span>
+        {link.subtitle && <span class="button-subtitle">{link.subtitle}</span>}
+        {link.description && <span class="button-subtitle">{link.description}</span>}
+      </div>
+    </a>
+  ) : (
+    <button
+      type="button"
+      class={classes}
+      data-copy-value={isCopyButton ? link.copyValue : undefined}
+      data-original-subtitle={isCopyButton ? link.subtitle : undefined}
+    >
+      <Icon icon={link.icon} />
+      <div class="button-text-wrapper">
+        <span class="button-main-text">{link.label}</span>
+        {link.subtitle && <span class="button-subtitle">{link.subtitle}</span>}
+        {link.description && <span class="button-subtitle">{link.description}</span>}
+      </div>
+    </button>
+  )
+}

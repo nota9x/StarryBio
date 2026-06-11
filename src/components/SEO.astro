@@ -1,0 +1,36 @@
+---
+import type { NormalizedStarryBioConfig } from '../config/schema';
+
+interface Props {
+  config: NormalizedStarryBioConfig;
+  title?: string;
+  description?: string;
+}
+
+const { config, title = config.seo.title, description = config.seo.description } = Astro.props;
+
+const absoluteUrl = (value?: string) => {
+  if (!value) return undefined;
+  if (/^https?:\/\//.test(value)) return value;
+  if (!config.seo.canonicalUrl) return value;
+  return new URL(value, config.seo.canonicalUrl).toString();
+};
+
+const image = absoluteUrl(config.seo.image);
+---
+
+<title>{title}</title>
+<meta name="description" content={description} />
+<meta name="theme-color" content={config.seo.themeColor} />
+{config.seo.canonicalUrl && <link rel="canonical" href={config.seo.canonicalUrl} />}
+
+<meta property="og:type" content="website" />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+{config.seo.canonicalUrl && <meta property="og:url" content={config.seo.canonicalUrl} />}
+{image && <meta property="og:image" content={image} />}
+
+<meta name="twitter:card" content={image ? 'summary_large_image' : 'summary'} />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+{image && <meta name="twitter:image" content={image} />}

@@ -1,0 +1,37 @@
+---
+import type { FeaturedCard } from '../config/schema';
+import Icon from './Icon.astro';
+
+interface Props {
+  featured: FeaturedCard[];
+}
+
+const { featured } = Astro.props;
+---
+
+{
+  featured.length > 0 && (
+    <section class="featured-grid" aria-label="Featured">
+      {featured.map((card) => (
+        <a href={card.url} target="_blank" rel="noopener noreferrer" class="featured-card">
+          {card.image && (
+            <img
+              class="featured-image"
+              src={card.image.startsWith('/') ? card.image : `/${card.image}`}
+              alt=""
+              loading="lazy"
+            />
+          )}
+          <div class="featured-card-body">
+            <div class="featured-card-meta">
+              {card.icon && <Icon icon={card.icon} />}
+              {card.badge && <span class="featured-badge">{card.badge}</span>}
+            </div>
+            <h2 class="featured-title">{card.title}</h2>
+            <p class="featured-description">{card.description}</p>
+          </div>
+        </a>
+      ))}
+    </section>
+  )
+}

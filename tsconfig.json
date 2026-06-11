@@ -2,12 +2,21 @@
   "compilerOptions": {
     "target": "esnext",
     "module": "esnext",
-    "lib": ["esnext"],
-    "types": ["@cloudflare/workers-types"],
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "types": ["astro/client", "@cloudflare/workers-types"],
     "moduleResolution": "bundler",
     "strict": true,
     "skipLibCheck": true,
-    "noEmit": true
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "jsx": "preserve",
+    "jsxImportSource": "astro"
   },
-  "include": ["src/**/*.ts"]
+  "include": [
+    "astro.config.mjs",
+    "config/**/*.ts",
+    "scripts/**/*.ts",
+    "src/**/*.ts",
+    "src/**/*.astro"
+  ]
 }

@@ -1,0 +1,42 @@
+---
+import type { NormalizedStarryBioConfig } from '../config/schema';
+
+interface Props {
+  analytics?: NormalizedStarryBioConfig['analytics'];
+}
+
+const { analytics } = Astro.props;
+const provider = analytics?.provider || 'none';
+
+const script =
+  provider === 'cloudflare' && analytics && 'token' in analytics
+    ? {
+        src: 'https://static.cloudflareinsights.com/beacon.min.js',
+        attrs: { 'data-cf-beacon': JSON.stringify({ token: analytics.token }) },
+      }
+    : provider === 'plausible' && analytics && 'domain' in analytics
+      ? {
+          src: analytics.scriptSrc || 'https://plausible.io/js/script.js',
+          attrs: { 'data-domain': analytics.domain },
+        }
+      : provider === 'umami' && analytics && 'websiteId' in analytics
+        ? {
+            src: analytics.scriptSrc,
+            attrs: { 'data-website-id': analytics.websiteId },
+          }
+        : analytics?.provider === 'custom'
+          ? {
+              src: analytics.scriptSrc,
+              attrs: analytics.dataAttributes
+                ? Object.fromEntries(
+                    Object.entries(analytics.dataAttributes).map(([key, value]) => [
+                      `data-${key}`,
+                      value,
+                    ])
+                  )
+                : {},
+            }
+          : null;
+---
+
+{script && <script is:inline defer src={script.src} {...script.attrs} />}

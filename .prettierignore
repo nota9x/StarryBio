@@ -1,19 +1,25 @@
-node_modules/
+# Dependencies
+node_modules
 
-# Build output
-dist/
-build/
-.output/
-coverage/
-src/site/style.css
-src/site/assets/icons/simple-icons/
+# Build outputs
+dist
+build
+.output
+coverage
+.wrangler
+public/style.css
+public/assets/icons/simple-icons
+public/_headers
+
+# Git
+.git
+
+# Package lock
+package-lock.json
+pnpm-lock.yaml
 
 # Cloudflare local state
-.wrangler/
-.mf/
-
-# User-editable config
-config.js
+.mf
 
 # Logs
 *.log

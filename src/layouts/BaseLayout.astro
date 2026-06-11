@@ -1,0 +1,75 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import Analytics from '../components/Analytics.astro';
+import SEO from '../components/SEO.astro';
+import type { NormalizedStarryBioConfig } from '../config/schema';
+import { getThemeStyle } from '../config/themes';
+
+interface Props {
+  config: NormalizedStarryBioConfig;
+  title?: string;
+  description?: string;
+  includeStatus?: boolean;
+}
+
+const { config, title, description, includeStatus = true } = Astro.props;
+
+const toAbsoluteAssetPath = (assetPath?: string) => {
+  if (!assetPath) return '';
+  if (/^(?:https?:|data:|\/)/.test(assetPath)) return assetPath;
+  return `/${assetPath}`;
+};
+
+const animation = config.animation;
+---
+
+<!doctype html>
+<html
+  lang="en"
+  data-theme={config.theme.preset}
+  data-theme-mode={config.theme.mode}
+  data-button-style={config.theme.buttonStyle}
+  style={getThemeStyle(config.theme)}
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <SEO config={config} title={title} description={description} />
+
+    {config.favicon && <link rel="icon" href={toAbsoluteAssetPath(config.favicon)} />}
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=Nunito+Sans:wght@400;700;800;900&family=Orbitron:wght@400;700;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="/style.css" />
+    <ClientRouter />
+    <Analytics analytics={config.analytics} />
+  </head>
+
+  <body>
+    <div
+      class="stars-container"
+      aria-hidden="true"
+      data-star-multiplier={animation?.starMultiplier ?? 1}
+      data-shooting-star-multiplier={animation?.shootingStarMultiplier ?? 1}
+      data-animation-intensity={config.theme.animationIntensity}
+      transition:name="starfield"
+      transition:animate="none"
+      transition:persist
+    >
+    </div>
+
+    <slot />
+
+    {
+      includeStatus && config.status?.enabled && (
+        <template id="starrybio-status-config">{JSON.stringify(config.status)}</template>
+      )
+    }
+    <script is:inline src="/app.js" defer></script>
+  </body>
+</html>

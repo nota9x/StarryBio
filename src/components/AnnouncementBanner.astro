@@ -1,0 +1,59 @@
+---
+import type { StarryBioConfig } from '../config/schema';
+
+interface Props {
+  announcement?: StarryBioConfig['announcement'];
+}
+
+const { announcement } = Astro.props;
+const showAnnouncement = Boolean(announcement?.enabled && announcement.text);
+const isLink = Boolean(announcement?.url);
+const Tag = isLink ? 'a' : 'div';
+const linkAttrs = isLink
+  ? { href: announcement?.url, target: '_blank', rel: 'noopener noreferrer' }
+  : {};
+---
+
+<div id="announcement-banner-container">
+  {
+    showAnnouncement && (
+      <Tag id="announcement-banner" {...linkAttrs}>
+        <div class="announcement-content">
+          <svg
+            class="announcement-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M21.74 18.5L14.16 4.42C13.12 2.53 10.88 2.53 9.84 4.42L2.26 18.5C1.22 20.39 2.96 22 4.42 22H19.58C21.04 22 22.78 20.39 21.74 18.5Z"
+              stroke="white"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path d="M12 9V13" stroke="white" stroke-width="2" stroke-linecap="round" />
+            <path d="M12 17H12.01" stroke="white" stroke-width="2.5" stroke-linecap="round" />
+          </svg>
+          <span class="announcement-text">{announcement?.text}</span>
+        </div>
+        <button id="announcement-close-btn" type="button" aria-label="Dismiss announcement">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            width="16"
+            height="16"
+            stroke-width="3"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </Tag>
+    )
+  }
+</div>

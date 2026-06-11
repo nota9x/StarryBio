@@ -1,95 +1,276 @@
-# ✨ StarryBio v2.0
+# StarryBio v3
 
-A mesmerizing, starry-themed link-in-bio page powered by Cloudflare Workers.
+StarryBio is a static-first, animated link-in-bio template built with Astro and deployed as Cloudflare Workers static assets. It keeps the signature starfield background, glassy profile card, Simple Icons support, smart availability status, and a user-editable TypeScript config.
 
 Demo: [a9x.pro](https://a9x.pro)
 
-## Features
+## v3 Features
 
-- **Deep Space Animation**: Interactive starfield with shooting stars and parallax depth.
-- **Fully Configurable**: Edit `src/site/config.js` to change your profile, links, icons, and schedule.
-- **Simple Icons Fetching**: Specify a brand name in config and download matching SVGs from the Simple Icons CDN during build.
-- **Smart Scheduling**: Define your availability in UTC, and visitors automatically see it in their local time.
-- **Status Icons**: Support for both monochromatic SVG masks and full-color images.
-- **Cloudflare Worker**: Edge-hosted for speed and scalability.
+- Type-safe config in `config/starrybio.config.ts` using `satisfies StarryBioConfig`.
+- Build-time config validation with clear path-based errors.
+- Theme presets: `nebula`, `midnight`, `aurora`, `eclipse`, `cosmic-gold`, `minimal`, `terminal`.
+- Homepage layout modes: `centered`, `split-screen`, `profile-card`, `compact`, `creator-grid`, `portfolio`, `terminal`.
+- Grouped link sections with optional descriptions, disabled states, and scheduling windows.
+- Featured cards for projects, releases, services, or posts.
+- SEO, Open Graph, Twitter card, canonical URL, favicon, and theme-color tags.
+- Optional build-time OG image, QR code, and vCard/contact export generation.
+- Optional privacy-friendly analytics for Cloudflare, Plausible, Umami, or a custom script.
+- Improved smart status with owner time, visitor time, next availability, and response text.
+- Custom 404 page with the same persistent starfield and smooth transition back home.
 
 ## Setup
 
-This project uses pnpm and Wrangler 4, which requires a current Node.js release. Node.js 20.3 or newer is recommended.
+Requirements:
 
-1.  **Install Dependencies**:
+- Node.js 20.3 or newer
+- pnpm
+- Wrangler for Cloudflare deployment, installed through project dependencies
 
-    ```bash
-    pnpm install
-    ```
+Install dependencies:
 
-2.  **Build Assets**:
-    This downloads configured Simple Icons and generates the static CSS file before running the server.
+```bash
+pnpm install
+```
 
-    ```bash
-    pnpm run build
-    ```
+Start local development:
 
-    > **Note:** For real-time CSS updates during development, run `pnpm run watch:css` in a separate terminal.
+```bash
+pnpm run dev
+```
 
-3.  **Development**:
-    Start the local development server:
+Build:
 
-    ```bash
-    pnpm run start
-    ```
+```bash
+pnpm run build
+```
 
-4.  **Deployment**:
-    Deploy to Cloudflare:
+Preview the Cloudflare static asset output:
 
-    ```bash
-    pnpm run deploy
-    ```
+```bash
+pnpm run preview
+```
 
-    You can also run `pnpm exec wrangler deploy` directly after generating `src/site/style.css`.
+Deploy:
+
+```bash
+pnpm run deploy
+```
+
+## Commands
+
+- `pnpm run dev`: validate config, build CSS, start Astro dev server.
+- `pnpm run build`: validate config, fetch Simple Icons, generate optional assets, build CSS, build Astro.
+- `pnpm run preview`: build and run `wrangler dev`.
+- `pnpm run validate`: validate the config only.
+- `pnpm run icons`: fetch configured Simple Icons.
+- `pnpm run typecheck`: run Astro and TypeScript checks.
+- `pnpm run deploy`: build and deploy with Wrangler.
 
 ## Configuration
 
-Navigate to `src/site/config.js`.
+Edit `config/starrybio.config.ts`. The browser never loads this file directly; Astro and build scripts consume it at build/render time and emit static HTML, CSS, JS, and assets.
 
-- **Profile**: Update name, description, image path, and layout.
-- **Links**: Add buttons with Simple Icons brand names, SVG paths, or image URLs.
-- **Status**: Set your `ownerTimeZone`, define your `schedule` (in UTC), and point to your custom status icons.
-- **Announcement**: Configure the banner text, URL, and enable/disable it.
-- **Footer**: Custom copyright text.
+The config should end with:
 
-Simple Icons are fetched as white SVGs at build time from the [Simple Icons CDN](https://github.com/LitoMore/simple-icons-cdn). Use a brand name in `src/site/config.js`:
-
-```js
-"icon": { "simpleIcon": "GitHub" }
+```ts
+} satisfies StarryBioConfig;
 ```
 
-Optional color fields are supported when you want a different downloaded color:
+Local asset paths are resolved from `public/`. For example, `assets/images/profile.svg` means `public/assets/images/profile.svg`.
 
-```js
-"icon": { "simpleIcon": "Discord", "color": "5865F2" }
+Legacy flat `links` still work. New v3 configs can use grouped `sections`.
+
+## Themes
+
+Use a preset and optional accent override:
+
+```ts
+theme: {
+  preset: 'nebula',
+  accent: '#a78bfa',
+  mode: 'dark',
+  buttonStyle: 'glass',
+  background: 'starfield',
+  animationIntensity: 'normal',
+}
 ```
 
-If a brand's generated slug does not match Simple Icons, provide the slug explicitly:
+Themes work through CSS custom properties, so users do not need to edit CSS for normal customization. Reduced-motion preferences are respected.
 
-```js
-"icon": { "simpleIcon": "Node.js", "slug": "nodedotjs" }
+## Layout Modes
+
+Configure layout without creating new pages:
+
+```ts
+layout: {
+  mode: 'centered',
+  linkStyle: 'cards',
+  profilePosition: 'top',
+  featuredPosition: 'above-links',
+}
 ```
 
-The example config points to common customizable assets such as a profile image and favicon. Add those files under `src/site/assets/images/`, or update the paths in `config.js` to match your own hosted images.
+Every mode renders the same homepage data differently and stays responsive.
 
-## Styling
+## Sections And Links
 
-To customize colors or styles beyond the config, modify `src/site/input.css` and re-run `pnpm run build`.
-
-To check the Worker TypeScript without deploying, run:
-
-```bash
-pnpm run typecheck
+```ts
+sections: [
+  {
+    title: 'Socials',
+    description: 'Find me around the web.',
+    enabled: true,
+    links: [
+      {
+        label: 'GitHub',
+        url: 'https://github.com/nota9x',
+        icon: { simpleIcon: 'GitHub' },
+      },
+    ],
+  },
+];
 ```
 
-## Project Structure
+Links and sections support `enabled`, `visibleFrom`, and `visibleUntil`. Disabled, future, and expired items are filtered during render.
 
-- `src/worker.ts`: Main Worker logic (routing, headers).
-- `src/site/`: Static assets (HTML, CSS, JS, Images).
-- `wrangler.jsonc`: Cloudflare configuration.
+## Featured Cards
+
+```ts
+featured: [
+  {
+    title: 'StarryBio',
+    description: 'A self-hosted animated link-in-bio template.',
+    url: 'https://github.com/nota9x/StarryBio',
+    image: 'assets/images/profile.svg',
+    badge: 'Open Source',
+    icon: { simpleIcon: 'GitHub' },
+  },
+];
+```
+
+Cards can appear above or below links using `layout.featuredPosition`.
+
+## Simple Icons
+
+Use Simple Icons in links, featured cards, and statuses:
+
+```ts
+icon: {
+  simpleIcon: 'GitHub';
+}
+```
+
+If a generated slug is wrong, provide one:
+
+```ts
+icon: { simpleIcon: 'Node.js', slug: 'nodedotjs' }
+```
+
+Run `pnpm run icons` to fetch icons manually. `pnpm run build` also fetches them.
+
+## Status And Schedule
+
+Status keeps the existing schedule model:
+
+```ts
+status: {
+  enabled: true,
+  ownerTimeZone: 'America/New_York',
+  showLocalTime: true,
+  showVisitorTime: true,
+  showNextAvailable: true,
+  responseText: 'Usually replies within a few hours',
+  schedule: [
+    { status: 'available', days: 'weekdays', start: '21:00', end: '05:00' },
+  ],
+}
+```
+
+Times use `HH:MM`. The current implementation treats schedule windows as UTC, then displays visitor-local schedule ranges in the modal and owner-local times in the tooltip when configured.
+
+## SEO And OG Image
+
+```ts
+seo: {
+  title: 'nota9x',
+  description: 'Developer, designer, and builder.',
+  image: '/assets/images/profile.svg',
+  canonicalUrl: 'https://a9x.pro',
+  themeColor: '#a78bfa',
+}
+```
+
+Optional OG image generation:
+
+```ts
+ogImage: {
+  enabled: true,
+  output: 'public/og.png',
+  title: 'nota9x',
+  subtitle: 'Developer, designer, and builder.',
+}
+```
+
+OG generation uses build-time `@resvg/resvg-js`. It is not shipped to the browser.
+
+## QR Code
+
+```ts
+qr: {
+  enabled: true,
+  url: 'https://a9x.pro',
+  output: 'public/qr.png',
+}
+```
+
+If `qr.url` is omitted, `seo.canonicalUrl` is used. QR generation uses the build-time `qrcode` package and adds a download link when enabled.
+
+## Analytics
+
+Analytics defaults to:
+
+```ts
+analytics: {
+  provider: 'none',
+}
+```
+
+Supported providers are `cloudflare`, `plausible`, `umami`, and `custom`. No analytics script is emitted unless explicitly enabled. Plausible, Umami, and custom providers send page-view data to third-party infrastructure; choose providers and retention settings according to your privacy needs.
+
+The default CSP allows Cloudflare Web Analytics, Plausible, and the default Umami host. Custom script hosts may require updating `public/_headers`.
+
+## Contact Card
+
+```ts
+contactCard: {
+  enabled: true,
+  output: 'public/contact.vcf',
+  name: 'nota9x',
+  email: 'hello@example.com',
+  website: 'https://a9x.pro',
+}
+```
+
+When enabled, the build generates a `.vcf` file and the homepage shows an “Add Contact” download link. StarryBio intentionally does not include a contact form.
+
+## 404 Transition
+
+`src/pages/404.astro` uses the same `BaseLayout`, theme variables, and persistent starfield as the homepage. Astro view transitions persist the background and transition the 404 card into the homepage card when clicking “Go Home”. External profile links still behave as normal links.
+
+## Deployment
+
+The project uses `@astrojs/cloudflare` with static output and `wrangler.jsonc` assets pointing at `dist`. Keep generated assets inside `public/` so they are copied to the deployment output.
+
+## Migration Notes
+
+StarryBio v3 is the Astro version. Old references to `src/site/config.js` are obsolete. Move site settings into `config/starrybio.config.ts`; legacy flat `links` can remain, but grouped `sections` are preferred for new configs.
+
+## Troubleshooting
+
+- Config fails: run `pnpm run validate` and fix the exact path shown in the error.
+- Local asset fails: make sure the file exists under `public/`.
+- Simple Icon fails: add an explicit `slug`.
+- Analytics script blocked: update `public/_headers` CSP for custom hosts.
+- QR generation fails: set `qr.url` or `seo.canonicalUrl`.
+- OG generation disabled: no image is generated unless `ogImage.enabled` is `true`.
+- Cloudflare preview issues: run `pnpm run build` first, then `pnpm run preview`.

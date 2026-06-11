@@ -23,7 +23,7 @@ function getCookie(name) {
   return null;
 }
 
-const starsContainer = document.querySelector('.stars-container');
+let starsContainer = document.querySelector('.stars-container');
 const STAR_COLORS = ['#ffffff', '#ffe9c4', '#d4fbff', '#d4fbff', '#b3cde0'];
 const DEFAULT_STAR_COUNT = 200;
 const DEFAULT_REDUCED_MOTION_STAR_COUNT = 80;
@@ -39,6 +39,74 @@ let shootingStarMultiplier = 1;
 let animationFrameId = null;
 let shootingStarTimeoutId = null;
 let animationStarted = false;
+let statusIntervalId = null;
+let mouseX = 0;
+let mouseY = 0;
+let targetMouseX = 0;
+let targetMouseY = 0;
+let animationTime = 0;
+
+document.addEventListener('mousemove', (event) => {
+  targetMouseX = event.clientX / window.innerWidth - 0.5;
+  targetMouseY = event.clientY / window.innerHeight - 0.5;
+});
+
+document.addEventListener('DOMContentLoaded', initializeStarryBioPage);
+document.addEventListener('astro:page-load', initializeStarryBioPage);
+
+function initializeStarryBioPage() {
+  starsContainer = document.querySelector('.stars-container') || starsContainer;
+  configureAnimationOptions();
+  setupAnimations();
+  initializeAnnouncement();
+  initializeCopyButtons();
+
+  const statusConfig = readStatusConfig();
+  if (statusConfig?.enabled) {
+    initStatusIndicator(statusConfig);
+  }
+
+  document.body.style.opacity = '1';
+}
+
+function configureAnimationOptions() {
+  const animationHost = starsContainer || document.body;
+  starMultiplier = getAnimationMultiplier(
+    animationHost.dataset.starMultiplier,
+    1,
+    'starMultiplier'
+  );
+  shootingStarMultiplier = getAnimationMultiplier(
+    animationHost.dataset.shootingStarMultiplier,
+    1,
+    'shootingStarMultiplier'
+  );
+
+  const intensity = animationHost.dataset.animationIntensity || 'normal';
+  if (intensity === 'none') {
+    starMultiplier = 0;
+    shootingStarMultiplier = 0;
+  } else if (intensity === 'subtle') {
+    starMultiplier *= 0.55;
+    shootingStarMultiplier *= 0.45;
+  } else if (intensity === 'high') {
+    starMultiplier *= 1.35;
+    shootingStarMultiplier *= 1.35;
+  }
+}
+
+function getAnimationMultiplier(value, fallback, fieldName) {
+  const multiplier = Number(value);
+
+  if (!Number.isFinite(multiplier) || multiplier < 0) {
+    console.warn(
+      `[StarryBio] animation.${fieldName} must be a number greater than or equal to 0. Falling back to ${fallback}.`
+    );
+    return fallback;
+  }
+
+  return multiplier;
+}
 
 function setupAnimations() {
   if (!starsContainer || animationStarted) return;
@@ -175,17 +243,6 @@ function stopShootingStars() {
   }
 }
 
-let mouseX = 0;
-let mouseY = 0;
-let targetMouseX = 0;
-let targetMouseY = 0;
-let animationTime = 0;
-
-document.body.addEventListener('mousemove', (event) => {
-  targetMouseX = event.clientX / window.innerWidth - 0.5;
-  targetMouseY = event.clientY / window.innerHeight - 0.5;
-});
-
 function startStarAnimation() {
   if (animationFrameId !== null || !starContext) return;
 
@@ -255,146 +312,17 @@ function renderStars({ updatePositions }) {
   starContext.shadowBlur = 0;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  configureAnimationOptions(typeof CONFIG !== 'undefined' ? CONFIG : {});
-  setupAnimations();
+function initializeAnnouncement() {
+  const banner = document.getElementById('announcement-banner');
+  if (!banner) return;
 
-  if (typeof CONFIG !== 'undefined') {
-    populatePage(CONFIG);
+  if (getCookie('announcementDismissed') === 'true') {
+    banner.remove();
+    return;
   }
 
-  document.body.style.opacity = '1';
-});
-
-function configureAnimationOptions(config) {
-  const animation =
-    config && config.animation && typeof config.animation === 'object' ? config.animation : {};
-
-  starMultiplier = getAnimationMultiplier(animation.starMultiplier, 1, 'starMultiplier');
-  shootingStarMultiplier = getAnimationMultiplier(
-    animation.shootingStarMultiplier,
-    1,
-    'shootingStarMultiplier'
-  );
-}
-
-function getAnimationMultiplier(value, fallback, fieldName) {
-  const multiplier = Number(value);
-
-  if (!Number.isFinite(multiplier) || multiplier < 0) {
-    console.warn(
-      `[StarryBio] animation.${fieldName} must be a number greater than or equal to 0. Falling back to ${fallback}.`
-    );
-    return fallback;
-  }
-
-  return multiplier;
-}
-
-const DEFAULT_SIMPLE_ICON_COLOR = 'fff';
-
-function populatePage(data) {
-  document.documentElement.setAttribute('data-theme', data.theme || 'midnight');
-  document.title = data.pageTitle || 'Starfield Bio';
-
-  if (data.favicon) {
-    populateFavicon(data.favicon);
-  }
-
-  if (data.announcement?.enabled && data.announcement.text) {
-    populateAnnouncement(data.announcement);
-  }
-
-  populateProfile(data.profile || {});
-  populateLinks(Array.isArray(data.links) ? data.links : []);
-  populateFooter(data.footer || {});
-
-  if (data.status?.enabled) {
-    initStatusIndicator(data.status);
-  }
-}
-
-function populateProfile(profile) {
-  const imgEl = document.getElementById('profileImage');
-  if (imgEl) {
-    imgEl.src = profile.image || '';
-    imgEl.onerror = () => {
-      imgEl.style.display = 'none';
-    };
-  }
-
-  const card = document.querySelector('.profile-card');
-  const textContent = document.querySelector('.profile-text-content');
-  if (card && textContent) {
-    card.classList.toggle('layout-horizontal', profile.layout === 'horizontal');
-  }
-
-  const nameEl = document.getElementById('profileName');
-  if (nameEl) nameEl.textContent = profile.name || '';
-
-  const descEl = document.getElementById('profileDescription');
-  if (descEl) descEl.textContent = profile.description || '';
-}
-
-function populateAnnouncement(announcement) {
-  if (getCookie('announcementDismissed') === 'true') return;
-
-  const container = document.getElementById('announcement-banner-container');
-  if (!container) return;
-
-  const bannerLink = document.createElement(announcement.url ? 'a' : 'div');
-  bannerLink.id = 'announcement-banner';
-
-  if (announcement.url) {
-    bannerLink.href = announcement.url;
-    bannerLink.target = '_blank';
-    bannerLink.rel = 'noopener noreferrer';
-  }
-
-  const contentWrapper = document.createElement('div');
-  contentWrapper.className = 'announcement-content';
-
-  contentWrapper.appendChild(
-    createSvgElement({
-      className: 'announcement-icon',
-      viewBox: '0 0 24 24',
-      fill: 'none',
-      paths: [
-        {
-          d: 'M21.74 18.5L14.16 4.42C13.12 2.53 10.88 2.53 9.84 4.42L2.26 18.5C1.22 20.39 2.96 22 4.42 22H19.58C21.04 22 22.78 20.39 21.74 18.5Z',
-          stroke: 'white',
-          strokeWidth: '2',
-          strokeLinecap: 'round',
-          strokeLinejoin: 'round',
-        },
-        {
-          d: 'M12 9V13',
-          stroke: 'white',
-          strokeWidth: '2',
-          strokeLinecap: 'round',
-          strokeLinejoin: 'round',
-        },
-        {
-          d: 'M12 17H12.01',
-          stroke: 'white',
-          strokeWidth: '2.5',
-          strokeLinecap: 'round',
-          strokeLinejoin: 'round',
-        },
-      ],
-    })
-  );
-
-  const announcementText = document.createElement('span');
-  announcementText.className = 'announcement-text';
-  announcementText.textContent = announcement.text;
-  contentWrapper.appendChild(announcementText);
-
-  const closeButton = document.createElement('button');
-  closeButton.id = 'announcement-close-btn';
-  closeButton.type = 'button';
-  closeButton.setAttribute('aria-label', 'Dismiss announcement');
-  closeButton.appendChild(createCloseIcon());
+  const closeButton = document.getElementById('announcement-close-btn');
+  if (!closeButton) return;
 
   closeButton.addEventListener('click', (event) => {
     event.preventDefault();
@@ -402,131 +330,439 @@ function populateAnnouncement(announcement) {
 
     setCookie('announcementDismissed', 'true', 7);
 
-    bannerLink.classList.add('closing');
-    bannerLink.addEventListener('animationend', () => bannerLink.remove(), { once: true });
+    banner.classList.add('closing');
+    banner.addEventListener('animationend', () => banner.remove(), { once: true });
   });
-
-  bannerLink.appendChild(contentWrapper);
-  bannerLink.appendChild(closeButton);
-  container.appendChild(bannerLink);
 }
 
-function populateLinks(links) {
-  const container = document.getElementById('linksContainer');
-  if (!container) return;
+function initializeCopyButtons() {
+  for (const button of document.querySelectorAll('.copy-button-active[data-copy-value]')) {
+    initializeCopyButton(button, button.dataset.copyValue, button.dataset.originalSubtitle);
+  }
+}
 
-  container.replaceChildren();
+function initializeCopyButton(buttonElement, textToCopy, originalSubtitle) {
+  if (!buttonElement || !textToCopy) return;
 
-  for (const linkData of links) {
-    const linkEl = createLinkElement(linkData);
-    container.appendChild(linkEl);
+  const subtitleElement = buttonElement.querySelector('.button-subtitle');
 
-    if (linkData.specialType === 'copy' && linkData.copyValue) {
-      initializeCopyButton(linkEl, linkData.copyValue, linkData.subtitle);
+  buttonElement.addEventListener('click', (event) => {
+    event.preventDefault();
+
+    if (buttonElement.classList.contains('animating') || !navigator.clipboard) return;
+
+    navigator.clipboard.writeText(textToCopy).then(() => {
+      if (!subtitleElement) return;
+
+      const oldText = subtitleElement.textContent;
+      buttonElement.classList.add('animating', 'fading-out');
+
+      window.setTimeout(() => {
+        subtitleElement.textContent = 'Copied!';
+        buttonElement.classList.add('show-copied-feedback');
+        buttonElement.classList.remove('fading-out');
+
+        window.setTimeout(() => {
+          buttonElement.classList.add('fading-out');
+
+          window.setTimeout(() => {
+            subtitleElement.textContent = originalSubtitle || oldText;
+            buttonElement.classList.remove('show-copied-feedback', 'fading-out', 'animating');
+          }, 300);
+        }, 2000);
+      }, 300);
+    });
+  });
+}
+
+const DEFAULT_SIMPLE_ICON_COLOR = 'fff';
+
+function readStatusConfig() {
+  const statusTemplate = document.getElementById('starrybio-status-config');
+  const statusJson = statusTemplate?.content?.textContent || statusTemplate?.textContent || '';
+  if (!statusJson) return null;
+
+  try {
+    return JSON.parse(statusJson);
+  } catch (error) {
+    console.warn('[StarryBio] Unable to parse embedded status config.', error);
+    return null;
+  }
+}
+
+function initStatusIndicator(statusConfig) {
+  const normalizedStatusConfig = normalizeStatusConfig(statusConfig);
+
+  if (statusIntervalId !== null) {
+    window.clearInterval(statusIntervalId);
+    statusIntervalId = null;
+  }
+
+  const elements = {
+    icon: document.getElementById('status-indicator-icon'),
+    tooltipStatus: document.getElementById('tooltip-status'),
+    tooltipTime: document.getElementById('tooltip-time'),
+    tooltipOwnerTimeRow: document.getElementById('tooltip-owner-time-row'),
+    tooltipAvailability: document.getElementById('tooltip-availability'),
+    tooltipNextAvailable: document.getElementById('tooltip-next-available'),
+  };
+
+  if (!elements.icon) return;
+
+  attachStatusModalEvents();
+  populateScheduleModal(normalizedStatusConfig);
+
+  function updateLoop() {
+    const currentStatus = determineCurrentStatus(normalizedStatusConfig);
+    const statusDef =
+      normalizedStatusConfig.types[currentStatus] || normalizedStatusConfig.default || {};
+    const defaultStatus = normalizedStatusConfig.default || {};
+
+    const color = statusDef.color || defaultStatus.color || '#6B7280';
+    const text = statusDef.text || defaultStatus.text || 'Offline';
+    const iconPath = resolveIconSource(statusDef.icon || defaultStatus.icon || '');
+    const isAvailableNow = currentStatus === 'available';
+    const message = statusDef.message || normalizedStatusConfig.responseText || '';
+    const iconPathData = getSvgPathData(iconPath);
+
+    if (iconPathData) {
+      const svgData = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black'><path d='${iconPathData}'/></svg>`;
+      const maskUrl = `data:image/svg+xml;base64,${btoa(svgData)}`;
+
+      setMaskedIcon(elements.icon, maskUrl, color);
+      elements.icon.style.backgroundImage = 'none';
+    } else {
+      setMaskedIcon(elements.icon, iconPath, color);
+      elements.icon.style.backgroundImage = 'none';
+    }
+
+    if (elements.tooltipStatus) elements.tooltipStatus.textContent = text;
+
+    if (elements.tooltipAvailability) {
+      const availabilityText = isAvailableNow
+        ? `Available now${message ? ` · ${message}` : ''}`
+        : message;
+      elements.tooltipAvailability.textContent = availabilityText;
+      elements.tooltipAvailability.classList.toggle('hidden', !availabilityText);
+    }
+
+    if (elements.tooltipTime) {
+      const showOwnerTime =
+        normalizedStatusConfig.showOwnerLocalTime ?? normalizedStatusConfig.showLocalTime ?? true;
+      const ownerTime = showOwnerTime ? getOwnerTime(normalizedStatusConfig.ownerTimeZone) : '';
+      elements.tooltipTime.textContent = ownerTime;
+      if (elements.tooltipOwnerTimeRow) {
+        elements.tooltipOwnerTimeRow.classList.toggle('hidden', !ownerTime);
+      }
+    }
+
+    if (elements.tooltipNextAvailable) {
+      const nextAvailable =
+        normalizedStatusConfig.showNextAvailable && !isAvailableNow
+          ? getNextAvailableText(normalizedStatusConfig)
+          : '';
+      elements.tooltipNextAvailable.textContent = nextAvailable;
+      elements.tooltipNextAvailable.classList.toggle('hidden', !nextAvailable);
+    }
+  }
+
+  statusIntervalId = window.setInterval(updateLoop, 1000);
+  updateLoop();
+}
+
+function attachStatusModalEvents() {
+  const container = document.getElementById('status-indicator-container');
+  const modal = document.getElementById('status-modal');
+  const closeBtn = document.getElementById('status-modal-close');
+  const overlay = document.getElementById('status-modal-overlay');
+
+  if (container && modal) {
+    container.addEventListener('click', () => modal.classList.remove('hidden'));
+  }
+
+  if (modal && closeBtn) {
+    closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
+  }
+
+  if (modal && overlay) {
+    overlay.addEventListener('click', () => modal.classList.add('hidden'));
+  }
+}
+
+function getOwnerTime(timeZone) {
+  const options = {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  };
+
+  try {
+    return new Date().toLocaleTimeString('en-US', { ...options, timeZone });
+  } catch {
+    return new Date().toLocaleTimeString('en-US', options);
+  }
+}
+
+function normalizeStatusConfig(config) {
+  const types = config.types || {};
+  const defaultStatus = config.default || {
+    text: 'Offline',
+    color: '#6B7280',
+    icon: '',
+  };
+  const ownerTimeZone = isValidTimeZone(config.ownerTimeZone) ? config.ownerTimeZone : undefined;
+  const schedule = normalizeSchedule(config.schedule, types);
+
+  if (config.ownerTimeZone && !ownerTimeZone) {
+    console.warn(
+      `[StarryBio] Invalid status.ownerTimeZone "${config.ownerTimeZone}". Falling back to the visitor's local time.`
+    );
+  }
+
+  return {
+    ...config,
+    default: defaultStatus,
+    ownerTimeZone,
+    schedule,
+    showLocalTime: config.showLocalTime !== false,
+    showOwnerLocalTime: config.showOwnerLocalTime ?? config.showLocalTime ?? true,
+    showVisitorTime: Boolean(config.showVisitorTime),
+    showNextAvailable: Boolean(config.showNextAvailable),
+    types,
+  };
+}
+
+function normalizeSchedule(schedule, types) {
+  if (!Array.isArray(schedule)) {
+    console.warn('[StarryBio] status.schedule must be an array. Falling back to default status.');
+    return [];
+  }
+
+  return schedule.reduce((validItems, item, index) => {
+    const normalizedItem = normalizeScheduleItem(item, types, index);
+    if (normalizedItem) validItems.push(normalizedItem);
+    return validItems;
+  }, []);
+}
+
+function normalizeScheduleItem(item, types, index) {
+  if (!item || typeof item !== 'object') {
+    console.warn(`[StarryBio] Ignoring schedule item ${index}: expected an object.`);
+    return null;
+  }
+
+  if (!isValidScheduleDay(item.days)) {
+    console.warn(
+      `[StarryBio] Ignoring schedule item ${index}: days must be "daily", "weekdays", or "weekends".`
+    );
+    return null;
+  }
+
+  if (!item.status || !types[item.status]) {
+    console.warn(`[StarryBio] Ignoring schedule item ${index}: unknown status "${item.status}".`);
+    return null;
+  }
+
+  const startMins = parseTimeToMinutes(item.start);
+  const endMins = parseTimeToMinutes(item.end);
+
+  if (startMins === null || endMins === null || startMins === endMins) {
+    console.warn(
+      `[StarryBio] Ignoring schedule item ${index}: start and end must be different HH:MM values.`
+    );
+    return null;
+  }
+
+  return {
+    ...item,
+    startMins,
+    endMins,
+    wrapsMidnight: startMins > endMins,
+  };
+}
+
+function isValidScheduleDay(days) {
+  return days === 'daily' || days === 'weekdays' || days === 'weekends';
+}
+
+function isValidTimeZone(timeZone) {
+  if (!timeZone) return false;
+
+  try {
+    new Intl.DateTimeFormat('en-US', { timeZone }).format();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function determineCurrentStatus(config, now = new Date()) {
+  const utcDay = now.getUTCDay();
+  const currentUtcMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
+
+  for (const item of config.schedule || []) {
+    if (scheduleItemMatchesNow(item, utcDay, currentUtcMinutes)) {
+      return item.status;
+    }
+  }
+
+  return 'default';
+}
+
+function getNextAvailableText(config) {
+  const next = findNextScheduleStart(config, 'available');
+  if (!next) return '';
+
+  const ownerTime = formatTime(next, config.ownerTimeZone);
+  return `Next available ${ownerTime}`;
+}
+
+function findNextScheduleStart(config, statusName) {
+  const now = new Date();
+  const minuteMs = 60 * 1000;
+
+  for (let offset = 1; offset <= 7 * 24 * 60; offset++) {
+    const candidate = new Date(now.getTime() + offset * minuteMs);
+    const previous = new Date(candidate.getTime() - minuteMs);
+    const currentStatus = determineCurrentStatus(config, candidate);
+    const previousStatus = determineCurrentStatus(config, previous);
+
+    if (currentStatus === statusName && previousStatus !== statusName) {
+      return candidate;
+    }
+  }
+
+  return null;
+}
+
+function formatTime(date, timeZone) {
+  const options = {
+    weekday: 'short',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  };
+
+  try {
+    return date.toLocaleString([], timeZone ? { ...options, timeZone } : options);
+  } catch {
+    return date.toLocaleString([], options);
+  }
+}
+
+function scheduleItemMatchesNow(item, utcDay, currentUtcMinutes) {
+  if (!item.wrapsMidnight) {
+    return appliesToUtcDay(item.days, utcDay) && isInMinuteRange(currentUtcMinutes, item);
+  }
+
+  if (currentUtcMinutes >= item.startMins) {
+    return appliesToUtcDay(item.days, utcDay);
+  }
+
+  const previousUtcDay = (utcDay + 6) % 7;
+  return currentUtcMinutes < item.endMins && appliesToUtcDay(item.days, previousUtcDay);
+}
+
+function isInMinuteRange(currentUtcMinutes, item) {
+  return currentUtcMinutes >= item.startMins && currentUtcMinutes < item.endMins;
+}
+
+function appliesToUtcDay(days, utcDay) {
+  if (days === 'daily') return true;
+
+  const isWeekend = utcDay === 0 || utcDay === 6;
+  return days === 'weekends' ? isWeekend : !isWeekend;
+}
+
+function parseTimeToMinutes(timeStr) {
+  if (typeof timeStr !== 'string') return null;
+
+  const match = timeStr.match(/^([01]\d|2[0-3]):([0-5]\d)$/);
+  if (!match) return null;
+
+  return Number(match[1]) * 60 + Number(match[2]);
+}
+
+function populateScheduleModal(config) {
+  const weekdayList = document.getElementById('weekday-schedule-list');
+  const weekendList = document.getElementById('weekend-schedule-list');
+
+  if (weekdayList) weekdayList.replaceChildren();
+  if (weekendList) weekendList.replaceChildren();
+
+  for (const item of config.schedule || []) {
+    const scheduleItem = createScheduleItemElement(item, config);
+    if (!scheduleItem) continue;
+
+    if (item.days === 'daily') {
+      if (weekdayList) weekdayList.appendChild(scheduleItem.cloneNode(true));
+      if (weekendList) weekendList.appendChild(scheduleItem);
+    } else if (item.days === 'weekdays' && weekdayList) {
+      weekdayList.appendChild(scheduleItem);
+    } else if (item.days === 'weekends' && weekendList) {
+      weekendList.appendChild(scheduleItem);
     }
   }
 }
 
-function populateFooter(footer) {
-  const container = document.getElementById('footerContent');
-  if (!container) return;
+function createScheduleItemElement(item, config) {
+  const statusDef = config.types?.[item.status];
+  if (!statusDef) return null;
 
-  const currentYear = new Date().getFullYear();
-  const copyright = footer.copyright || `© ${currentYear} Starfield Bio`;
-  container.textContent = copyright.replace('{year}', currentYear);
+  const listItem = document.createElement('li');
+  listItem.className =
+    'flex items-center justify-between p-3 border-b border-white/10 last:border-0';
+
+  const statusWrapper = document.createElement('div');
+  statusWrapper.className = 'flex items-center gap-3';
+
+  const colorDot = document.createElement('div');
+  colorDot.className = 'w-3 h-3 rounded-full';
+  colorDot.style.backgroundColor = statusDef.color || '#6B7280';
+
+  const label = document.createElement('span');
+  label.className = 'font-medium text-slate-200';
+  label.textContent = statusDef.text || item.status;
+
+  const timeRange = document.createElement('span');
+  timeRange.className = 'text-sm text-slate-400 font-mono';
+  timeRange.textContent = formatUtcRangeToLocal(item);
+
+  statusWrapper.appendChild(colorDot);
+  statusWrapper.appendChild(label);
+  listItem.appendChild(statusWrapper);
+  listItem.appendChild(timeRange);
+
+  return listItem;
 }
 
-function createLinkElement(linkData) {
-  const isLink = linkData.url && linkData.url !== '#';
-  const linkEl = document.createElement(isLink ? 'a' : 'button');
+function formatUtcRangeToLocal(item) {
+  const d1 = new Date();
+  const [h1, m1] = item.start.split(':');
+  d1.setUTCHours(h1, m1, 0, 0);
 
-  if (isLink) {
-    linkEl.href = linkData.url;
-    linkEl.target = '_blank';
-    linkEl.rel = 'noopener noreferrer';
-  } else {
-    linkEl.type = 'button';
+  const d2 = new Date();
+  const [h2, m2] = item.end.split(':');
+  d2.setUTCHours(h2, m2, 0, 0);
+
+  if (item.wrapsMidnight) {
+    d2.setUTCDate(d2.getUTCDate() + 1);
   }
 
-  linkEl.className = 'link-button';
+  const timeOpt = { hour: 'numeric', minute: '2-digit', hour12: true };
+  const startTime = d1.toLocaleTimeString([], timeOpt);
+  const endTime = d2.toLocaleTimeString([], timeOpt);
+  const crossesLocalDay = getLocalDateKey(d1) !== getLocalDateKey(d2);
 
-  if (linkData.specialType === 'copy') {
-    linkEl.classList.add('copy-button-active');
-  }
-
-  const iconEl = createIconElement(linkData.icon);
-  if (iconEl) {
-    linkEl.appendChild(iconEl);
-  }
-
-  const textWrapper = document.createElement('div');
-  textWrapper.className = 'button-text-wrapper';
-
-  const mainText = document.createElement('span');
-  mainText.className = 'button-main-text';
-  mainText.textContent = linkData.text || '';
-
-  const subtitle = document.createElement('span');
-  subtitle.className = 'button-subtitle';
-  subtitle.textContent = linkData.subtitle || '';
-
-  textWrapper.appendChild(mainText);
-  textWrapper.appendChild(subtitle);
-  linkEl.appendChild(textWrapper);
-
-  return linkEl;
+  return crossesLocalDay ? `${startTime} - ${endTime} (next day)` : `${startTime} - ${endTime}`;
 }
 
-function populateFavicon(faviconUrl) {
-  let link = document.querySelector("link[rel~='icon']");
-  if (!link) {
-    link = document.createElement('link');
-    link.rel = 'icon';
-    document.head.appendChild(link);
-  }
-
-  link.href = faviconUrl;
-
-  const ext = faviconUrl.split('.').pop().toLowerCase();
-  const mimeTypes = {
-    ico: 'image/x-icon',
-    png: 'image/png',
-    svg: 'image/svg+xml',
-    jpg: 'image/jpeg',
-    jpeg: 'image/jpeg',
-    gif: 'image/gif',
-    webp: 'image/webp',
-  };
-
-  if (mimeTypes[ext]) {
-    link.type = mimeTypes[ext];
-  } else {
-    link.removeAttribute('type');
-  }
-}
-
-function createIconElement(iconStr) {
-  const iconSource = resolveIconSource(iconStr);
-  if (!iconSource) return null;
-
-  const pathData = getSvgPathData(iconSource);
-  if (pathData) {
-    return createSvgElement({
-      viewBox: '0 0 24 24',
-      fill: 'currentColor',
-      paths: [{ d: pathData }],
-    });
-  }
-
-  const wrapper = document.createElement('span');
-  wrapper.className = 'link-button-icon-wrapper';
-
-  const icon = document.createElement('span');
-  icon.className = 'link-button-icon';
-  setMaskedIcon(icon, iconSource, 'currentColor');
-
-  wrapper.appendChild(icon);
-  return wrapper;
+function getLocalDateKey(date) {
+  return date.toLocaleDateString([], {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
 }
 
 function getSvgPathData(iconStr) {
@@ -636,464 +872,4 @@ function setMaskedIcon(element, iconUrl, color) {
 
 function cssEscapeUrl(url) {
   return String(url).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-}
-
-function initializeCopyButton(buttonElement, textToCopy, originalSubtitle) {
-  if (!buttonElement) return;
-
-  const subtitleElement = buttonElement.querySelector('.button-subtitle');
-
-  buttonElement.addEventListener('click', (event) => {
-    event.preventDefault();
-
-    if (buttonElement.classList.contains('animating') || !navigator.clipboard) return;
-
-    navigator.clipboard.writeText(textToCopy).then(() => {
-      if (!subtitleElement) return;
-
-      const oldText = subtitleElement.textContent;
-      buttonElement.classList.add('animating', 'fading-out');
-
-      window.setTimeout(() => {
-        subtitleElement.textContent = 'Copied!';
-        buttonElement.classList.add('show-copied-feedback');
-        buttonElement.classList.remove('fading-out');
-
-        window.setTimeout(() => {
-          buttonElement.classList.add('fading-out');
-
-          window.setTimeout(() => {
-            subtitleElement.textContent = originalSubtitle || oldText;
-            buttonElement.classList.remove('show-copied-feedback', 'fading-out', 'animating');
-          }, 300);
-        }, 2000);
-      }, 300);
-    });
-  });
-}
-
-function initStatusIndicator(statusConfig) {
-  const normalizedStatusConfig = normalizeStatusConfig(statusConfig);
-
-  if (!document.getElementById('status-indicator-container')) {
-    createStatusHtml();
-  }
-
-  const elements = {
-    icon: document.getElementById('status-indicator-icon'),
-    tooltipStatus: document.getElementById('tooltip-status'),
-    tooltipTime: document.getElementById('tooltip-time'),
-    tooltipAvailability: document.getElementById('tooltip-availability'),
-  };
-
-  if (!elements.icon) return;
-
-  populateScheduleModal(normalizedStatusConfig);
-
-  function updateLoop() {
-    const currentStatus = determineCurrentStatus(normalizedStatusConfig);
-    const statusDef =
-      normalizedStatusConfig.types[currentStatus] || normalizedStatusConfig.default || {};
-    const defaultStatus = normalizedStatusConfig.default || {};
-
-    const color = statusDef.color || defaultStatus.color || '#6B7280';
-    const text = statusDef.text || defaultStatus.text || 'Offline';
-    const iconPath = resolveIconSource(statusDef.icon || defaultStatus.icon || '');
-    const message = statusDef.message || '';
-    const iconPathData = getSvgPathData(iconPath);
-
-    if (iconPathData) {
-      const svgData = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black'><path d='${iconPathData}'/></svg>`;
-      const maskUrl = `data:image/svg+xml;base64,${btoa(svgData)}`;
-
-      setMaskedIcon(elements.icon, maskUrl, color);
-      elements.icon.style.backgroundImage = 'none';
-    } else {
-      setMaskedIcon(elements.icon, iconPath, color);
-      elements.icon.style.backgroundImage = 'none';
-    }
-
-    if (elements.tooltipStatus) elements.tooltipStatus.textContent = text;
-
-    if (elements.tooltipAvailability) {
-      elements.tooltipAvailability.textContent = message;
-      elements.tooltipAvailability.classList.toggle('hidden', !message);
-    }
-
-    if (elements.tooltipTime) {
-      elements.tooltipTime.textContent = getOwnerTime(normalizedStatusConfig.ownerTimeZone);
-    }
-  }
-
-  window.setInterval(updateLoop, 1000);
-  updateLoop();
-}
-
-function getOwnerTime(timeZone) {
-  const options = {
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true,
-  };
-
-  try {
-    return new Date().toLocaleTimeString('en-US', { ...options, timeZone });
-  } catch {
-    return new Date().toLocaleTimeString('en-US', options);
-  }
-}
-
-function normalizeStatusConfig(config) {
-  const types = config.types || {};
-  const defaultStatus = config.default || {
-    text: 'Offline',
-    color: '#6B7280',
-    icon: '',
-  };
-  const ownerTimeZone = isValidTimeZone(config.ownerTimeZone) ? config.ownerTimeZone : undefined;
-  const schedule = normalizeSchedule(config.schedule, types);
-
-  if (config.ownerTimeZone && !ownerTimeZone) {
-    console.warn(
-      `[StarryBio] Invalid status.ownerTimeZone "${config.ownerTimeZone}". Falling back to the visitor's local time.`
-    );
-  }
-
-  return {
-    ...config,
-    default: defaultStatus,
-    ownerTimeZone,
-    schedule,
-    types,
-  };
-}
-
-function normalizeSchedule(schedule, types) {
-  if (!Array.isArray(schedule)) {
-    console.warn('[StarryBio] status.schedule must be an array. Falling back to default status.');
-    return [];
-  }
-
-  return schedule.reduce((validItems, item, index) => {
-    const normalizedItem = normalizeScheduleItem(item, types, index);
-    if (normalizedItem) validItems.push(normalizedItem);
-    return validItems;
-  }, []);
-}
-
-function normalizeScheduleItem(item, types, index) {
-  if (!item || typeof item !== 'object') {
-    console.warn(`[StarryBio] Ignoring schedule item ${index}: expected an object.`);
-    return null;
-  }
-
-  if (!isValidScheduleDay(item.days)) {
-    console.warn(
-      `[StarryBio] Ignoring schedule item ${index}: days must be "daily", "weekdays", or "weekends".`
-    );
-    return null;
-  }
-
-  if (!item.status || !types[item.status]) {
-    console.warn(`[StarryBio] Ignoring schedule item ${index}: unknown status "${item.status}".`);
-    return null;
-  }
-
-  const startMins = parseTimeToMinutes(item.start);
-  const endMins = parseTimeToMinutes(item.end);
-
-  if (startMins === null || endMins === null || startMins === endMins) {
-    console.warn(
-      `[StarryBio] Ignoring schedule item ${index}: start and end must be different HH:MM values.`
-    );
-    return null;
-  }
-
-  return {
-    ...item,
-    startMins,
-    endMins,
-    wrapsMidnight: startMins > endMins,
-  };
-}
-
-function isValidScheduleDay(days) {
-  return days === 'daily' || days === 'weekdays' || days === 'weekends';
-}
-
-function isValidTimeZone(timeZone) {
-  if (!timeZone) return false;
-
-  try {
-    new Intl.DateTimeFormat('en-US', { timeZone }).format();
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-function createStatusHtml() {
-  const profileImageWrapper = document.querySelector('.profile-image-wrapper');
-  if (!profileImageWrapper) return;
-
-  const container = document.createElement('div');
-  container.id = 'status-indicator-container';
-
-  const icon = document.createElement('div');
-  icon.id = 'status-indicator-icon';
-
-  const tooltip = document.createElement('div');
-  tooltip.id = 'status-tooltip';
-
-  const tooltipStatus = document.createElement('div');
-  tooltipStatus.id = 'tooltip-status';
-  tooltipStatus.className = 'font-bold text-sm mb-1 text-center';
-
-  const timeRow = document.createElement('div');
-  timeRow.className = 'flex items-center justify-center gap-1.5 text-xs text-slate-300';
-
-  const clockIcon = createSvgElement({
-    className: 'status-clock-icon w-3.5 h-3.5 opacity-70',
-    viewBox: '0 0 24 24',
-    fill: 'none',
-    stroke: 'currentColor',
-    paths: [
-      {
-        d: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
-        strokeLinecap: 'round',
-        strokeLinejoin: 'round',
-        strokeWidth: '2',
-      },
-    ],
-  });
-
-  const tooltipTime = document.createElement('span');
-  tooltipTime.id = 'tooltip-time';
-  tooltipTime.className = 'font-mono opacity-90';
-
-  const tooltipAvailability = document.createElement('div');
-  tooltipAvailability.id = 'tooltip-availability';
-  tooltipAvailability.className =
-    'text-[0.65rem] italic text-amber-300/90 mt-1.5 pt-1.5 border-t border-white/10 text-center hidden';
-
-  timeRow.appendChild(clockIcon);
-  timeRow.appendChild(tooltipTime);
-  tooltip.appendChild(tooltipStatus);
-  tooltip.appendChild(timeRow);
-  tooltip.appendChild(tooltipAvailability);
-  container.appendChild(icon);
-  container.appendChild(tooltip);
-  profileImageWrapper.appendChild(container);
-
-  const modal = document.getElementById('status-modal');
-  const closeBtn = document.getElementById('status-modal-close');
-  const overlay = document.getElementById('status-modal-overlay');
-
-  if (modal) {
-    container.addEventListener('click', () => modal.classList.remove('hidden'));
-  }
-
-  if (modal && closeBtn) {
-    closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
-  }
-
-  if (modal && overlay) {
-    overlay.addEventListener('click', () => modal.classList.add('hidden'));
-  }
-}
-
-function determineCurrentStatus(config, now = new Date()) {
-  const utcDay = now.getUTCDay();
-  const currentUtcMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
-
-  for (const item of config.schedule || []) {
-    if (scheduleItemMatchesNow(item, utcDay, currentUtcMinutes)) {
-      return item.status;
-    }
-  }
-
-  return 'default';
-}
-
-function scheduleItemMatchesNow(item, utcDay, currentUtcMinutes) {
-  if (!item.wrapsMidnight) {
-    return appliesToUtcDay(item.days, utcDay) && isInMinuteRange(currentUtcMinutes, item);
-  }
-
-  if (currentUtcMinutes >= item.startMins) {
-    return appliesToUtcDay(item.days, utcDay);
-  }
-
-  const previousUtcDay = (utcDay + 6) % 7;
-  return currentUtcMinutes < item.endMins && appliesToUtcDay(item.days, previousUtcDay);
-}
-
-function isInMinuteRange(currentUtcMinutes, item) {
-  return currentUtcMinutes >= item.startMins && currentUtcMinutes < item.endMins;
-}
-
-function appliesToUtcDay(days, utcDay) {
-  if (days === 'daily') return true;
-
-  const isWeekend = utcDay === 0 || utcDay === 6;
-  return days === 'weekends' ? isWeekend : !isWeekend;
-}
-
-function parseTimeToMinutes(timeStr) {
-  if (typeof timeStr !== 'string') return null;
-
-  const match = timeStr.match(/^([01]\d|2[0-3]):([0-5]\d)$/);
-  if (!match) return null;
-
-  return Number(match[1]) * 60 + Number(match[2]);
-}
-
-function populateScheduleModal(config) {
-  const weekdayList = document.getElementById('weekday-schedule-list');
-  const weekendList = document.getElementById('weekend-schedule-list');
-
-  const titleEl = document.getElementById('status-modal-title');
-  if (titleEl) titleEl.textContent = 'Schedule';
-
-  const weekdayTitleEl = document.getElementById('status-modal-weekday-title');
-  if (weekdayTitleEl) weekdayTitleEl.textContent = 'Weekdays';
-
-  const weekendTitleEl = document.getElementById('status-modal-weekend-title');
-  if (weekendTitleEl) weekendTitleEl.textContent = 'Weekends';
-
-  if (weekdayList) weekdayList.replaceChildren();
-  if (weekendList) weekendList.replaceChildren();
-
-  for (const item of config.schedule || []) {
-    const scheduleItem = createScheduleItemElement(item, config);
-    if (!scheduleItem) continue;
-
-    if (item.days === 'daily') {
-      if (weekdayList) weekdayList.appendChild(scheduleItem.cloneNode(true));
-      if (weekendList) weekendList.appendChild(scheduleItem);
-    } else if (item.days === 'weekdays' && weekdayList) {
-      weekdayList.appendChild(scheduleItem);
-    } else if (item.days === 'weekends' && weekendList) {
-      weekendList.appendChild(scheduleItem);
-    }
-  }
-}
-
-function createScheduleItemElement(item, config) {
-  const statusDef = config.types?.[item.status];
-  if (!statusDef) return null;
-
-  const listItem = document.createElement('li');
-  listItem.className =
-    'flex items-center justify-between p-3 border-b border-white/10 last:border-0';
-
-  const statusWrapper = document.createElement('div');
-  statusWrapper.className = 'flex items-center gap-3';
-
-  const colorDot = document.createElement('div');
-  colorDot.className = 'w-3 h-3 rounded-full';
-  colorDot.style.backgroundColor = statusDef.color || '#6B7280';
-
-  const label = document.createElement('span');
-  label.className = 'font-medium text-slate-200';
-  label.textContent = statusDef.text || item.status;
-
-  const timeRange = document.createElement('span');
-  timeRange.className = 'text-sm text-slate-400 font-mono';
-  timeRange.textContent = formatUtcRangeToLocal(item);
-
-  statusWrapper.appendChild(colorDot);
-  statusWrapper.appendChild(label);
-  listItem.appendChild(statusWrapper);
-  listItem.appendChild(timeRange);
-
-  return listItem;
-}
-
-function formatUtcRangeToLocal(item) {
-  const d1 = new Date();
-  const [h1, m1] = item.start.split(':');
-  d1.setUTCHours(h1, m1, 0, 0);
-
-  const d2 = new Date();
-  const [h2, m2] = item.end.split(':');
-  d2.setUTCHours(h2, m2, 0, 0);
-
-  if (item.wrapsMidnight) {
-    d2.setUTCDate(d2.getUTCDate() + 1);
-  }
-
-  const timeOpt = { hour: 'numeric', minute: '2-digit', hour12: true };
-  const startTime = d1.toLocaleTimeString([], timeOpt);
-  const endTime = d2.toLocaleTimeString([], timeOpt);
-  const crossesLocalDay = getLocalDateKey(d1) !== getLocalDateKey(d2);
-
-  return crossesLocalDay ? `${startTime} - ${endTime} (next day)` : `${startTime} - ${endTime}`;
-}
-
-function getLocalDateKey(date) {
-  return date.toLocaleDateString([], {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  });
-}
-
-function createCloseIcon() {
-  const svg = createSvgElement({
-    viewBox: '0 0 24 24',
-    fill: 'none',
-    stroke: 'currentColor',
-    paths: [],
-  });
-
-  svg.setAttribute('width', '16');
-  svg.setAttribute('height', '16');
-  svg.setAttribute('stroke-width', '3');
-  svg.setAttribute('stroke-linecap', 'round');
-  svg.setAttribute('stroke-linejoin', 'round');
-
-  const firstLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-  firstLine.setAttribute('x1', '18');
-  firstLine.setAttribute('y1', '6');
-  firstLine.setAttribute('x2', '6');
-  firstLine.setAttribute('y2', '18');
-
-  const secondLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-  secondLine.setAttribute('x1', '6');
-  secondLine.setAttribute('y1', '6');
-  secondLine.setAttribute('x2', '18');
-  secondLine.setAttribute('y2', '18');
-
-  svg.appendChild(firstLine);
-  svg.appendChild(secondLine);
-
-  return svg;
-}
-
-function createSvgElement({ className, viewBox, fill, stroke, paths }) {
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.setAttribute('viewBox', viewBox);
-  svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-
-  if (className) svg.setAttribute('class', className);
-  if (fill) svg.setAttribute('fill', fill);
-  if (stroke) svg.setAttribute('stroke', stroke);
-
-  for (const pathDefinition of paths) {
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    path.setAttribute('d', pathDefinition.d);
-
-    if (pathDefinition.stroke) path.setAttribute('stroke', pathDefinition.stroke);
-    if (pathDefinition.strokeWidth) path.setAttribute('stroke-width', pathDefinition.strokeWidth);
-    if (pathDefinition.strokeLinecap)
-      path.setAttribute('stroke-linecap', pathDefinition.strokeLinecap);
-    if (pathDefinition.strokeLinejoin) {
-      path.setAttribute('stroke-linejoin', pathDefinition.strokeLinejoin);
-    }
-
-    svg.appendChild(path);
-  }
-
-  return svg;
 }

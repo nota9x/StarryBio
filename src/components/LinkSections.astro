@@ -1,0 +1,28 @@
+---
+import type { NormalizedSection } from '../config/schema';
+import LinkButton from './LinkButton.astro';
+
+interface Props {
+  sections: NormalizedSection[];
+}
+
+const { sections } = Astro.props;
+---
+
+<div class="sections-container">
+  {
+    sections.map((section) => (
+      <section class="link-section">
+        <div class="section-heading">
+          <h2>{section.title}</h2>
+          {section.description && <p>{section.description}</p>}
+        </div>
+        <div class="links-container">
+          {section.links.map((link) => (
+            <LinkButton link={link} />
+          ))}
+        </div>
+      </section>
+    ))
+  }
+</div>

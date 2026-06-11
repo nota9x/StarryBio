@@ -1,0 +1,36 @@
+---
+import { siteConfig } from '../config/site';
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  config={siteConfig}
+  title={`404 - ${siteConfig.seo.title}`}
+  description="The page could not be found."
+  includeStatus={false}
+>
+  <div class="content-wrapper layout-shell not-found-shell">
+    <main class="profile-card not-found-card" transition:name="main-card">
+      <div class="card-shine"></div>
+      <p class="not-found-kicker">Lost in orbit</p>
+      <h1 class="profile-name">404</h1>
+      <p class="profile-description">The page you're looking for drifted out of range.</p>
+
+      <div class="links-container">
+        <a href="/" class="link-button no-hover-shift home-link">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"></path>
+          </svg>
+          <span class="button-text-wrapper">
+            <span class="button-main-text">Go Home</span>
+          </span>
+        </a>
+      </div>
+    </main>
+  </div>
+</BaseLayout>

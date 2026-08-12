@@ -14,14 +14,14 @@
     "watch:css": "tailwindcss -i ./src/site/input.css -o ./src/site/style.css --watch"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20260702.1",
-    "@tailwindcss/cli": "^4.3.2",
-    "autoprefixer": "^10.5.2",
-    "postcss": "^8.5.16",
-    "prettier": "^3.9.5",
-    "tailwindcss": "^4.3.2",
-    "typescript": "^5.9.3",
-    "wrangler": "^4.110.0"
+    "@cloudflare/workers-types": "^5.20260810.1",
+    "@tailwindcss/cli": "^4.3.3",
+    "autoprefixer": "^10.5.4",
+    "postcss": "^8.5.26",
+    "prettier": "^3.9.6",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^7.0.2",
+    "wrangler": "^4.120.1"
   },
   "private": true
 }

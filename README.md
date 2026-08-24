@@ -44,15 +44,15 @@ tests, and `pnpm audit --prod`. It does not publish, tag, merge, or deploy.
 
 v3 rejects legacy and unknown configuration properties.
 
-| v2                                            | v3                                                        |
-| --------------------------------------------- | --------------------------------------------------------- |
-| Top-level `links`                             | Required `sections: [{ title, links }]`                   |
-| Link `text`                                   | Required link `label`                                     |
-| Theme `bright`                                | Choose a supported preset such as `midnight` or `minimal` |
-| `status.showLocalTime`                        | `status.showVisitorTime`                                  |
-| `status.showOwnerLocalTime`                   | `status.showOwnerTime`                                    |
-| Status schedule interpreted as UTC/owner time | Schedule interpreted in each visitor's local time         |
-| CDN icon download during every build          | Deterministic generation from installed `simple-icons`    |
+| v2                                            | v3                                                     |
+| --------------------------------------------- | ------------------------------------------------------ |
+| Top-level `links`                             | Required `sections: [{ title, links }]`                |
+| Link `text`                                   | Required link `label`                                  |
+| Theme `bright`                                | Theme `classic-blue`                                   |
+| `status.showLocalTime`                        | `status.showVisitorTime`                               |
+| `status.showOwnerLocalTime`                   | `status.showOwnerTime`                                 |
+| Status schedule interpreted as UTC/owner time | Schedule interpreted in each visitor's local time      |
+| CDN icon download during every build          | Deterministic generation from installed `simple-icons` |
 
 When `showOwnerTime` is `true`, `ownerTimeZone` is required and must be a valid IANA timezone.
 It controls only the optional owner clock, never schedule matching.
@@ -97,8 +97,9 @@ and `tel:` links stay in the current context.
 
 ### Themes And Layouts
 
-Theme presets are `nebula`, `midnight`, `aurora`, `eclipse`, `cosmic-gold`, `minimal`, and
-`terminal`. Layout modes are `centered`, `split-screen`, `profile-card`, `compact`,
+Theme presets are `nebula`, `midnight`, `classic-blue`, `aurora`, `eclipse`, `cosmic-gold`,
+`minimal`, and `terminal`. `classic-blue` restores v2's blue-gradient Bright theme under its
+new name. Layout modes are `centered`, `split-screen`, `profile-card`, `compact`,
 `creator-grid`, `portfolio`, and `terminal`.
 
 ```ts

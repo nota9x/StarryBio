@@ -3,6 +3,7 @@ import { z } from 'zod';
 const THEME_PRESETS = [
   'nebula',
   'midnight',
+  'classic-blue',
   'aurora',
   'eclipse',
   'cosmic-gold',
@@ -438,6 +439,7 @@ export interface NormalizedStarryBioConfig extends Omit<
 const DEFAULT_THEME_ACCENTS: Record<ThemePreset, string> = {
   nebula: '#a78bfa',
   midnight: '#b0c4de',
+  'classic-blue': '#b0c4de',
   aurora: '#6ee7b7',
   eclipse: '#fb7185',
   'cosmic-gold': '#f6c453',

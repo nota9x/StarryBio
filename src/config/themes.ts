@@ -17,6 +17,11 @@ interface ThemePresetTokens {
   statusBg: string;
   modalBg: string;
   tooltipBg: string;
+  announcementBg?: string;
+  announcementBorder?: string;
+  announcementShadow?: string;
+  imageBorder?: string;
+  imageShadow?: string;
 }
 
 export const THEME_PRESETS: Record<ThemePreset, ThemePresetTokens> = {
@@ -56,6 +61,29 @@ export const THEME_PRESETS: Record<ThemePreset, ThemePresetTokens> = {
     statusBg: 'rgba(20, 22, 30, 0.8)',
     modalBg: 'rgba(15, 17, 25, 0.9)',
     tooltipBg: 'rgba(15, 17, 25, 0.95)',
+  },
+  'classic-blue': {
+    accent: '#b0c4de',
+    bgColor: 'linear-gradient(135deg, #0b1c36 0%, #1a2a4d 40%, #2a3b65 100%)',
+    bgStars: 'transparent',
+    text: '#e0e7ff',
+    muted: '#b0c4de',
+    heading: 'linear-gradient(135deg, #e0e7ff 0%, #b0c4de 50%, #ffffff 100%)',
+    cardBg: 'rgba(11, 28, 54, 0.6)',
+    cardBorder: '1px solid rgba(176, 196, 222, 0.25)',
+    cardShadow: '0 20px 40px rgba(0, 0, 0, 0.4)',
+    buttonBg: 'rgba(42, 59, 101, 0.6)',
+    buttonBorder: '1px solid rgba(176, 196, 222, 0.3)',
+    buttonHoverBg: 'rgba(176, 196, 222, 0.4)',
+    glow: 'rgba(176, 196, 222, 0.4)',
+    statusBg: '#1a2a4d',
+    modalBg: 'rgba(11, 28, 54, 0.8)',
+    tooltipBg: '#0b1c36',
+    announcementBg: 'rgba(251, 191, 36, 0.25)',
+    announcementBorder: '1px solid rgba(251, 191, 36, 0.5)',
+    announcementShadow: '0 0 25px rgba(251, 191, 36, 0.4)',
+    imageBorder: '4px solid rgba(224, 231, 255, 0.7)',
+    imageShadow: '0 0 25px rgba(176, 196, 222, 0.4)',
   },
   aurora: {
     accent: '#7ddf9b',
@@ -173,7 +201,7 @@ export function getThemeStyle(theme: NormalizedThemeConfig): string {
         : tokens.bgColor;
   const starsBackground = theme.background === 'starfield' ? tokens.bgStars : 'transparent';
 
-  return [
+  const properties = [
     `--accent-color: ${tokens.accent}`,
     `--bg-color: ${background}`,
     `--bg-stars: ${starsBackground}`,
@@ -190,5 +218,15 @@ export function getThemeStyle(theme: NormalizedThemeConfig): string {
     `--status-bg: ${tokens.statusBg}`,
     `--modal-bg: ${tokens.modalBg}`,
     `--tooltip-bg: ${tokens.tooltipBg}`,
-  ].join('; ');
+  ];
+
+  if (tokens.announcementBg) properties.push(`--announcement-bg: ${tokens.announcementBg}`);
+  if (tokens.announcementBorder)
+    properties.push(`--announcement-border: ${tokens.announcementBorder}`);
+  if (tokens.announcementShadow)
+    properties.push(`--announcement-shadow: ${tokens.announcementShadow}`);
+  if (tokens.imageBorder) properties.push(`--img-border: ${tokens.imageBorder}`);
+  if (tokens.imageShadow) properties.push(`--img-shadow: ${tokens.imageShadow}`);
+
+  return properties.join('; ');
 }

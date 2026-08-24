@@ -5,6 +5,7 @@ import {
   StarryBioConfigError,
   validateStarryBioConfig,
 } from '../../src/config/schema';
+import { getThemeStyle } from '../../src/config/themes';
 import { createConfig, createStatus } from './fixtures';
 
 describe('StarryBio v3 configuration', () => {
@@ -38,6 +39,25 @@ describe('StarryBio v3 configuration', () => {
     });
     expect(normalized.layout).toMatchObject({ mode: 'centered', featuredPosition: 'above-links' });
     expect(normalized.analytics).toEqual({ provider: 'none' });
+  });
+
+  it('supports the restored Classic Blue theme preset', () => {
+    const normalized = normalizeStarryBioConfig(
+      validateStarryBioConfig(createConfig({ theme: 'classic-blue' }))
+    );
+
+    expect(normalized.theme).toMatchObject({
+      preset: 'classic-blue',
+      accent: '#b0c4de',
+      mode: 'dark',
+      background: 'starfield',
+    });
+    expect(getThemeStyle(normalized.theme)).toContain(
+      '--bg-color: linear-gradient(135deg, #0b1c36 0%, #1a2a4d 40%, #2a3b65 100%)'
+    );
+    expect(getThemeStyle(normalized.theme)).toContain(
+      '--announcement-bg: rgba(251, 191, 36, 0.25)'
+    );
   });
 
   it('requires an owner timezone only when the owner clock is enabled', () => {

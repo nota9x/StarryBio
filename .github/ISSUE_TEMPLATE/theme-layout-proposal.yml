@@ -1,0 +1,48 @@
+name: Theme or layout proposal
+description: Suggest a new visual preset, layout mode, or improvement to an existing one.
+title: '[Theme]: '
+labels:
+  - enhancement
+  - design
+body:
+  - type: markdown
+    attributes:
+      value: |
+        StarryBio themes and layouts should stay configurable, responsive, and accessible. Share enough detail for maintainers to evaluate the idea.
+  - type: input
+    id: proposal-name
+    attributes:
+      label: Proposal name
+      placeholder: 'e.g. Monochrome theme preset'
+    validations:
+      required: true
+  - type: textarea
+    id: concept
+    attributes:
+      label: Visual concept
+      description: Describe the colors, typography, background, component treatment, and overall mood.
+    validations:
+      required: true
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use case and benefit
+      description: Explain who this helps and why an existing preset or layout does not cover it.
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: References or mockups
+      description: Attach sketches, screenshots, or links to inspiration. Do not submit copyrighted assets for direct reuse.
+  - type: checkboxes
+    id: requirements
+    attributes:
+      label: Design considerations
+      options:
+        - label: This proposal works on both narrow and wide screens.
+          required: true
+        - label: This proposal preserves readable contrast and reduced-motion support.
+          required: true
+        - label: I searched existing issues and presets before submitting.
+          required: true

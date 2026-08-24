@@ -1,0 +1,49 @@
+name: Analytics provider proposal
+description: Propose support for an additional analytics provider or an improvement to an existing integration.
+title: '[Analytics]: '
+labels:
+  - enhancement
+  - analytics
+body:
+  - type: markdown
+    attributes:
+      value: |
+        StarryBio currently supports Google Analytics, Cloudflare Web Analytics, Plausible, Umami, and custom scripts. Do not include real site IDs, tokens, or account details.
+  - type: input
+    id: provider
+    attributes:
+      label: Provider name
+      placeholder: 'e.g. Bob\'s Analytics'
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What need would this address?
+      description: Explain why an existing provider or the custom-script option is insufficient.
+    validations:
+      required: true
+  - type: textarea
+    id: integration
+    attributes:
+      label: Proposed integration
+      description: Link official setup documentation and describe the configuration fields, script URL, and any data attributes required. Use example placeholders only.
+      placeholder: |
+        Official docs: https://example.com/docs
+        Suggested config: `{ provider: 'example', siteId: 'YOUR_SITE_ID' }`
+    validations:
+      required: true
+  - type: textarea
+    id: csp
+    attributes:
+      label: Content Security Policy requirements
+      description: List the script and network hosts the provider needs, if known. This is needed to evaluate changes to `public/_headers`.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I reviewed the existing analytics providers and custom-script option.
+          required: true
+        - label: I have not included real credentials, tokens, or personal analytics data.
+          required: true

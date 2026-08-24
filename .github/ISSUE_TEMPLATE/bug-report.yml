@@ -1,0 +1,59 @@
+name: Bug report
+description: Report a reproducible problem with the StarryBio site, configuration, or build.
+title: '[Bug]: '
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve StarryBio. Please remove any credentials, analytics tokens, or personal data before submitting.
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: Describe the unexpected behavior and what you expected instead.
+      placeholder: The profile card overlaps the first link on narrow screens, but it should remain readable.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Start the project with `pnpm dev`
+        2. Open ...
+        3. Change ...
+        4. Observe ...
+    validations:
+      required: true
+  - type: input
+    id: area
+    attributes:
+      label: Affected area
+      description: Name the page, configuration section, generated asset, or command involved.
+      placeholder: 'e.g. theme preset, status schedule, `pnpm build`, /'
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include OS, browser (for UI issues), Node.js version, and pnpm version.
+      placeholder: 'Windows 11; Chrome 140; Node 24.x; pnpm 11.x'
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Logs, screenshots, or configuration excerpt
+      description: Attach screenshots or paste a minimal, redacted error/configuration example.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues and did not find a duplicate.
+          required: true
+        - label: I removed secrets, analytics tokens, and personal information.
+          required: true

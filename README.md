@@ -8,7 +8,7 @@ Demo: [a9x.pro](https://a9x.pro)
 
 ## Requirements
 
-- Node.js 22.22.3+, 24.16.0+, or 26.3.0+
+- Node.js 24.0.0+
 - pnpm 11.23.0+
 - A Cloudflare account only when deploying
 

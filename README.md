@@ -20,7 +20,8 @@ pnpm dev
 ```
 
 Edit [`config/starrybio.config.ts`](config/starrybio.config.ts). It is a complete starter config
-and the only file most installations need to change.
+and the only file most installations need to change. While `pnpm dev` is running, saving this
+file automatically reloads the open site with the updated configuration.
 
 ## Commands
 

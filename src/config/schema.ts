@@ -51,7 +51,7 @@ const simpleIconSchema = z
   .object({
     simpleIcon: nonEmptyString.optional(),
     brand: nonEmptyString.optional(),
-    slug: nonEmptyString.optional(),
+    slug: nonEmptyString.regex(/^[a-z0-9]+$/, 'must be a lowercase Simple Icons slug').optional(),
     color: z.union([z.string(), z.number()]).optional(),
     darkColor: z.union([z.string(), z.number()]).optional(),
     viewbox: z.union([z.string(), z.number()]).optional(),

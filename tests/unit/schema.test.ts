@@ -138,6 +138,17 @@ describe('StarryBio v3 configuration', () => {
         })
       )
     ).toThrow(/dataAttributes/);
+    expect(() =>
+      validateStarryBioConfig(
+        createConfig({
+          analytics: {
+            provider: 'custom',
+            scriptSrc: 'https://analytics.example.com/script.js',
+            dataAttributes: { 'starrybio-provider': 'google' },
+          },
+        })
+      )
+    ).toThrow(/reserved StarryBio analytics attribute/);
   });
 
   it('accepts both current and legacy Plausible installation formats', () => {

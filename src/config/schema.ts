@@ -32,6 +32,12 @@ const TIME_RE = /^([01]\d|2[0-3]):([0-5]\d)$/;
 const GA_MEASUREMENT_ID_RE = /^G-[A-Z0-9]+$/;
 const ANALYTICS_ID_RE = /^[A-Za-z0-9_-]+$/;
 const DATA_ATTRIBUTE_RE = /^[a-z][a-z0-9-]*$/;
+const RESERVED_CUSTOM_DATA_ATTRIBUTES = new Set([
+  'starrybio-provider',
+  'measurement-id',
+  'send-page-view',
+  'config',
+]);
 
 const nonEmptyString = z.string().trim().min(1, 'must be a non-empty string');
 const hexColor = z.string().regex(HEX_COLOR_RE, 'must be a hex color such as "#10B981"');
@@ -248,7 +254,17 @@ const analyticsSchema = z.discriminatedUnion('provider', [
         )
         .optional(),
     })
-    .strict(),
+    .strict()
+    .superRefine((analytics, context) => {
+      for (const key of Object.keys(analytics.dataAttributes || {})) {
+        if (!RESERVED_CUSTOM_DATA_ATTRIBUTES.has(key)) continue;
+        context.addIssue({
+          code: 'custom',
+          path: ['dataAttributes', key],
+          message: 'must not override a reserved StarryBio analytics attribute',
+        });
+      }
+    }),
 ]);
 
 export const starryBioConfigSchema = z

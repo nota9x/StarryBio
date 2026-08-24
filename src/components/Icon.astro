@@ -11,7 +11,10 @@ const { icon } = Astro.props;
 const iconSource = resolveIconSource(icon);
 const pathData = iconSource ? getSvgPathData(iconSource) : '';
 const iconUrl = toAbsoluteAssetPath(iconSource);
-const escapedIconSource = iconUrl.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+const escapedIconSource = iconUrl
+  .replace(/[\r\n\f]/g, '')
+  .replace(/\\/g, '\\\\')
+  .replace(/'/g, "\\'");
 ---
 
 {

@@ -146,13 +146,18 @@ describe('analytics serialization', () => {
     });
   });
 
-  it('does not let custom attributes collide with the internal provider marker', () => {
+  it('does not emit custom attributes that collide with internal analytics markers', () => {
     const descriptor = createAnalyticsScript({
       provider: 'custom',
       scriptSrc: 'https://analytics.example.com/script.js',
-      dataAttributes: { provider: 'google' },
+      dataAttributes: {
+        provider: 'google',
+        'starrybio-provider': 'google',
+        'measurement-id': 'G-ABC123',
+      },
     });
     expect(descriptor?.attrs).toEqual({ 'data-provider': 'google' });
     expect(descriptor?.attrs).not.toHaveProperty('data-starrybio-provider');
+    expect(descriptor?.attrs).not.toHaveProperty('data-measurement-id');
   });
 });

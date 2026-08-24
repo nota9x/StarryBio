@@ -281,5 +281,8 @@ function toAbsoluteUrl(value: string): string {
 }
 
 function cssEscapeUrl(value: string): string {
-  return value.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+  return value
+    .replace(/[\r\n\f]/g, '')
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'");
 }

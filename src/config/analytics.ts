@@ -1,5 +1,12 @@
 import type { AnalyticsConfig } from './schema';
 
+const RESERVED_CUSTOM_DATA_ATTRIBUTES = new Set([
+  'starrybio-provider',
+  'measurement-id',
+  'send-page-view',
+  'config',
+]);
+
 export interface AnalyticsScriptDescriptor {
   src: string;
   loading: 'async' | 'defer' | 'module';
@@ -49,7 +56,9 @@ export function createAnalyticsScript(
         loading: 'defer',
         attrs: analytics.dataAttributes
           ? Object.fromEntries(
-              Object.entries(analytics.dataAttributes).map(([key, value]) => [`data-${key}`, value])
+              Object.entries(analytics.dataAttributes)
+                .filter(([key]) => !RESERVED_CUSTOM_DATA_ATTRIBUTES.has(key))
+                .map(([key, value]) => [`data-${key}`, value])
             )
           : {},
       };

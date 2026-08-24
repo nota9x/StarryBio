@@ -13,7 +13,7 @@ body:
     id: provider
     attributes:
       label: Provider name
-      placeholder: 'e.g. Bob\'s Analytics'
+      placeholder: "e.g. Bob's Analytics"
     validations:
       required: true
   - type: textarea

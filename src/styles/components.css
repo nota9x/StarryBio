@@ -665,6 +665,10 @@ body {
   padding-right: 3rem;
 }
 
+.link-button:not(.copy-button-active) {
+  padding-right: 3rem;
+}
+
 .copy-button-active.show-copied-feedback {
   border-color: rgba(255, 255, 255, 0.4);
 }
@@ -715,6 +719,23 @@ body {
 }
 .link-button:hover > svg {
   transform: scale(1.15);
+  filter: drop-shadow(0 0 6px rgba(224, 231, 255, 0.6));
+}
+
+.link-button > .link-button-chevron {
+  position: absolute;
+  top: 50%;
+  right: 1.5rem;
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  opacity: 0.72;
+  transform: translateY(-50%);
+}
+
+.link-button:hover > .link-button-chevron {
+  opacity: 1;
+  transform: translate(3px, -50%);
   filter: drop-shadow(0 0 6px rgba(224, 231, 255, 0.6));
 }
 
@@ -850,8 +871,13 @@ body {
     height: 20px;
     right: 1rem;
   }
-  .copy-button-active {
+  .copy-button-active,
+  .link-button:not(.copy-button-active) {
     padding-right: 2.5rem;
+  }
+  .link-button > .link-button-chevron {
+    right: 1rem;
+    margin: 0;
   }
   .link-button:not(.no-hover-shift):hover {
     padding-right: 2.5rem;

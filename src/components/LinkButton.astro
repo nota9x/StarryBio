@@ -1,5 +1,5 @@
 ---
-import { Check, Copy } from '@lucide/astro';
+import { Check, ChevronRight, Copy } from '@lucide/astro';
 import type { NormalizedLink } from '../config/schema';
 import { externalLinkAttributes } from '../config/urls';
 import Icon from './Icon.astro';
@@ -23,6 +23,7 @@ const classes = ['link-button', isCopyButton ? 'copy-button-active' : ''].filter
         {link.subtitle && <span class="button-subtitle">{link.subtitle}</span>}
         {link.description && <span class="button-subtitle">{link.description}</span>}
       </div>
+      <ChevronRight class="link-button-chevron" aria-hidden="true" />
     </a>
   ) : (
     <button

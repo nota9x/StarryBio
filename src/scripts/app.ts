@@ -116,10 +116,10 @@ function setupCopyButtons(signal: AbortSignal): void {
 
             schedule(() => {
               button.classList.add('copy-feedback-changing');
-              button.classList.remove('show-copied-feedback');
 
               schedule(() => {
                 feedback.textContent = originalText;
+                button.classList.remove('show-copied-feedback');
                 requestAnimationFrame(() => {
                   button.classList.remove('copy-feedback-changing');
                   button.disabled = false;

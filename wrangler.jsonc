@@ -1,14 +1,10 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "starry-bio",
-  "main": "src/worker.ts",
-  "compatibility_date": "2026-01-01",
+  "compatibility_date": "2026-08-24",
+  "send_metrics": false,
   "assets": {
-    "directory": "src/site",
-    "binding": "ASSETS",
-    "run_worker_first": true,
-  },
-  "observability": {
-    "enabled": true,
+    "directory": "./dist",
+    "not_found_handling": "404-page",
   },
 }

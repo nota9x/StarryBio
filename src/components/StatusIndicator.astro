@@ -1,0 +1,42 @@
+---
+import { Clock3 } from '@lucide/astro';
+import type { StarryBioConfig } from '../config/schema';
+
+interface Props {
+  status?: StarryBioConfig['status'];
+}
+
+const { status } = Astro.props;
+---
+
+{
+  status?.enabled && (
+    <button
+      id="status-indicator-container"
+      type="button"
+      aria-label="View availability schedule"
+      aria-controls="status-modal"
+      aria-describedby="status-tooltip"
+      aria-expanded="false"
+      aria-haspopup="dialog"
+    >
+      <span id="status-indicator-icon" aria-hidden="true" />
+      <span id="status-tooltip" role="tooltip">
+        <span id="tooltip-status" class="font-bold text-sm mb-1 text-center" />
+        <span
+          id="tooltip-owner-time-row"
+          class="status-time-row flex items-center justify-center gap-1.5 text-xs text-slate-300 hidden"
+        >
+          <Clock3 class="status-clock-icon w-3.5 h-3.5 opacity-70" size={14} aria-hidden="true" />
+          <span id="tooltip-owner-time" class="font-mono opacity-90" />
+        </span>
+        <span id="tooltip-visitor-time" class="status-visitor-time hidden" />
+        <span
+          id="tooltip-availability"
+          class="text-[0.65rem] italic text-amber-300/90 mt-1.5 pt-1.5 border-t border-white/10 text-center hidden"
+        />
+        <span id="tooltip-next-available" class="status-next-available hidden" />
+      </span>
+    </button>
+  )
+}

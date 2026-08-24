@@ -4,9 +4,12 @@ node_modules/
 dist/
 build/
 .output/
+.astro/
 coverage/
-src/site/style.css
-src/site/assets/icons/simple-icons/
+public/assets/icons/simple-icons/
+public/og.png
+public/qr.png
+public/contact.vcf
 
 # Cloudflare local state
 .wrangler/
@@ -29,6 +32,8 @@ Thumbs.db
 
 # Development
 qa-screenshots/
+test-results/
+playwright-report/
 
 # IDE files
 .vscode/

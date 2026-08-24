@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
+  <defs>
+    <radialGradient id="space" cx="50%" cy="35%" r="70%">
+      <stop offset="0" stop-color="#2a3b65"/>
+      <stop offset="1" stop-color="#090a0f"/>
+    </radialGradient>
+    <linearGradient id="visor" x1="60" x2="180" y1="94" y2="150">
+      <stop offset="0" stop-color="#e0e7ff"/>
+      <stop offset="1" stop-color="#7dd3fc"/>
+    </linearGradient>
+  </defs>
+  <rect width="240" height="240" fill="url(#space)"/>
+  <circle cx="54" cy="50" r="3" fill="#fff" opacity=".9"/>
+  <circle cx="185" cy="38" r="2" fill="#fff" opacity=".7"/>
+  <circle cx="204" cy="112" r="3" fill="#fff" opacity=".8"/>
+  <circle cx="35" cy="154" r="2" fill="#fff" opacity=".6"/>
+  <circle cx="120" cy="119" r="72" fill="#f8fafc"/>
+  <circle cx="120" cy="119" r="58" fill="#dbeafe"/>
+  <rect x="66" y="88" width="108" height="66" rx="31" fill="#111827"/>
+  <rect x="78" y="99" width="84" height="44" rx="22" fill="url(#visor)"/>
+  <path d="M80 187c11-15 25-23 40-23s29 8 40 23v53H80z" fill="#e5e7eb"/>
+  <path d="M96 190h48v50H96z" fill="#cbd5e1"/>
+</svg>

@@ -1,95 +1,224 @@
-# ✨ StarryBio v2.0
+# StarryBio v3
 
-A mesmerizing, starry-themed link-in-bio page powered by Cloudflare Workers.
+StarryBio is a static Astro link-in-bio site with an animated starfield, grouped links,
+featured cards, availability schedules, generated downloads, and optional analytics. It builds
+directly to `dist/` and deploys as Cloudflare Workers static assets.
 
 Demo: [a9x.pro](https://a9x.pro)
 
-## Features
+## Requirements
 
-- **Deep Space Animation**: Interactive starfield with shooting stars and parallax depth.
-- **Fully Configurable**: Edit `src/site/config.js` to change your profile, links, icons, and schedule.
-- **Simple Icons Fetching**: Specify a brand name in config and download matching SVGs from the Simple Icons CDN during build.
-- **Smart Scheduling**: Define your availability in UTC, and visitors automatically see it in their local time.
-- **Status Icons**: Support for both monochromatic SVG masks and full-color images.
-- **Cloudflare Worker**: Edge-hosted for speed and scalability.
+- Node.js 24.0.0+
+- pnpm 11.23.0+
+- A Cloudflare account only when deploying
 
-## Setup
+Install and start the local Astro server:
 
-This project uses pnpm and Wrangler 4, which requires a current Node.js release. Node.js 20.3 or newer is recommended.
+```bash
+pnpm install
+pnpm dev
+```
 
-1.  **Install Dependencies**:
+Edit [`config/starrybio.config.ts`](config/starrybio.config.ts). It is a complete starter config
+and the only file most installations need to change.
 
-    ```bash
-    pnpm install
-    ```
+## Commands
 
-2.  **Build Assets**:
-    This downloads configured Simple Icons and generates the static CSS file before running the server.
+| Command              | Purpose                                                       |
+| -------------------- | ------------------------------------------------------------- |
+| `pnpm dev`           | Validate config, generate assets and icons, then start Astro  |
+| `pnpm build`         | Produce the static site in `dist/`                            |
+| `pnpm preview`       | Build and serve `dist/` through Wrangler                      |
+| `pnpm validate`      | Validate configuration and local asset paths                  |
+| `pnpm icons`         | Regenerate configured Simple Icons from the installed package |
+| `pnpm test:unit`     | Run Vitest coverage for config and build/runtime helpers      |
+| `pnpm test:e2e`      | Build and run local Playwright browser tests                  |
+| `pnpm release:check` | Run the complete local v3 release gate                        |
+| `pnpm deploy`        | Build and deploy static assets with Wrangler                  |
 
-    ```bash
-    pnpm run build
-    ```
+`release:check` runs formatting, linting, type checks, unit tests, a production build, browser
+tests, and `pnpm audit --prod`. It does not publish, tag, merge, or deploy.
 
-    > **Note:** For real-time CSS updates during development, run `pnpm run watch:css` in a separate terminal.
+## v2 To v3
 
-3.  **Development**:
-    Start the local development server:
+v3 rejects legacy and unknown configuration properties.
 
-    ```bash
-    pnpm run start
-    ```
+| v2                                            | v3                                                        |
+| --------------------------------------------- | --------------------------------------------------------- |
+| Top-level `links`                             | Required `sections: [{ title, links }]`                   |
+| Link `text`                                   | Required link `label`                                     |
+| Theme `bright`                                | Choose a supported preset such as `midnight` or `minimal` |
+| `status.showLocalTime`                        | `status.showVisitorTime`                                  |
+| `status.showOwnerLocalTime`                   | `status.showOwnerTime`                                    |
+| Status schedule interpreted as UTC/owner time | Schedule interpreted in each visitor's local time         |
+| CDN icon download during every build          | Deterministic generation from installed `simple-icons`    |
 
-4.  **Deployment**:
-    Deploy to Cloudflare:
-
-    ```bash
-    pnpm run deploy
-    ```
-
-    You can also run `pnpm exec wrangler deploy` directly after generating `src/site/style.css`.
+When `showOwnerTime` is `true`, `ownerTimeZone` is required and must be a valid IANA timezone.
+It controls only the optional owner clock, never schedule matching.
 
 ## Configuration
 
-Navigate to `src/site/config.js`.
+The TypeScript config ends with `satisfies StarryBioConfig`, while the same strict Zod schema
+validates it at build time. Errors include the exact failing path. Unknown fields, unsafe paths,
+unsupported URL protocols, invalid analytics identifiers, and incorrect generated-file
+extensions stop the build.
 
-- **Profile**: Update name, description, image path, and layout.
-- **Links**: Add buttons with Simple Icons brand names, SVG paths, or image URLs.
-- **Status**: Set your `ownerTimeZone`, define your `schedule` (in UTC), and point to your custom status icons.
-- **Announcement**: Configure the banner text, URL, and enable/disable it.
-- **Footer**: Custom copyright text.
+### Sections And Links
 
-Simple Icons are fetched as white SVGs at build time from the [Simple Icons CDN](https://github.com/LitoMore/simple-icons-cdn). Use a brand name in `src/site/config.js`:
-
-```js
-"icon": { "simpleIcon": "GitHub" }
+```ts
+sections: [
+  {
+    title: 'Socials',
+    description: 'Find me around the web.',
+    links: [
+      {
+        label: 'GitHub',
+        subtitle: '@your-name',
+        url: 'https://github.com/your-name',
+        icon: { simpleIcon: 'GitHub' },
+      },
+      {
+        label: 'Email address',
+        specialType: 'copy',
+        copyValue: 'hello@example.com',
+      },
+    ],
+  },
+];
 ```
 
-Optional color fields are supported when you want a different downloaded color:
+Sections, links, and featured cards accept `enabled`, `visibleFrom`, and `visibleUntil`.
+Visibility timestamps use ISO date-time strings and are evaluated during the build. End times
+are exclusive.
 
-```js
-"icon": { "simpleIcon": "Discord", "color": "5865F2" }
+Only external HTTP(S) destinations open a new tab. Root-relative, relative, hash, `mailto:`,
+and `tel:` links stay in the current context.
+
+### Themes And Layouts
+
+Theme presets are `nebula`, `midnight`, `aurora`, `eclipse`, `cosmic-gold`, `minimal`, and
+`terminal`. Layout modes are `centered`, `split-screen`, `profile-card`, `compact`,
+`creator-grid`, `portfolio`, and `terminal`.
+
+```ts
+theme: {
+  preset: 'midnight',
+  mode: 'dark',
+  buttonStyle: 'glass',
+  background: 'starfield',
+  animationIntensity: 'normal',
+},
+layout: {
+  mode: 'centered',
+  linkStyle: 'cards',
+  profilePosition: 'top',
+  featuredPosition: 'above-links',
+},
 ```
 
-If a brand's generated slug does not match Simple Icons, provide the slug explicitly:
+Reduced-motion preferences disable nonessential movement.
 
-```js
-"icon": { "simpleIcon": "Node.js", "slug": "nodedotjs" }
+### Status Schedule
+
+```ts
+status: {
+  enabled: true,
+  ownerTimeZone: 'America/New_York',
+  showOwnerTime: true,
+  showVisitorTime: true,
+  showNextAvailable: true,
+  responseText: 'Usually replies within a few hours',
+  default: { text: 'Offline', color: '#6B7280' },
+  types: {
+    available: { text: 'Available', color: '#10B981' },
+    busy: { text: 'Busy', color: '#EF4444' },
+  },
+  schedule: [
+    { status: 'busy', days: 'weekdays', start: '09:00', end: '17:00' },
+    { status: 'available', days: 'weekdays', start: '21:00', end: '05:00' },
+  ],
+},
 ```
 
-The example config points to common customizable assets such as a profile image and favicon. Add those files under `src/site/assets/images/`, or update the paths in `config.js` to match your own hosted images.
+Times use 24-hour `HH:MM`. `daily`, `weekdays`, and `weekends` refer to the visitor's local
+calendar day. An overnight range belongs to its start day, so a Friday weekday range from
+`21:00` to `05:00` remains active early Saturday.
 
-## Styling
+### Images And Icons
 
-To customize colors or styles beyond the config, modify `src/site/input.css` and re-run `pnpm run build`.
+Local images live under `public/`. Both `assets/images/profile.svg` and
+`/assets/images/profile.svg` resolve to `public/assets/images/profile.svg`. Remote images must
+use HTTP(S). Stable image dimensions are emitted to prevent layout shift.
 
-To check the Worker TypeScript without deploying, run:
+Simple Icons can be used in links, featured cards, and statuses:
+
+```ts
+icon: { simpleIcon: 'Node.js', slug: 'nodedotjs', color: '#5FA04E' }
+```
+
+The build reads SVG data from the pinned `simple-icons` dependency and writes only the icons in
+use. `slug`, `color`, `darkColor`, `viewbox`, and `size` remain available for customization.
+
+### Generated Assets
+
+```ts
+ogImage: { enabled: true, output: 'public/og.png' },
+qr: { enabled: true, url: 'https://example.com', output: 'public/qr.png' },
+contactCard: {
+  enabled: true,
+  output: 'public/contact.vcf',
+  name: 'Your Name',
+  email: 'hello@example.com',
+},
+```
+
+Outputs must stay inside `public/` and use the correct extension. Disabling a generator removes
+its configured output so stale downloads cannot be deployed. vCard values are escaped and
+folded according to the format's UTF-8 line limit.
+
+### Analytics And CSP
+
+Analytics defaults to `{ provider: 'none' }`. Supported providers are `google`, `cloudflare`,
+`plausible`, `umami`, and `custom`. Configuration is passed to the bundled runtime through data
+attributes; StarryBio emits no inline analytics initialization.
+
+```ts
+// Google Analytics 4
+analytics: { provider: 'google', measurementId: 'G-XXXXXXXXXX' },
+
+// Cloudflare Web Analytics
+analytics: { provider: 'cloudflare', token: 'your-site-token' },
+
+// Plausible's current per-site snippet (copy the complete URL from Site Installation)
+analytics: { provider: 'plausible', scriptSrc: 'https://plausible.io/js/pa-XXXXXXXX.js' },
+
+// Umami Cloud or a self-hosted Umami instance
+analytics: {
+  provider: 'umami',
+  websiteId: 'your-website-id',
+  scriptSrc: 'https://cloud.umami.is/script.js',
+},
+```
+
+Existing Plausible installations can continue to use the legacy
+`{ provider: 'plausible', domain: 'example.com' }` form. New installations should use the exact
+per-site `scriptSrc` supplied by Plausible.
+
+The default CSP in `public/_headers` allows the documented provider hosts without
+`script-src 'unsafe-inline'`. Any overridden or self-hosted `scriptSrc` remains HTTPS-only. If it
+uses a host not already listed in `_headers`, add that host to `script-src` and add the provider's
+collection endpoint to `connect-src` before deployment.
+
+## Static Cloudflare Deployment
+
+`astro build` writes static HTML and hashed CSS/JavaScript directly to `dist/`. There is no
+Astro Cloudflare adapter, Worker entry point, session binding, or Workers runtime type package.
+Wrangler deploys `dist/` using the `assets.directory` setting in `wrangler.jsonc`, including the
+custom `404.html` and `public/_headers` rules.
 
 ```bash
-pnpm run typecheck
+pnpm deploy
 ```
 
-## Project Structure
-
-- `src/worker.ts`: Main Worker logic (routing, headers).
-- `src/site/`: Static assets (HTML, CSS, JS, Images).
-- `wrangler.jsonc`: Cloudflare configuration.
+Use `pnpm preview` before deployment to verify Cloudflare's static asset routing, headers, cache
+rules, generated downloads, and unknown-route 404 responses.

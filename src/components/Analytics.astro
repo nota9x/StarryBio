@@ -1,0 +1,25 @@
+---
+import type { NormalizedStarryBioConfig } from '../config/schema';
+import { createAnalyticsScript } from '../config/analytics';
+
+interface Props {
+  analytics?: NormalizedStarryBioConfig['analytics'];
+}
+
+const { analytics } = Astro.props;
+const script = createAnalyticsScript(analytics);
+---
+
+{
+  script && (
+    <script
+      id="starrybio-analytics"
+      is:inline
+      async={script.loading === 'async'}
+      defer={script.loading === 'defer'}
+      type={script.loading === 'module' ? 'module' : undefined}
+      src={script.src}
+      {...script.attrs}
+    />
+  )
+}

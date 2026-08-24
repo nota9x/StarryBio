@@ -1,0 +1,13 @@
+---
+import AnnouncementBanner from '../components/AnnouncementBanner.astro';
+import ProfileCard from '../components/ProfileCard.astro';
+import StatusModal from '../components/StatusModal.astro';
+import { siteConfig } from '../config/site';
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout config={siteConfig}>
+  <AnnouncementBanner announcement={siteConfig.announcement} />
+  <ProfileCard config={siteConfig} />
+  <StatusModal status={siteConfig.status} />
+</BaseLayout>

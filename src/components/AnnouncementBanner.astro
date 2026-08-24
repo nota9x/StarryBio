@@ -1,0 +1,44 @@
+---
+import { createHash } from 'node:crypto';
+import { TriangleAlert, X } from '@lucide/astro';
+import type { StarryBioConfig } from '../config/schema';
+import { externalLinkAttributes } from '../config/urls';
+
+interface Props {
+  announcement?: StarryBioConfig['announcement'];
+}
+
+const { announcement } = Astro.props;
+const showAnnouncement = Boolean(announcement?.enabled && announcement.text);
+const announcementKey = createHash('sha256')
+  .update(`${announcement?.text || ''}|${announcement?.url || ''}`)
+  .digest('hex')
+  .slice(0, 12);
+---
+
+<div id="announcement-banner-container">
+  {
+    showAnnouncement && (
+      <aside id="announcement-banner" data-announcement-key={announcementKey}>
+        {announcement?.url ? (
+          <a
+            class="announcement-content"
+            href={announcement.url}
+            {...externalLinkAttributes(announcement.url)}
+          >
+            <TriangleAlert class="announcement-icon" aria-hidden="true" />
+            <span class="announcement-text">{announcement.text}</span>
+          </a>
+        ) : (
+          <div class="announcement-content">
+            <TriangleAlert class="announcement-icon" aria-hidden="true" />
+            <span class="announcement-text">{announcement?.text}</span>
+          </div>
+        )}
+        <button id="announcement-close-btn" type="button" aria-label="Dismiss announcement">
+          <X size={18} stroke-width={2.5} aria-hidden="true" />
+        </button>
+      </aside>
+    )
+  }
+</div>

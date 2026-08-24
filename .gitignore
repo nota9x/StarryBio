@@ -6,9 +6,7 @@ build/
 .output/
 .astro/
 coverage/
-public/style.css
 public/assets/icons/simple-icons/
-src/assets/images/
 public/og.png
 public/qr.png
 public/contact.vcf
@@ -34,6 +32,8 @@ Thumbs.db
 
 # Development
 qa-screenshots/
+test-results/
+playwright-report/
 
 # IDE files
 .vscode/

@@ -15,7 +15,7 @@ export const SIMPLE_ICON_OUTPUT_PREFIX = 'assets/icons/simple-icons';
 export function collectSimpleIconSpecs(
   value: unknown,
   collected = new Map<string, SimpleIconSpec>()
-) {
+): SimpleIconSpec[] {
   if (Array.isArray(value)) {
     for (const item of value) {
       collectSimpleIconSpecs(item, collected);
@@ -99,7 +99,7 @@ export function getSvgPathData(icon: string): string {
     return trimmedIcon;
   }
 
-  if (trimmedIcon.startsWith('<path')) {
+  if (trimmedIcon.includes('<path')) {
     const match = trimmedIcon.match(/\sd=(["'])(.*?)\1/i);
     return match ? match[2] : '';
   }

@@ -3,11 +3,12 @@
     "target": "esnext",
     "module": "esnext",
     "lib": ["dom", "dom.iterable", "esnext"],
-    "types": ["astro/client", "@cloudflare/workers-types"],
+    "types": ["astro/client", "node"],
     "moduleResolution": "bundler",
     "strict": true,
     "skipLibCheck": true,
     "noEmit": true,
+    "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
     "jsx": "preserve",
     "jsxImportSource": "astro"

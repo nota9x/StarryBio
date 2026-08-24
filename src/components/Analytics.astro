@@ -1,63 +1,25 @@
 ---
 import type { NormalizedStarryBioConfig } from '../config/schema';
+import { createAnalyticsScript } from '../config/analytics';
 
 interface Props {
   analytics?: NormalizedStarryBioConfig['analytics'];
 }
 
 const { analytics } = Astro.props;
-const provider = analytics?.provider || 'none';
-
-const externalScript =
-  provider === 'cloudflare' && analytics && 'token' in analytics
-    ? {
-        src: 'https://static.cloudflareinsights.com/beacon.min.js',
-        attrs: { 'data-cf-beacon': JSON.stringify({ token: analytics.token }) },
-      }
-    : provider === 'google' && analytics && 'measurementId' in analytics
-      ? {
-          src:
-            analytics.scriptSrc ||
-            `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(
-              analytics.measurementId
-            )}`,
-          attrs: { async: true },
-        }
-      : provider === 'plausible' && analytics && 'domain' in analytics
-        ? {
-            src: analytics.scriptSrc || 'https://plausible.io/js/script.js',
-            attrs: { 'data-domain': analytics.domain },
-          }
-        : provider === 'umami' && analytics && 'websiteId' in analytics
-          ? {
-              src: analytics.scriptSrc,
-              attrs: { 'data-website-id': analytics.websiteId },
-            }
-          : analytics?.provider === 'custom'
-            ? {
-                src: analytics.scriptSrc,
-                attrs: analytics.dataAttributes
-                  ? Object.fromEntries(
-                      Object.entries(analytics.dataAttributes).map(([key, value]) => [
-                        `data-${key}`,
-                        value,
-                      ])
-                    )
-                  : {},
-              }
-            : null;
-
-const googleInit =
-  provider === 'google' && analytics && 'measurementId' in analytics
-    ? `window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', ${JSON.stringify(analytics.measurementId)}, ${JSON.stringify({
-        send_page_view: analytics.sendPageView ?? true,
-        ...(analytics.config || {}),
-      })});`
-    : null;
+const script = createAnalyticsScript(analytics);
 ---
 
-{externalScript && <script is:inline defer src={externalScript.src} {...externalScript.attrs} />}
-{googleInit && <script is:inline set:html={googleInit} />}
+{
+  script && (
+    <script
+      id="starrybio-analytics"
+      is:inline
+      async={script.loading === 'async'}
+      defer={script.loading === 'defer'}
+      type={script.loading === 'module' ? 'module' : undefined}
+      src={script.src}
+      {...script.attrs}
+    />
+  )
+}

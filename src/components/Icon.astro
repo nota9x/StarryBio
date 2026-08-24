@@ -1,13 +1,6 @@
 ---
-import { getImage } from 'astro:assets';
+import { toAbsoluteAssetPath } from '../config/image-assets';
 import type { IconConfig } from '../config/schema';
-import {
-  isImageMetadata,
-  isLocalImagePath,
-  isSvgImagePath,
-  resolveImageAsset,
-  toAbsoluteAssetPath,
-} from '../config/image-assets';
 import { getSvgPathData, resolveIconSource } from '../config/icons';
 
 interface Props {
@@ -17,13 +10,7 @@ interface Props {
 const { icon } = Astro.props;
 const iconSource = resolveIconSource(icon);
 const pathData = iconSource ? getSvgPathData(iconSource) : '';
-const resolvedIcon =
-  iconSource && isLocalImagePath(iconSource) ? resolveImageAsset(iconSource) : '';
-const optimizedIcon =
-  resolvedIcon && isImageMetadata(resolvedIcon) && !isSvgImagePath(iconSource)
-    ? await getImage({ src: resolvedIcon, width: 48, height: 48, format: 'webp', quality: 82 })
-    : null;
-const iconUrl = optimizedIcon?.src || toAbsoluteAssetPath(iconSource);
+const iconUrl = toAbsoluteAssetPath(iconSource);
 const escapedIconSource = iconUrl.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
 ---
 

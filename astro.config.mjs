@@ -1,11 +1,9 @@
 import { defineConfig } from 'astro/config';
-import cloudflare from '@astrojs/cloudflare';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  adapter: cloudflare({ imageService: 'compile' }),
-  image: {
-    layout: 'constrained',
-    responsiveStyles: true,
-  },
   output: 'static',
+  vite: {
+    plugins: [tailwindcss()],
+  },
 });

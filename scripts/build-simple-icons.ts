@@ -1,84 +1,88 @@
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import config from '../config/starrybio.config';
 import {
   collectSimpleIconSpecs,
   getSimpleIconFilename,
+  getSvgPathData,
   SIMPLE_ICON_OUTPUT_PREFIX,
+  type SimpleIconSpec,
 } from '../src/config/icons';
 import { normalizeStarryBioConfig, validateStarryBioConfig } from '../src/config/schema';
 
 const OUTPUT_DIR = path.resolve('public/assets/icons/simple-icons');
-const CDN_BASE_URL = 'https://cdn.simpleicons.org';
+const require = createRequire(import.meta.url);
 
-async function main() {
-  const validatedConfig = normalizeStarryBioConfig(validateStarryBioConfig(config));
-  const iconSpecs = collectSimpleIconSpecs(validatedConfig);
-
+export async function buildSimpleIcons(value: unknown): Promise<number> {
+  const iconSpecs = collectSimpleIconSpecs(value);
+  await rm(OUTPUT_DIR, { recursive: true, force: true });
   if (iconSpecs.length === 0) {
-    console.log('✓ Fetched Simple Icons (none configured)');
-    return;
+    console.log('✓ Generated Simple Icons (none configured)');
+    return 0;
   }
 
   await mkdir(OUTPUT_DIR, { recursive: true });
-
-  let downloadedCount = 0;
   for (const spec of iconSpecs) {
     const filename = getSimpleIconFilename(spec);
     const outputPath = path.join(OUTPUT_DIR, filename);
-    const cdnUrl = getSimpleIconCdnUrl(spec);
-
-    const response = await fetch(cdnUrl);
-    if (!response.ok) {
-      throw new Error(
-        `[simple-icons] Failed to fetch "${spec.brand}" from ${cdnUrl}: ${response.status} ${response.statusText}`
-      );
-    }
-
-    const svg = await response.text();
-    if (!svg.trimStart().startsWith('<svg')) {
-      throw new Error(`[simple-icons] CDN response for "${spec.brand}" did not look like SVG.`);
-    }
-
-    await writeFile(outputPath, svg);
-    downloadedCount += 1;
+    await writeFile(outputPath, await createSimpleIconSvg(spec));
     console.log(`[simple-icons] ${spec.brand} -> ${SIMPLE_ICON_OUTPUT_PREFIX}/${filename}`);
   }
 
-  console.log(`✓ Fetched Simple Icons (${downloadedCount} icon(s))`);
+  console.log(`✓ Generated Simple Icons (${iconSpecs.length} icon(s))`);
+  return iconSpecs.length;
 }
 
-function getSimpleIconCdnUrl(spec: {
-  slug: string;
-  color: string;
-  darkColor: string;
-  viewbox: string;
-  size: string;
-}): string {
-  const segments = [CDN_BASE_URL, encodeURIComponent(spec.slug)];
-
-  if (spec.color || spec.darkColor) {
-    segments.push(encodeURIComponent(spec.color || '_'));
+export async function createSimpleIconSvg(spec: SimpleIconSpec): Promise<string> {
+  let sourcePath: string;
+  try {
+    sourcePath = require.resolve(`simple-icons/icons/${spec.slug}.svg`);
+  } catch {
+    throw new Error(
+      `[simple-icons] Unknown icon "${spec.brand}". Set icon.slug to a valid Simple Icons slug.`
+    );
   }
 
-  if (spec.darkColor) {
-    segments.push(encodeURIComponent(spec.darkColor));
+  const source = await readFile(sourcePath, 'utf8');
+  const pathData = getSvgPathData(source);
+  if (!pathData) {
+    throw new Error(`[simple-icons] Icon "${spec.brand}" did not contain SVG path data.`);
   }
 
-  const url = new URL(segments.join('/'));
+  const viewBox = normalizeViewBox(spec.viewbox);
+  const sizeAttributes = spec.size
+    ? ` width="${escapeXml(spec.size)}" height="${escapeXml(spec.size)}"`
+    : '';
+  const darkStyle = spec.darkColor
+    ? `<style>@media (prefers-color-scheme: dark){path{fill:#${escapeXml(spec.darkColor)}}}</style>`
+    : '';
 
-  if (spec.viewbox) {
-    url.searchParams.set('viewbox', spec.viewbox);
-  }
-
-  if (spec.size) {
-    url.searchParams.set('size', spec.size);
-  }
-
-  return url.toString();
+  return `<svg role="img" viewBox="${escapeXml(viewBox)}"${sizeAttributes} xmlns="http://www.w3.org/2000/svg"><title>${escapeXml(spec.brand)}</title>${darkStyle}<path fill="#${escapeXml(spec.color)}" d="${escapeXml(pathData)}"/></svg>`;
 }
 
-main().catch((error: unknown) => {
-  console.error(error instanceof Error ? error.message : error);
-  process.exitCode = 1;
-});
+function normalizeViewBox(value: string): string {
+  if (!value) return '0 0 24 24';
+  return /^\d+(?:\.\d+)?$/.test(value) ? `0 0 ${value} ${value}` : value;
+}
+
+function escapeXml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+export async function main(): Promise<void> {
+  const siteConfig = normalizeStarryBioConfig(validateStarryBioConfig(config));
+  await buildSimpleIcons(siteConfig);
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+  main().catch((error: unknown) => {
+    console.error(error instanceof Error ? error.message : error);
+    process.exitCode = 1;
+  });
+}

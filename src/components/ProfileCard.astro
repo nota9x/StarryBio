@@ -1,7 +1,9 @@
 ---
-import { Image } from 'astro:assets';
+import { QrCode } from '@lucide/astro';
+import { toAbsoluteAssetPath } from '../config/image-assets';
 import type { NormalizedStarryBioConfig } from '../config/schema';
-import { isImageMetadata, resolveImageAsset } from '../config/image-assets';
+import { STARRYBIO_VERSION } from '../config/version';
+import { toGeneratedAssetUrl } from '../config/urls';
 import FeaturedCards from './FeaturedCards.astro';
 import LinkSections from './LinkSections.astro';
 import StatusIndicator from './StatusIndicator.astro';
@@ -12,7 +14,7 @@ interface Props {
 
 const { config } = Astro.props;
 const currentYear = new Date().getFullYear();
-const copyright = (config.footer?.copyright || `© ${currentYear} Starfield Bio`).replace(
+const copyright = (config.footer?.copyright || `© ${currentYear} StarryBio`).replace(
   '{year}',
   String(currentYear)
 );
@@ -26,16 +28,10 @@ const profileClasses = [
   .filter(Boolean)
   .join(' ');
 const showFeaturedAbove = config.layout.featuredPosition === 'above-links';
-const qrHref = config.qr?.enabled ? toPublicUrl(config.qr.output, 'public/qr.png') : '';
+const qrHref = config.qr?.enabled ? toGeneratedAssetUrl(config.qr.output, 'public/qr.png') : '';
 const contactHref = config.contactCard?.enabled
-  ? toPublicUrl(config.contactCard.output, 'public/contact.vcf')
+  ? toGeneratedAssetUrl(config.contactCard.output, 'public/contact.vcf')
   : '';
-const profileImage = resolveImageAsset(config.profile.image);
-
-function toPublicUrl(output: string | undefined, fallback: string): string {
-  const value = output || fallback;
-  return `/${value.replace(/^public[\\/]/, '').replace(/\\/g, '/')}`;
-}
 ---
 
 <div class="content-wrapper layout-shell" data-layout={config.layout.mode}>
@@ -45,31 +41,14 @@ function toPublicUrl(output: string | undefined, fallback: string): string {
     <header class="profile-header">
       <div class="profile-image-wrapper">
         <div class="profile-image-container">
-          {
-            isImageMetadata(profileImage) ? (
-              <Image
-                src={profileImage}
-                alt={config.profile.name}
-                width={120}
-                height={120}
-                fit="cover"
-                layout="fixed"
-                loading="eager"
-                fetchpriority="high"
-              />
-            ) : (
-              <Image
-                src={profileImage}
-                alt={config.profile.name}
-                width={120}
-                height={120}
-                fit="cover"
-                layout="fixed"
-                loading="eager"
-                fetchpriority="high"
-              />
-            )
-          }
+          <img
+            src={toAbsoluteAssetPath(config.profile.image)}
+            alt={config.profile.name}
+            width="120"
+            height="120"
+            loading="eager"
+            fetchpriority="high"
+          />
         </div>
         <StatusIndicator status={config.status} />
       </div>
@@ -90,31 +69,7 @@ function toPublicUrl(output: string | undefined, fallback: string): string {
             download
             data-astro-reload
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <rect width="5" height="5" x="3" y="3" rx="1" />
-              <rect width="5" height="5" x="16" y="3" rx="1" />
-              <rect width="5" height="5" x="3" y="16" rx="1" />
-              <path d="M21 16h-3a2 2 0 0 0-2 2v3" />
-              <path d="M21 21v.01" />
-              <path d="M12 7v3a2 2 0 0 1-2 2H7" />
-              <path d="M3 12h.01" />
-              <path d="M12 3h.01" />
-              <path d="M12 16v.01" />
-              <path d="M16 12h1" />
-              <path d="M21 12v.01" />
-              <path d="M12 21v-1" />
-            </svg>
+            <QrCode size={20} aria-hidden="true" />
           </a>
         )
       }
@@ -141,7 +96,7 @@ function toPublicUrl(output: string | undefined, fallback: string): string {
       rel="noopener noreferrer"
       class="hover:underline opacity-75 hover:opacity-100 transition-opacity"
     >
-      Powered by StarryBio v3.0
+      Powered by StarryBio v{STARRYBIO_VERSION}
     </a>
   </p>
 </div>

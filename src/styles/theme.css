@@ -1,0 +1,24 @@
+:root {
+  --bg-color: #090a0f;
+  --bg-stars: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+  --announcement-bg: rgba(20, 22, 30, 0.8);
+  --announcement-border: 1px solid rgba(255, 255, 255, 0.1);
+  --announcement-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
+  --card-bg: rgba(15, 17, 25, 0.75);
+  --card-border: 1px solid rgba(255, 255, 255, 0.08);
+  --card-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  --img-border: 2px solid rgba(255, 255, 255, 0.15);
+  --img-shadow: 0 0 25px rgba(255, 255, 255, 0.1);
+  --btn-bg: rgba(20, 22, 30, 0.6);
+  --btn-border: 1px solid rgba(255, 255, 255, 0.08);
+  --btn-hover-bg: rgba(176, 196, 222, 0.4);
+  --status-bg: rgba(20, 22, 30, 0.8);
+  --modal-bg: rgba(15, 17, 25, 0.9);
+  --tooltip-bg: rgba(15, 17, 25, 0.95);
+  --accent-color: #a78bfa;
+  --focus-color: #88a2ff;
+  --text-color: #e0e7ff;
+  --muted-color: #b0c4de;
+  --heading-gradient: linear-gradient(135deg, #e0e7ff 0%, #b0c4de 50%, #ffffff 100%);
+  --theme-glow: rgba(176, 196, 222, 0.42);
+}

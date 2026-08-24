@@ -1,44 +1,36 @@
-import { cp, mkdir, rm, writeFile } from 'node:fs/promises';
+import { mkdir, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import config from '../config/starrybio.config';
 import { resolveOutputPath } from './config-utils';
-import { normalizeStarryBioConfig, validateStarryBioConfig } from '../src/config/schema';
+import {
+  normalizeStarryBioConfig,
+  type NormalizedStarryBioConfig,
+  validateStarryBioConfig,
+} from '../src/config/schema';
 import { getThemePresetTokens } from '../src/config/themes';
 
-async function main() {
-  const siteConfig = normalizeStarryBioConfig(validateStarryBioConfig(config));
-
-  await generateOgImage(siteConfig);
-  await generateQrCode(siteConfig);
-  await generateContactCard(siteConfig);
-  await syncImageOptimizationAssets();
+export async function generateAssets(siteConfig: NormalizedStarryBioConfig): Promise<void> {
+  await Promise.all([
+    generateOgImage(siteConfig),
+    generateQrCode(siteConfig),
+    generateContactCard(siteConfig),
+  ]);
 }
 
-async function syncImageOptimizationAssets() {
-  const publicImages = path.resolve('public/assets/images');
-  const optimizedImages = path.resolve('src/assets/images');
+async function generateOgImage(siteConfig: NormalizedStarryBioConfig): Promise<void> {
+  const output = await prepareOutput(
+    siteConfig.ogImage?.output,
+    'public/og.png',
+    Boolean(siteConfig.ogImage?.enabled)
+  );
 
-  await rm(optimizedImages, { recursive: true, force: true });
-  await mkdir(path.dirname(optimizedImages), { recursive: true });
-  await cp(publicImages, optimizedImages, {
-    recursive: true,
-    filter: (source) => !path.basename(source).startsWith('.'),
-  });
-
-  console.log('✓ Synced image assets for Astro optimization');
-}
-
-async function generateOgImage(siteConfig: ReturnType<typeof normalizeStarryBioConfig>) {
   if (!siteConfig.ogImage?.enabled) {
     console.log('✓ Generated SEO metadata');
     return;
   }
 
-  const output = resolveOutputPath(siteConfig.ogImage.output, 'public/og.png');
-  await mkdir(path.dirname(output), { recursive: true });
-
   const svg = createOgSvg(siteConfig);
-
   if (output.endsWith('.svg')) {
     await writeFile(output, svg);
   } else {
@@ -55,7 +47,12 @@ async function generateOgImage(siteConfig: ReturnType<typeof normalizeStarryBioC
   console.log(`✓ Generated SEO metadata (${path.relative(process.cwd(), output)})`);
 }
 
-async function generateQrCode(siteConfig: ReturnType<typeof normalizeStarryBioConfig>) {
+async function generateQrCode(siteConfig: NormalizedStarryBioConfig): Promise<void> {
+  const output = await prepareOutput(
+    siteConfig.qr?.output,
+    'public/qr.png',
+    Boolean(siteConfig.qr?.enabled)
+  );
   if (!siteConfig.qr?.enabled) return;
 
   const url = siteConfig.qr.url || siteConfig.seo.canonicalUrl;
@@ -63,33 +60,43 @@ async function generateQrCode(siteConfig: ReturnType<typeof normalizeStarryBioCo
     throw new Error('qr.url is required when seo.canonicalUrl is not configured.');
   }
 
-  const output = resolveOutputPath(siteConfig.qr.output, 'public/qr.png');
-  await mkdir(path.dirname(output), { recursive: true });
-
   const qrcode = await import('qrcode');
   await qrcode.toFile(output, url, {
     width: 960,
     margin: 2,
-    color: {
-      dark: '#0b1020',
-      light: '#ffffff',
-    },
+    color: { dark: '#0b1020', light: '#ffffff' },
   });
 
   console.log(`✓ Generated QR code (${path.relative(process.cwd(), output)})`);
 }
 
-async function generateContactCard(siteConfig: ReturnType<typeof normalizeStarryBioConfig>) {
+async function generateContactCard(siteConfig: NormalizedStarryBioConfig): Promise<void> {
+  const output = await prepareOutput(
+    siteConfig.contactCard?.output,
+    'public/contact.vcf',
+    Boolean(siteConfig.contactCard?.enabled)
+  );
   if (!siteConfig.contactCard?.enabled) return;
 
-  const output = resolveOutputPath(siteConfig.contactCard.output, 'public/contact.vcf');
-  await mkdir(path.dirname(output), { recursive: true });
   await writeFile(output, createVCard(siteConfig));
-
   console.log(`✓ Generated contact card (${path.relative(process.cwd(), output)})`);
 }
 
-function createOgSvg(siteConfig: ReturnType<typeof normalizeStarryBioConfig>): string {
+async function prepareOutput(
+  configuredOutput: string | undefined,
+  fallback: string,
+  enabled: boolean
+): Promise<string> {
+  const output = resolveOutputPath(configuredOutput, fallback);
+  const defaultOutput = resolveOutputPath(undefined, fallback);
+  await Promise.all(
+    Array.from(new Set([output, defaultOutput])).map((file) => rm(file, { force: true }))
+  );
+  if (enabled) await mkdir(path.dirname(output), { recursive: true });
+  return output;
+}
+
+export function createOgSvg(siteConfig: NormalizedStarryBioConfig): string {
   const tokens = getThemePresetTokens(siteConfig.theme);
   const title = escapeXml(siteConfig.ogImage?.title || siteConfig.seo.title);
   const subtitle = escapeXml(siteConfig.ogImage?.subtitle || siteConfig.seo.description);
@@ -133,13 +140,15 @@ function createStarSvg(): string {
     [414, 512, 1.5],
     [186, 418, 2],
   ];
-
   return stars
-    .map(([cx, cy, r]) => `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#ffffff" opacity="0.72"/>`)
+    .map(
+      ([cx, cy, radius]) =>
+        `<circle cx="${cx}" cy="${cy}" r="${radius}" fill="#ffffff" opacity="0.72"/>`
+    )
     .join('');
 }
 
-function createVCard(siteConfig: ReturnType<typeof normalizeStarryBioConfig>): string {
+export function createVCard(siteConfig: NormalizedStarryBioConfig): string {
   const card = siteConfig.contactCard;
   if (!card?.enabled) return '';
 
@@ -148,15 +157,14 @@ function createVCard(siteConfig: ReturnType<typeof normalizeStarryBioConfig>): s
     'VERSION:3.0',
     `FN:${escapeVCard(card.name || siteConfig.profile.name)}`,
   ];
-
   if (card.organization) lines.push(`ORG:${escapeVCard(card.organization)}`);
   if (card.title) lines.push(`TITLE:${escapeVCard(card.title)}`);
   if (card.email) lines.push(`EMAIL:${escapeVCard(cleanEmail(card.email))}`);
   if (card.phone) lines.push(`TEL:${escapeVCard(card.phone)}`);
   if (card.website) lines.push(`URL:${escapeVCard(card.website)}`);
-  lines.push('END:VCARD', '');
+  lines.push('END:VCARD');
 
-  return lines.join('\r\n');
+  return `${lines.flatMap(foldVCardLine).join('\r\n')}\r\n`;
 }
 
 function cleanEmail(email: string): string {
@@ -174,12 +182,38 @@ function escapeXml(value: string): string {
 function escapeVCard(value: string): string {
   return value
     .replace(/\\/g, '\\\\')
+    .replace(/\r\n?/g, '\n')
     .replace(/\n/g, '\\n')
     .replace(/,/g, '\\,')
     .replace(/;/g, '\\;');
 }
 
-main().catch((error: unknown) => {
-  console.error(error instanceof Error ? error.message : error);
-  process.exitCode = 1;
-});
+function foldVCardLine(line: string): string[] {
+  const folded: string[] = [];
+  let current = '';
+  let limit = 75;
+
+  for (const character of line) {
+    if (Buffer.byteLength(current + character, 'utf8') > limit) {
+      folded.push(current);
+      current = ` ${character}`;
+      limit = 75;
+    } else {
+      current += character;
+    }
+  }
+  folded.push(current);
+  return folded;
+}
+
+export async function main(): Promise<void> {
+  const siteConfig = normalizeStarryBioConfig(validateStarryBioConfig(config));
+  await generateAssets(siteConfig);
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+  main().catch((error: unknown) => {
+    console.error(error instanceof Error ? error.message : error);
+    process.exitCode = 1;
+  });
+}

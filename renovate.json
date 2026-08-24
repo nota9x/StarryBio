@@ -1,0 +1,48 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "helpers:pinGitHubActionDigests",
+    ":semanticCommits"
+  ],
+  "enabledManagers": ["npm", "github-actions"],
+  "dependencyDashboard": false,
+  "labels": ["dependencies"],
+  "assignees": ["nota9x"],
+  "platformAutomerge": true,
+  "automergeType": "pr",
+  "automergeStrategy": "squash",
+  "internalChecksFilter": "strict",
+  "prConcurrentLimit": 0,
+  "prHourlyLimit": 0,
+  "lockFileMaintenance": {
+    "enabled": true,
+    "automerge": true
+  },
+  "packageRules": [
+    {
+      "description": "Wait one day before proposing npm dependency updates",
+      "matchManagers": ["npm"],
+      "minimumReleaseAge": "1 day"
+    },
+    {
+      "description": "Automerge stable non-major npm updates after CI passes",
+      "matchManagers": ["npm"],
+      "matchCurrentVersion": "!/^0/",
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "automerge": true
+    },
+    {
+      "description": "Require review for unstable 0.x dependency updates",
+      "matchManagers": ["npm"],
+      "matchCurrentVersion": "/^0\\./",
+      "automerge": false
+    },
+    {
+      "description": "Automerge GitHub Actions digest updates after CI passes",
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["digest", "pinDigest"],
+      "automerge": true
+    }
+  ]
+}

@@ -10,6 +10,11 @@ export function validateLocalAssetPaths(config: StarryBioConfig): string[] {
     const publicPath = toPublicPath(item.value);
     if (!publicPath) continue;
 
+    if (!isInsideDirectory(publicPath, path.resolve('public'))) {
+      issues.push(`${item.path} must stay inside public/.`);
+      continue;
+    }
+
     if (!existsSync(publicPath)) {
       issues.push(
         `${item.path} points to "${item.value}", but ${path.relative(process.cwd(), publicPath)} does not exist.`
@@ -33,12 +38,6 @@ export function resolveOutputPath(output: string | undefined, fallback: string):
   return absolute;
 }
 
-export function toPublicUrl(output: string | undefined, fallback: string): string {
-  const outputPath = output || fallback;
-  const relative = path.relative('public', outputPath).replace(/\\/g, '/');
-  return `/${relative}`;
-}
-
 function collectLocalAssetPaths(config: StarryBioConfig): Array<{ path: string; value: string }> {
   const paths: Array<{ path: string; value: string }> = [];
 
@@ -46,7 +45,6 @@ function collectLocalAssetPaths(config: StarryBioConfig): Array<{ path: string; 
   addAsset(paths, 'profile.image', config.profile.image);
   addAsset(paths, 'seo.image', config.seo?.image);
 
-  config.links?.forEach((link, index) => collectIcon(paths, `links[${index}].icon`, link.icon));
   config.sections?.forEach((section, sectionIndex) => {
     section.links.forEach((link, linkIndex) =>
       collectIcon(paths, `sections[${sectionIndex}].links[${linkIndex}].icon`, link.icon)
@@ -96,4 +94,12 @@ function isLocalAssetPath(value: string): boolean {
 function toPublicPath(value: string): string {
   const clean = value.startsWith('/') ? value.slice(1) : value;
   return path.resolve('public', clean);
+}
+
+function isInsideDirectory(candidate: string, directory: string): boolean {
+  const relative = path.relative(directory, candidate);
+  return (
+    relative === '' ||
+    (!relative.startsWith(`..${path.sep}`) && relative !== '..' && !path.isAbsolute(relative))
+  );
 }

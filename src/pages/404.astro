@@ -1,4 +1,5 @@
 ---
+import { House } from '@lucide/astro';
 import { siteConfig } from '../config/site';
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
@@ -18,14 +19,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
       <div class="links-container">
         <a href="/" class="link-button no-hover-shift home-link">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            aria-hidden="true"
-          >
-            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"></path>
-          </svg>
+          <House size={24} aria-hidden="true" />
           <span class="button-text-wrapper">
             <span class="button-main-text">Go Home</span>
           </span>

@@ -1,17 +1,23 @@
 ---
 import { ClientRouter } from 'astro:transitions';
-import { getImage } from 'astro:assets';
+import '@fontsource/inter/latin-300.css';
+import '@fontsource/inter/latin-400.css';
+import '@fontsource/inter/latin-600.css';
+import '@fontsource/inter/latin-700.css';
+import '@fontsource/inter/latin-900.css';
+import '@fontsource/nunito-sans/latin-400.css';
+import '@fontsource/nunito-sans/latin-700.css';
+import '@fontsource/nunito-sans/latin-800.css';
+import '@fontsource/nunito-sans/latin-900.css';
+import '@fontsource/orbitron/latin-400.css';
+import '@fontsource/orbitron/latin-700.css';
+import '@fontsource/orbitron/latin-900.css';
 import Analytics from '../components/Analytics.astro';
 import SEO from '../components/SEO.astro';
-import type { NormalizedStarryBioConfig, StatusDefinition } from '../config/schema';
-import {
-  isImageMetadata,
-  isLocalImagePath,
-  isSvgImagePath,
-  resolveImageAsset,
-  toAbsoluteAssetPath,
-} from '../config/image-assets';
+import { toAbsoluteAssetPath } from '../config/image-assets';
+import type { NormalizedStarryBioConfig } from '../config/schema';
 import { getThemeStyle } from '../config/themes';
+import '../styles/input.css';
 
 interface Props {
   config: NormalizedStarryBioConfig;
@@ -23,50 +29,7 @@ interface Props {
 const { config, title, description, includeStatus = true } = Astro.props;
 
 const animation = config.animation;
-const statusConfig = includeStatus ? await optimizeStatusImageAssets(config.status) : undefined;
-
-async function optimizeStatusImageAssets(status: NormalizedStarryBioConfig['status']) {
-  if (!status?.enabled) return status;
-
-  return {
-    ...status,
-    default: await optimizeStatusDefinition(status.default),
-    types: Object.fromEntries(
-      await Promise.all(
-        Object.entries(status.types).map(async ([name, definition]) => [
-          name,
-          await optimizeStatusDefinition(definition),
-        ])
-      )
-    ),
-  };
-}
-
-async function optimizeStatusDefinition(definition: StatusDefinition): Promise<StatusDefinition> {
-  if (typeof definition.icon !== 'string') return definition;
-  if (!isLocalImagePath(definition.icon) || isSvgImagePath(definition.icon)) return definition;
-
-  const resolvedIcon = resolveImageAsset(definition.icon);
-  if (!isImageMetadata(resolvedIcon)) {
-    return {
-      ...definition,
-      icon: toAbsoluteAssetPath(definition.icon),
-    };
-  }
-
-  const optimizedIcon = await getImage({
-    src: resolvedIcon,
-    width: 48,
-    height: 48,
-    format: 'webp',
-    quality: 82,
-  });
-
-  return {
-    ...definition,
-    icon: optimizedIcon.src,
-  };
-}
+const statusConfig = includeStatus ? config.status : undefined;
 ---
 
 <!doctype html>
@@ -84,14 +47,6 @@ async function optimizeStatusDefinition(definition: StatusDefinition): Promise<S
 
     {config.favicon && <link rel="icon" href={toAbsoluteAssetPath(config.favicon)} />}
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=Nunito+Sans:wght@400;700;800;900&family=Orbitron:wght@400;700;900&display=swap"
-      rel="stylesheet"
-    />
-
-    <link rel="stylesheet" href="/style.css" />
     <ClientRouter />
     <Analytics analytics={config.analytics} />
   </head>
@@ -116,6 +71,8 @@ async function optimizeStatusDefinition(definition: StatusDefinition): Promise<S
         <template id="starrybio-status-config">{JSON.stringify(statusConfig)}</template>
       )
     }
-    <script is:inline src="/app.js" defer></script>
+    <script>
+      import '../scripts/app';
+    </script>
   </body>
 </html>

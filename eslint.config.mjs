@@ -12,13 +12,11 @@ export default tseslint.config(
       'dist/',
       'node_modules/',
       'public/assets/icons/simple-icons/',
-      'public/style.css',
     ],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   ...astro.configs['flat/recommended'],
-  ...astro.configs['flat/jsx-a11y-recommended'],
   {
     files: ['**/*.{js,mjs,cjs,ts,astro}'],
     languageOptions: {
@@ -37,7 +35,6 @@ export default tseslint.config(
       '*.config.{js,mjs,ts}',
       'eslint.config.mjs',
       'astro.config.mjs',
-      'tailwind.config.js',
       'scripts/**/*.{js,mjs,cjs,ts}',
     ],
     languageOptions: {

@@ -29,7 +29,10 @@ const profileClasses = [
   .filter(Boolean)
   .join(' ');
 const showFeaturedAbove = config.layout.featuredPosition === 'above-links';
-const qrHref = config.qr?.enabled ? toGeneratedAssetUrl(config.qr.output, 'public/qr.png') : '';
+const qrHref =
+  config.qr?.enabled && config.qr.showButton
+    ? toGeneratedAssetUrl(config.qr.output, 'public/qr.png')
+    : '';
 const contactHref = config.contactCard?.enabled
   ? toGeneratedAssetUrl(config.contactCard.output, 'public/contact.vcf')
   : '';

@@ -56,6 +56,27 @@ describe('deterministic build assets', () => {
     }
   });
 
+  it('generates a QR file even when its profile button is hidden', async () => {
+    const output = path.join(outputDirectory, 'qr.png');
+    const config = normalizeStarryBioConfig(
+      validateStarryBioConfig(
+        createConfig({
+          qr: {
+            enabled: true,
+            showButton: false,
+            url: 'https://example.com',
+            output: 'public/.vitest-output/qr.png',
+          },
+        })
+      )
+    );
+
+    await generateAssets(config);
+
+    const details = await (await import('node:fs/promises')).stat(output);
+    expect(details.size).toBeGreaterThan(0);
+  });
+
   it('escapes injection characters and folds vCard lines to 75 UTF-8 bytes', () => {
     const config = normalizeStarryBioConfig(
       validateStarryBioConfig(

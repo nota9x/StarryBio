@@ -136,6 +136,7 @@ const config = {
 
   qr: {
     enabled: true,
+    showButton: true,
     url: 'https://a9x.pro',
     output: 'public/qr.png',
   },

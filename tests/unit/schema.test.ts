@@ -60,6 +60,20 @@ describe('StarryBio v3 configuration', () => {
     );
   });
 
+  it('keeps QR generation and profile-button visibility independent', () => {
+    const generatedOnly = normalizeStarryBioConfig(
+      validateStarryBioConfig(
+        createConfig({ qr: { enabled: true, showButton: false, url: 'https://example.com' } })
+      )
+    );
+    const legacyConfig = normalizeStarryBioConfig(
+      validateStarryBioConfig(createConfig({ qr: { enabled: true, url: 'https://example.com' } }))
+    );
+
+    expect(generatedOnly.qr).toMatchObject({ enabled: true, showButton: false });
+    expect(legacyConfig.qr).toMatchObject({ enabled: true, showButton: true });
+  });
+
   it.each([
     ['nebula', '#6d28d9', '#251d33'],
     ['midnight', '#3e6085', '#172335'],

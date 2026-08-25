@@ -322,6 +322,7 @@ export const starryBioConfigSchema = z
     qr: z
       .object({
         enabled: z.boolean(),
+        showButton: z.boolean().optional(),
         url: supportedUrl({ allowHash: false, protocols: ['http:', 'https:'] }).optional(),
         output: publicOutput(['.png', '.svg']).optional(),
       })
@@ -423,9 +424,13 @@ export type NormalizedStatusConfig = NonNullable<StarryBioConfig['status']> & {
   showNextAvailable: boolean;
 };
 
+export type NormalizedQrConfig = NonNullable<StarryBioConfig['qr']> & {
+  showButton: boolean;
+};
+
 export interface NormalizedStarryBioConfig extends Omit<
   StarryBioConfig,
-  'theme' | 'layout' | 'sections' | 'featured' | 'seo' | 'status'
+  'theme' | 'layout' | 'sections' | 'featured' | 'seo' | 'status' | 'qr'
 > {
   theme: NormalizedThemeConfig;
   layout: NormalizedLayoutConfig;
@@ -433,6 +438,7 @@ export interface NormalizedStarryBioConfig extends Omit<
   featured: FeaturedCard[];
   seo: NormalizedSeoConfig;
   status?: NormalizedStatusConfig;
+  qr?: NormalizedQrConfig;
   analytics: AnalyticsConfig;
 }
 
@@ -515,6 +521,12 @@ export function normalizeStarryBioConfig(config: StarryBioConfig): NormalizedSta
           showOwnerTime: config.status.showOwnerTime ?? Boolean(config.status.ownerTimeZone),
           showVisitorTime: config.status.showVisitorTime ?? false,
           showNextAvailable: config.status.showNextAvailable ?? false,
+        }
+      : undefined,
+    qr: config.qr
+      ? {
+          ...config.qr,
+          showButton: config.qr.showButton ?? true,
         }
       : undefined,
     analytics: config.analytics || { provider: 'none' },

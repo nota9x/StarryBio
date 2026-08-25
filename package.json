@@ -3,7 +3,7 @@
   "version": "3.2.0",
   "type": "module",
   "description": "A customizable link-in-bio page built with Astro for Cloudflare Workers.",
-  "packageManager": "pnpm@11.23.0",
+  "packageManager": "pnpm@11.24.0",
   "engines": {
     "node": ">=24.0.0"
   },

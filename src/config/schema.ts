@@ -436,16 +436,33 @@ export interface NormalizedStarryBioConfig extends Omit<
   analytics: AnalyticsConfig;
 }
 
-const DEFAULT_THEME_ACCENTS: Record<ThemePreset, string> = {
-  nebula: '#a78bfa',
+const DEFAULT_DARK_THEME_ACCENTS: Record<ThemePreset, string> = {
+  nebula: '#d8b4fe',
   midnight: '#b0c4de',
   'classic-blue': '#b0c4de',
-  aurora: '#6ee7b7',
-  eclipse: '#fb7185',
-  'cosmic-gold': '#f6c453',
-  minimal: '#2563eb',
-  terminal: '#4ade80',
+  aurora: '#7ddf9b',
+  eclipse: '#f6c177',
+  'cosmic-gold': '#f7d06b',
+  minimal: '#b8c4d4',
+  terminal: '#9cffac',
 };
+
+const DEFAULT_LIGHT_THEME_ACCENTS: Record<ThemePreset, string> = {
+  nebula: '#6d28d9',
+  midnight: '#3e6085',
+  'classic-blue': '#285b9e',
+  aurora: '#167346',
+  eclipse: '#9a4d0a',
+  'cosmic-gold': '#80600c',
+  minimal: '#334155',
+  terminal: '#147532',
+};
+
+export function getDefaultThemeAccent(preset: ThemePreset, mode: ThemeMode): string {
+  return mode === 'light'
+    ? DEFAULT_LIGHT_THEME_ACCENTS[preset]
+    : DEFAULT_DARK_THEME_ACCENTS[preset];
+}
 
 export class StarryBioConfigError extends Error {
   constructor(public readonly issues: string[]) {
@@ -514,10 +531,11 @@ export function isVisible(item: VisibilityConfig, now = Date.now()): boolean {
 function normalizeTheme(theme: StarryBioConfig['theme']): NormalizedThemeConfig {
   const value = typeof theme === 'string' ? { preset: theme } : theme || {};
   const preset = value.preset || 'midnight';
+  const mode = value.mode || (preset === 'minimal' ? 'light' : 'dark');
   return {
     preset,
-    accent: value.accent || DEFAULT_THEME_ACCENTS[preset],
-    mode: value.mode || (preset === 'minimal' ? 'light' : 'dark'),
+    accent: value.accent || getDefaultThemeAccent(preset, mode),
+    mode,
     buttonStyle: value.buttonStyle || (preset === 'terminal' ? 'terminal' : 'glass'),
     background: value.background || (preset === 'minimal' ? 'minimal' : 'starfield'),
     animationIntensity: value.animationIntensity || 'normal',

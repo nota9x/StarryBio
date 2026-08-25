@@ -17,15 +17,35 @@
   align-items: start;
 }
 
-.profile-card.layout-split-screen .profile-header,
-.profile-card.layout-split-screen .profile-actions,
-.profile-card.layout-split-screen .footer-text {
+.profile-primary,
+.profile-content {
+  display: contents;
+}
+
+.profile-card.layout-split-screen .profile-primary {
+  display: block;
   grid-column: 1;
 }
 
-.profile-card.layout-split-screen .sections-container,
-.profile-card.layout-split-screen .featured-grid {
+.profile-card.layout-split-screen .profile-content {
+  display: block;
   grid-column: 2;
+}
+
+.profile-card.layout-split-screen > .footer-text {
+  grid-column: 1 / -1;
+  text-align: center;
+}
+
+.profile-card.layout-split-screen.profile-position-top {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: min(760px, calc(100vw - 2rem));
+  text-align: center;
+}
+
+.profile-card.layout-split-screen.profile-position-top .profile-primary,
+.profile-card.layout-split-screen.profile-position-top .profile-content {
+  grid-column: 1;
 }
 
 .profile-card.layout-profile-card {
@@ -72,26 +92,24 @@
 
 @layer components {
   .profile-card.layout-horizontal {
+    max-width: 680px;
+    text-align: left;
+  }
+
+  .profile-card.layout-horizontal .profile-header {
     display: grid;
     grid-template-columns: auto 1fr;
-    grid-template-rows: auto auto auto;
     align-items: center;
     column-gap: 1.5rem;
-    text-align: left;
-    padding-top: 2rem;
   }
 
   .profile-card.layout-horizontal .profile-image-wrapper {
-    grid-column: 1;
-    grid-row: 1 / 2;
     margin: 0;
     width: 110px;
     height: 110px;
   }
 
   .profile-card.layout-horizontal .profile-text-content {
-    grid-column: 2;
-    grid-row: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -115,16 +133,12 @@
     line-height: 1.2;
   }
 
-  .profile-card.layout-horizontal .links-container {
-    grid-column: 1 / -1;
-    grid-row: 2;
-    margin-top: 2.5rem;
-    width: 100%;
+  .profile-card.layout-horizontal .profile-actions {
+    justify-content: flex-start;
+    margin: 1.25rem 0 0 8.4rem;
   }
 
   .profile-card.layout-horizontal .footer-text {
-    grid-column: 1 / -1;
-    grid-row: 3;
     margin-top: 2.5rem;
     text-align: center;
   }
@@ -149,44 +163,33 @@
 }
 
 @media (max-width: 450px) {
-  .profile-card.layout-horizontal {
+  .profile-card.layout-horizontal .profile-header {
     grid-template-columns: 1fr;
     text-align: center;
     justify-items: center;
-    padding-top: 2rem;
   }
 
   .profile-card.layout-horizontal .profile-image-wrapper {
-    grid-column: 1;
-    grid-row: 1;
     margin-bottom: 1rem;
     width: 120px;
     height: 120px;
   }
 
+  .profile-card.layout-horizontal .profile-text-content {
+    align-items: center;
+    text-align: center;
+  }
+
   .profile-card.layout-horizontal .profile-name {
-    grid-column: 1;
-    grid-row: 2;
-    align-self: center;
-    margin-bottom: 0.5rem;
     font-size: 2rem;
   }
 
-  .profile-card.layout-horizontal .profile-title {
-    grid-column: 1;
-    grid-row: 3;
-    align-self: center;
-    margin-bottom: 1.5rem;
+  .profile-card.layout-horizontal .profile-description {
     font-size: 0.95rem;
   }
 
-  .profile-card.layout-horizontal .links-container {
-    grid-row: 4;
-    margin-top: 1rem;
-  }
-
-  .profile-card.layout-horizontal .footer-text {
-    grid-row: 5;
-    margin-top: 2rem;
+  .profile-card.layout-horizontal .profile-actions {
+    justify-content: center;
+    margin: 1.25rem 0 0;
   }
 }

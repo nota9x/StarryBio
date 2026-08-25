@@ -60,6 +60,44 @@ describe('StarryBio v3 configuration', () => {
     );
   });
 
+  it.each([
+    ['nebula', '#6d28d9', '#251d33'],
+    ['midnight', '#3e6085', '#172335'],
+    ['classic-blue', '#285b9e', '#112844'],
+    ['aurora', '#167346', '#143324'],
+    ['eclipse', '#9a4d0a', '#3c271e'],
+    ['cosmic-gold', '#80600c', '#3b2f15'],
+    ['minimal', '#334155', '#121826'],
+    ['terminal', '#147532', '#153a20'],
+  ] as const)('provides a complete light palette for %s', (preset, accent, text) => {
+    const normalized = normalizeStarryBioConfig(
+      validateStarryBioConfig(createConfig({ theme: { preset, mode: 'light' } }))
+    );
+    const style = getThemeStyle(normalized.theme);
+
+    expect(normalized.theme.accent).toBe(accent);
+    expect(style).toContain(`--text-color: ${text}`);
+    expect(style).toContain(`--focus-color: ${accent}`);
+    expect(style).toContain('--announcement-bg:');
+    expect(style).toContain('--img-border:');
+  });
+
+  it('provides a true dark palette for Minimal and preserves custom accents', () => {
+    const darkMinimal = normalizeStarryBioConfig(
+      validateStarryBioConfig(createConfig({ theme: { preset: 'minimal', mode: 'dark' } }))
+    );
+    const custom = normalizeStarryBioConfig(
+      validateStarryBioConfig(
+        createConfig({ theme: { preset: 'aurora', mode: 'light', accent: '#123456' } })
+      )
+    );
+
+    expect(darkMinimal.theme.accent).toBe('#b8c4d4');
+    expect(getThemeStyle(darkMinimal.theme)).toContain('--text-color: #edf2f7');
+    expect(custom.theme.accent).toBe('#123456');
+    expect(getThemeStyle(custom.theme)).toContain('--accent-color: #123456');
+  });
+
   it('requires an owner timezone only when the owner clock is enabled', () => {
     expect(() =>
       validateStarryBioConfig(createConfig({ status: { ...createStatus(), showOwnerTime: true } }))

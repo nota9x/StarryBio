@@ -22,6 +22,7 @@ const profileClasses = [
   'profile-card',
   `layout-${config.layout.mode}`,
   `links-${config.layout.linkStyle}`,
+  `profile-position-${config.layout.profilePosition}`,
   config.profile.layout === 'horizontal' ? 'layout-horizontal' : '',
   config.theme.buttonStyle === 'terminal' ? 'theme-terminal' : '',
 ]
@@ -38,53 +39,57 @@ const contactHref = config.contactCard?.enabled
   <main class={profileClasses} transition:name="main-card">
     <div class="card-shine"></div>
 
-    <header class="profile-header">
-      <div class="profile-image-wrapper">
-        <div class="profile-image-container">
-          <img
-            src={toAbsoluteAssetPath(config.profile.image)}
-            alt={config.profile.name}
-            width="120"
-            height="120"
-            loading="eager"
-            fetchpriority="high"
-          />
+    <div class="profile-primary">
+      <header class="profile-header">
+        <div class="profile-image-wrapper">
+          <div class="profile-image-container">
+            <img
+              src={toAbsoluteAssetPath(config.profile.image)}
+              alt={config.profile.name}
+              width="120"
+              height="120"
+              loading="eager"
+              fetchpriority="high"
+            />
+          </div>
+          <StatusIndicator status={config.status} />
         </div>
-        <StatusIndicator status={config.status} />
-      </div>
 
-      <div class="profile-text-content">
-        <h1 class="profile-name">{config.profile.name}</h1>
-        <p class="profile-description">{config.profile.description}</p>
-      </div>
-    </header>
+        <div class="profile-text-content">
+          <h1 class="profile-name">{config.profile.name}</h1>
+          <p class="profile-description">{config.profile.description}</p>
+        </div>
+      </header>
 
-    <div class="profile-actions" aria-label="Profile actions">
-      {
-        qrHref && (
-          <a
-            href={qrHref}
-            class="mini-action mini-action-icon"
-            aria-label="Download QR code"
-            download
-            data-astro-reload
-          >
-            <QrCode size={20} aria-hidden="true" />
-          </a>
-        )
-      }
-      {
-        contactHref && (
-          <a href={contactHref} class="mini-action" download data-astro-reload>
-            Add Contact
-          </a>
-        )
-      }
+      <div class="profile-actions" aria-label="Profile actions">
+        {
+          qrHref && (
+            <a
+              href={qrHref}
+              class="mini-action mini-action-icon"
+              aria-label="Download QR code"
+              download
+              data-astro-reload
+            >
+              <QrCode size={20} aria-hidden="true" />
+            </a>
+          )
+        }
+        {
+          contactHref && (
+            <a href={contactHref} class="mini-action" download data-astro-reload>
+              Add Contact
+            </a>
+          )
+        }
+      </div>
     </div>
 
-    {showFeaturedAbove && <FeaturedCards featured={config.featured} />}
-    <LinkSections sections={config.sections} />
-    {!showFeaturedAbove && <FeaturedCards featured={config.featured} />}
+    <div class="profile-content">
+      {showFeaturedAbove && <FeaturedCards featured={config.featured} />}
+      <LinkSections sections={config.sections} />
+      {!showFeaturedAbove && <FeaturedCards featured={config.featured} />}
+    </div>
 
     <p class="footer-text">{copyright}</p>
   </main>

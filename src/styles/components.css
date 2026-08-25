@@ -29,8 +29,8 @@
   border: var(--announcement-border);
   border-radius: 16px;
 
-  color: #ffffff;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  color: var(--text-color);
+  text-shadow: none;
   font-size: 0.9rem;
   font-weight: 600;
 
@@ -53,10 +53,10 @@
 
 #announcement-banner:hover {
   transform: translateY(-4px) scale(1.02);
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--btn-hover-bg);
   box-shadow:
-    0 8px 40px rgba(0, 0, 0, 0.6),
-    0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+    0 8px 40px color-mix(in srgb, var(--accent-color) 22%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--text-color) 14%, transparent) inset;
 }
 
 #announcement-banner::before {
@@ -239,9 +239,9 @@ body {
 .profile-card:hover {
   transform: translateY(-8px) scale(1.02);
   box-shadow:
-    0 30px 60px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(255, 255, 255, 0.08) inset,
-    0 2px 4px rgba(255, 255, 255, 0.15) inset;
+    var(--card-shadow),
+    0 12px 36px var(--theme-glow),
+    0 0 0 1px color-mix(in srgb, var(--text-color) 10%, transparent) inset;
 }
 
 @media (min-width: 640px) {
@@ -273,8 +273,8 @@ body {
 .profile-image-container:hover {
   transform: scale(1.05);
   box-shadow:
-    0 0 35px rgba(176, 196, 222, 0.6),
-    0 0 0 2px rgba(255, 255, 255, 0.2) inset;
+    0 0 35px var(--theme-glow),
+    0 0 0 2px color-mix(in srgb, var(--text-color) 18%, transparent) inset;
 }
 .profile-image-container img {
   width: 100%;
@@ -397,12 +397,12 @@ body {
 .featured-card:hover,
 .featured-card:focus-visible {
   transform: translateY(-4px) scale(1.02);
-  border-color: rgba(224, 231, 255, 0.6);
+  border-color: color-mix(in srgb, var(--accent-color) 55%, var(--text-color));
   background: var(--btn-hover-bg);
-  color: #ffffff;
+  color: var(--text-color);
   box-shadow:
-    0 8px 20px rgba(176, 196, 222, 0.25),
-    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+    0 8px 20px var(--theme-glow),
+    0 0 0 1px color-mix(in srgb, var(--text-color) 10%, transparent) inset;
 }
 
 .featured-card:hover::before,
@@ -449,8 +449,8 @@ body {
   min-height: 22px;
   padding: 0.1rem 0.55rem;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid color-mix(in srgb, var(--text-color) 18%, transparent);
+  background: color-mix(in srgb, var(--text-color) 7%, transparent);
   color: var(--text-color);
   font-size: 0.7rem;
   font-weight: 700;
@@ -534,12 +534,12 @@ body {
 .mini-action:hover,
 .mini-action:focus-visible {
   background: var(--btn-hover-bg);
-  color: #ffffff;
+  color: var(--text-color);
   transform: translateY(-4px) scale(1.02);
-  border-color: rgba(224, 231, 255, 0.6);
+  border-color: color-mix(in srgb, var(--accent-color) 55%, var(--text-color));
   box-shadow:
-    0 8px 20px rgba(176, 196, 222, 0.25),
-    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+    0 8px 20px var(--theme-glow),
+    0 0 0 1px color-mix(in srgb, var(--text-color) 10%, transparent) inset;
 }
 
 .mini-action:hover::before,
@@ -646,8 +646,8 @@ body {
 }
 
 .copy-button-active.show-copied-feedback .button-subtitle {
-  color: #ffffff;
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+  color: var(--text-color);
+  text-shadow: 0 0 10px var(--theme-glow);
 }
 
 .show-copied-feedback .copy-feedback-glyph-copy {
@@ -670,7 +670,7 @@ body {
 }
 
 .copy-button-active.show-copied-feedback {
-  border-color: rgba(255, 255, 255, 0.4);
+  border-color: color-mix(in srgb, var(--accent-color) 55%, var(--text-color));
 }
 
 .copy-button-active.copy-feedback-changing .button-subtitle {
@@ -691,12 +691,12 @@ body {
 }
 .link-button:hover {
   background: var(--btn-hover-bg);
-  color: #ffffff;
+  color: var(--text-color);
   transform: translateY(-4px) scale(1.02);
   box-shadow:
-    0 8px 20px rgba(176, 196, 222, 0.25),
-    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-  border-color: rgba(224, 231, 255, 0.6);
+    0 8px 20px var(--theme-glow),
+    0 0 0 1px color-mix(in srgb, var(--text-color) 10%, transparent) inset;
+  border-color: color-mix(in srgb, var(--accent-color) 55%, var(--text-color));
 }
 .link-button:not(.no-hover-shift):hover {
   padding-right: 3rem;
@@ -781,7 +781,7 @@ body {
 [data-button-style='minimal'] .link-button,
 [data-button-style='minimal'] .featured-card {
   box-shadow: none;
-  background: rgba(255, 255, 255, 0.04);
+  background: color-mix(in srgb, var(--text-color) 5%, transparent);
 }
 
 [data-button-style='terminal'] .link-button,
@@ -789,6 +789,49 @@ body {
 [data-button-style='terminal'] .mini-action {
   border-radius: 8px;
   box-shadow: none;
+}
+
+.links-buttons .link-button {
+  justify-content: center;
+  text-align: center;
+}
+
+.links-buttons .link-button-icon-wrapper,
+.links-buttons .link-button > svg:not(.link-button-chevron) {
+  margin-right: 0.75rem;
+}
+
+.links-minimal .links-container {
+  gap: 0.25rem;
+}
+
+.links-minimal .link-button {
+  padding-block: 0.8rem;
+  border-color: transparent;
+  border-bottom: 1px solid color-mix(in srgb, var(--text-color) 12%, transparent);
+  border-radius: 8px;
+  background: transparent;
+  box-shadow: none;
+}
+
+.links-minimal .link-button:hover,
+.links-minimal .link-button:focus-visible {
+  background: color-mix(in srgb, var(--accent-color) 12%, transparent);
+  border-color: transparent;
+  border-bottom-color: color-mix(in srgb, var(--accent-color) 45%, transparent);
+  box-shadow: none;
+}
+
+.links-terminal .link-button {
+  border-radius: 6px;
+  padding: 0.9rem 1rem;
+  font-family: var(--font-mono);
+  box-shadow: none;
+}
+
+.links-terminal .button-main-text::before {
+  content: '$ ';
+  color: var(--accent-color);
 }
 
 .button-text-wrapper {
@@ -913,7 +956,7 @@ body {
   appearance: none;
 
   background-color: var(--status-bg);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid color-mix(in srgb, var(--text-color) 12%, transparent);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -944,10 +987,10 @@ body {
   padding: 10px 14px;
   background: var(--tooltip-bg);
   /* Removed backdrop-filter as it can cause blurry text on some displays/browsers */
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid color-mix(in srgb, var(--text-color) 12%, transparent);
   border-radius: 14px;
 
-  color: #e0e7ff;
+  color: var(--text-color);
   font-size: 14px;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -1011,7 +1054,8 @@ body {
   border-width: 6px;
 
   border-style: solid;
-  border-color: rgba(255, 255, 255, 0.1) transparent transparent transparent;
+  border-color: color-mix(in srgb, var(--text-color) 12%, transparent) transparent transparent
+    transparent;
   z-index: 1;
 }
 
@@ -1045,12 +1089,12 @@ body {
   position: relative;
   background: var(--modal-bg);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08); /* Neutral border */
+  border: 1px solid color-mix(in srgb, var(--text-color) 12%, transparent);
   border-radius: 18px;
   padding: 1.75rem;
   width: 100%;
   max-width: 480px;
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 30px 60px color-mix(in srgb, var(--text-color) 24%, transparent);
   transform: scale(0.95);
   opacity: 0;
   transition:
@@ -1075,7 +1119,7 @@ body {
   padding: 0;
   border: 0;
   background: transparent;
-  color: #e0e7ff;
+  color: var(--text-color);
   line-height: 0;
   cursor: pointer;
   transition:
@@ -1088,11 +1132,17 @@ body {
 }
 
 .schedule-list li {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid color-mix(in srgb, var(--text-color) 10%, transparent);
 }
 
 .schedule-list {
   padding-inline: 0.75rem;
+  background: color-mix(in srgb, var(--text-color) 6%, transparent);
+}
+
+.status-modal-title,
+.status-modal-heading {
+  color: var(--text-color);
 }
 .schedule-list li:last-child {
   border-bottom: none;

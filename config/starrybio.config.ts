@@ -8,7 +8,6 @@ const config = {
 
   theme: {
     preset: 'midnight',
-    mode: 'dark',
     buttonStyle: 'glass',
     background: 'starfield',
     animationIntensity: 'normal',

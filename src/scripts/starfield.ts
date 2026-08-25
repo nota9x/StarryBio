@@ -10,7 +10,7 @@ interface Star {
   twinklePhase: number;
 }
 
-const STAR_COLORS = ['#ffffff', '#ffe9c4', '#d4fbff', '#d4fbff', '#b3cde0'];
+const DEFAULT_STAR_COLORS = ['#ffffff', '#ffe9c4', '#d4fbff', '#d4fbff', '#b3cde0'];
 const DEFAULT_STAR_COUNT = 200;
 const REDUCED_STAR_COUNT = 80;
 const DEFAULT_SHOOTING_STAR_CHANCE = 0.05;
@@ -41,6 +41,7 @@ class StarfieldController {
   private animationTime = 0;
   private starMultiplier = 1;
   private shootingStarMultiplier = 1;
+  private starColors = DEFAULT_STAR_COLORS;
 
   constructor(container: HTMLElement) {
     this.container = container;
@@ -64,6 +65,10 @@ class StarfieldController {
     if (!container.contains(this.canvas)) container.prepend(this.canvas);
 
     const intensity = container.dataset.animationIntensity || 'normal';
+    const styles = window.getComputedStyle(container);
+    this.starColors = DEFAULT_STAR_COLORS.map(
+      (fallback, index) => styles.getPropertyValue(`--star-color-${index + 1}`).trim() || fallback
+    );
     this.starMultiplier = parseMultiplier(container.dataset.starMultiplier);
     this.shootingStarMultiplier = parseMultiplier(container.dataset.shootingStarMultiplier);
     if (intensity === 'none') {
@@ -91,7 +96,7 @@ class StarfieldController {
         baseX: Math.random() * 100,
         baseY: Math.random() * 100,
         size: Math.random() * 2.2 + 0.5,
-        color: STAR_COLORS[Math.floor(Math.random() * STAR_COLORS.length)],
+        color: this.starColors[Math.floor(Math.random() * this.starColors.length)],
         depth,
         driftX: (Math.random() - 0.5) * 0.002 * (depth + 0.2),
         driftY: (Math.random() - 0.5) * 0.002 * (depth + 0.2),

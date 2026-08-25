@@ -117,7 +117,7 @@
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--theme-font-family);
   background: var(--bg-color); /* Fallback / Main BG */
   color: var(--text-color);
   overflow-x: hidden;
@@ -131,9 +131,9 @@ body {
   position: absolute;
   width: 150px; /* Longer tail */
   height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 1)); /* Head at right */
+  background: linear-gradient(90deg, transparent, var(--star-color-1)); /* Head at right */
   border-radius: 50%;
-  box-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 4px var(--star-color-1);
   animation: shootingStar 4s linear infinite;
   opacity: 0;
   pointer-events: none;
@@ -187,15 +187,15 @@ body {
   backdrop-filter: blur(16px) saturate(120%);
   -webkit-backdrop-filter: blur(16px) saturate(120%);
   border: var(--card-border);
-  border-radius: 24px;
+  border-radius: var(--card-radius);
   padding: 2rem 1.5rem;
   width: 100%;
   max-width: 420px;
   text-align: center;
   box-shadow:
     var(--card-shadow),
-    0 0 0 1px rgba(255, 255, 255, 0.05) inset,
-    0 2px 4px rgba(0, 0, 0, 0.2) inset;
+    0 0 0 1px color-mix(in srgb, var(--text-color) 5%, transparent) inset,
+    0 2px 4px color-mix(in srgb, var(--text-color) 8%, transparent) inset;
   transition:
     transform 0.3s ease,
     box-shadow 0.3s ease;
@@ -213,11 +213,21 @@ body {
 .card-shine {
   position: absolute;
   inset: 0;
-  border-radius: 24px;
+  border-radius: var(--card-radius);
   overflow: hidden;
   pointer-events: none;
   z-index: 0;
   transform: translateZ(0); /* Fix clipping in some browsers */
+}
+
+.card-shine::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--theme-decoration);
+  background-size: var(--theme-decoration-size);
+  opacity: var(--theme-decoration-opacity);
+  pointer-events: none;
 }
 
 .card-shine::before {
@@ -227,7 +237,12 @@ body {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.03), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--text-color) 6%, transparent),
+    transparent
+  );
   transition: left 0.6s ease;
   pointer-events: none;
 }
@@ -370,7 +385,7 @@ body {
   color: inherit;
   background: color-mix(in srgb, var(--btn-bg) 82%, transparent);
   border: var(--btn-border);
-  border-radius: 18px;
+  border-radius: var(--button-radius);
   overflow: hidden;
   text-decoration: none;
   position: relative;
@@ -389,7 +404,12 @@ body {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--text-color) 10%, transparent),
+    transparent
+  );
   transition: left 0.6s ease;
   pointer-events: none;
 }
@@ -550,7 +570,7 @@ body {
 .mini-action:hover svg,
 .mini-action:focus-visible svg {
   transform: scale(1.15);
-  filter: drop-shadow(0 0 6px rgba(224, 231, 255, 0.6));
+  filter: drop-shadow(0 0 6px var(--theme-glow));
 }
 
 .mini-action:focus-visible {
@@ -566,13 +586,13 @@ body {
   color: var(--text-color);
   font-weight: 600;
   padding: 1.15rem 1.5rem;
-  border-radius: 16px;
+  border-radius: var(--button-radius);
   text-decoration: none;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   border: var(--btn-border);
   box-shadow:
     0 4px 12px rgba(0, 0, 0, 0.15),
-    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+    0 0 0 1px color-mix(in srgb, var(--text-color) 5%, transparent) inset;
   position: relative;
   overflow: hidden;
   text-align: left;
@@ -582,8 +602,8 @@ body {
   outline: 2px solid var(--focus-color);
   outline-offset: 2px;
   box-shadow:
-    0 8px 20px rgba(176, 196, 222, 0.35),
-    0 0 0 1px rgba(255, 255, 255, 0.15) inset,
+    0 8px 20px var(--theme-glow),
+    0 0 0 1px color-mix(in srgb, var(--text-color) 15%, transparent) inset,
     0 0 0 2px var(--focus-color);
 }
 .link-button::before {
@@ -593,7 +613,12 @@ body {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--text-color) 10%, transparent),
+    transparent
+  );
   transition: left 0.6s ease;
 }
 .link-button:hover::before {
@@ -658,7 +683,7 @@ body {
 .show-copied-feedback .copy-feedback-glyph-check {
   opacity: 1;
   transform: scale(1);
-  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.35));
+  filter: drop-shadow(0 0 5px var(--theme-glow));
 }
 
 .copy-button-active {
@@ -687,7 +712,7 @@ body {
 }
 
 .link-button.show-copied-feedback:hover .copy-feedback-glyph-check {
-  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.35));
+  filter: drop-shadow(0 0 5px var(--theme-glow));
 }
 .link-button:hover {
   background: var(--btn-hover-bg);

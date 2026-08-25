@@ -5,7 +5,11 @@ import {
   StarryBioConfigError,
   validateStarryBioConfig,
 } from '../../src/config/schema';
-import { getThemeStyle } from '../../src/config/themes';
+import {
+  THEME_PRESET_NAMES,
+  getThemePresetDefinition,
+  getThemeStyle,
+} from '../../src/config/themes';
 import { createConfig, createStatus } from './fixtures';
 
 describe('StarryBio v3 configuration', () => {
@@ -23,6 +27,7 @@ describe('StarryBio v3 configuration', () => {
   it.each([
     ['top-level links', { links: [{ label: 'Legacy', url: '/' }] }],
     ['bright theme alias', { theme: 'bright' }],
+    ['manual theme mode', { theme: { preset: 'midnight', mode: 'light' } }],
     ['showLocalTime', { status: { ...createStatus(), showLocalTime: true } }],
     ['showOwnerLocalTime', { status: { ...createStatus(), showOwnerLocalTime: true } }],
   ])('rejects removed %s configuration', (_name, legacy) => {
@@ -33,7 +38,6 @@ describe('StarryBio v3 configuration', () => {
     const normalized = normalizeStarryBioConfig(validateStarryBioConfig(createConfig()));
     expect(normalized.theme).toMatchObject({
       preset: 'midnight',
-      mode: 'dark',
       buttonStyle: 'glass',
       background: 'starfield',
     });
@@ -49,7 +53,6 @@ describe('StarryBio v3 configuration', () => {
     expect(normalized.theme).toMatchObject({
       preset: 'classic-blue',
       accent: '#b0c4de',
-      mode: 'dark',
       background: 'starfield',
     });
     expect(getThemeStyle(normalized.theme)).toContain(
@@ -74,40 +77,33 @@ describe('StarryBio v3 configuration', () => {
     expect(legacyConfig.qr).toMatchObject({ enabled: true, showButton: true });
   });
 
-  it.each([
-    ['nebula', '#6d28d9', '#251d33'],
-    ['midnight', '#3e6085', '#172335'],
-    ['classic-blue', '#285b9e', '#112844'],
-    ['aurora', '#167346', '#143324'],
-    ['eclipse', '#9a4d0a', '#3c271e'],
-    ['cosmic-gold', '#80600c', '#3b2f15'],
-    ['minimal', '#334155', '#121826'],
-    ['terminal', '#147532', '#153a20'],
-  ] as const)('provides a complete light palette for %s', (preset, accent, text) => {
+  it.each(THEME_PRESET_NAMES)('provides a complete first-class palette for %s', (preset) => {
     const normalized = normalizeStarryBioConfig(
-      validateStarryBioConfig(createConfig({ theme: { preset, mode: 'light' } }))
+      validateStarryBioConfig(createConfig({ theme: { preset } }))
     );
     const style = getThemeStyle(normalized.theme);
+    const definition = getThemePresetDefinition(preset);
 
-    expect(normalized.theme.accent).toBe(accent);
-    expect(style).toContain(`--text-color: ${text}`);
-    expect(style).toContain(`--focus-color: ${accent}`);
+    expect(normalized.theme.accent).toBe(definition.accent);
+    expect(style).toContain(`color-scheme: ${definition.appearance}`);
+    expect(style).toContain(`--text-color: ${definition.text}`);
+    expect(style).toContain(`--focus-color: ${definition.accent}`);
     expect(style).toContain('--announcement-bg:');
     expect(style).toContain('--img-border:');
+    expect(style).toContain('--theme-decoration:');
+    expect(style).toContain('--star-color-5:');
   });
 
-  it('provides a true dark palette for Minimal and preserves custom accents', () => {
-    const darkMinimal = normalizeStarryBioConfig(
-      validateStarryBioConfig(createConfig({ theme: { preset: 'minimal', mode: 'dark' } }))
-    );
+  it('assigns appearance per theme and preserves custom accents', () => {
     const custom = normalizeStarryBioConfig(
-      validateStarryBioConfig(
-        createConfig({ theme: { preset: 'aurora', mode: 'light', accent: '#123456' } })
-      )
+      validateStarryBioConfig(createConfig({ theme: { preset: 'aurora', accent: '#123456' } }))
     );
 
-    expect(darkMinimal.theme.accent).toBe('#b8c4d4');
-    expect(getThemeStyle(darkMinimal.theme)).toContain('--text-color: #edf2f7');
+    expect(getThemePresetDefinition('minimal').appearance).toBe('light');
+    expect(getThemePresetDefinition('starlight').appearance).toBe('light');
+    expect(getThemePresetDefinition('voyager').appearance).toBe('light');
+    expect(getThemePresetDefinition('apollo').appearance).toBe('light');
+    expect(getThemePresetDefinition('midnight').appearance).toBe('dark');
     expect(custom.theme.accent).toBe('#123456');
     expect(getThemeStyle(custom.theme)).toContain('--accent-color: #123456');
   });

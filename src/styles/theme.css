@@ -21,4 +21,15 @@
   --muted-color: #b0c4de;
   --heading-gradient: linear-gradient(135deg, #e0e7ff 0%, #b0c4de 50%, #ffffff 100%);
   --theme-glow: rgba(176, 196, 222, 0.42);
+  --theme-decoration: none;
+  --theme-decoration-opacity: 0;
+  --theme-decoration-size: auto;
+  --card-radius: 28px;
+  --button-radius: 16px;
+  --theme-font-family: 'Inter', sans-serif;
+  --star-color-1: #ffffff;
+  --star-color-2: #ffe9c4;
+  --star-color-3: #d4fbff;
+  --star-color-4: #d4fbff;
+  --star-color-5: #b3cde0;
 }

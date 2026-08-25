@@ -1,16 +1,5 @@
 import { z } from 'zod';
-
-const THEME_PRESETS = [
-  'nebula',
-  'midnight',
-  'classic-blue',
-  'aurora',
-  'eclipse',
-  'cosmic-gold',
-  'minimal',
-  'terminal',
-] as const;
-const THEME_MODES = ['dark', 'light'] as const;
+import { THEME_PRESET_NAMES, getThemePresetDefinition, type ThemePreset } from './themes';
 const BUTTON_STYLES = ['glass', 'solid', 'outline', 'minimal', 'terminal'] as const;
 const THEME_BACKGROUNDS = ['starfield', 'gradient', 'minimal'] as const;
 const ANIMATION_INTENSITIES = ['none', 'subtle', 'normal', 'high'] as const;
@@ -150,9 +139,8 @@ const scheduleItemSchema = z
 
 const themeConfigSchema = z
   .object({
-    preset: z.enum(THEME_PRESETS).optional(),
+    preset: z.enum(THEME_PRESET_NAMES).optional(),
     accent: hexColor.optional(),
-    mode: z.enum(THEME_MODES).optional(),
     buttonStyle: z.enum(BUTTON_STYLES).optional(),
     background: z.enum(THEME_BACKGROUNDS).optional(),
     animationIntensity: z.enum(ANIMATION_INTENSITIES).optional(),
@@ -272,7 +260,7 @@ export const starryBioConfigSchema = z
   .object({
     pageTitle: nonEmptyString,
     favicon: assetUrl.optional(),
-    theme: z.union([z.enum(THEME_PRESETS), themeConfigSchema]).optional(),
+    theme: z.union([z.enum(THEME_PRESET_NAMES), themeConfigSchema]).optional(),
     layout: layoutConfigSchema.optional(),
     animation: z
       .object({
@@ -358,8 +346,7 @@ export const starryBioConfigSchema = z
   })
   .strict();
 
-export type ThemePreset = (typeof THEME_PRESETS)[number];
-export type ThemeMode = (typeof THEME_MODES)[number];
+export type { ThemePreset } from './themes';
 export type ButtonStyle = (typeof BUTTON_STYLES)[number];
 export type ThemeBackground = (typeof THEME_BACKGROUNDS)[number];
 export type AnimationIntensity = (typeof ANIMATION_INTENSITIES)[number];
@@ -387,7 +374,6 @@ export type VisibilityConfig = Pick<StarryBioLink, 'enabled' | 'visibleFrom' | '
 export interface NormalizedThemeConfig {
   preset: ThemePreset;
   accent: string;
-  mode: ThemeMode;
   buttonStyle: ButtonStyle;
   background: ThemeBackground;
   animationIntensity: AnimationIntensity;
@@ -442,32 +428,8 @@ export interface NormalizedStarryBioConfig extends Omit<
   analytics: AnalyticsConfig;
 }
 
-const DEFAULT_DARK_THEME_ACCENTS: Record<ThemePreset, string> = {
-  nebula: '#d8b4fe',
-  midnight: '#b0c4de',
-  'classic-blue': '#b0c4de',
-  aurora: '#7ddf9b',
-  eclipse: '#f6c177',
-  'cosmic-gold': '#f7d06b',
-  minimal: '#b8c4d4',
-  terminal: '#9cffac',
-};
-
-const DEFAULT_LIGHT_THEME_ACCENTS: Record<ThemePreset, string> = {
-  nebula: '#6d28d9',
-  midnight: '#3e6085',
-  'classic-blue': '#285b9e',
-  aurora: '#167346',
-  eclipse: '#9a4d0a',
-  'cosmic-gold': '#80600c',
-  minimal: '#334155',
-  terminal: '#147532',
-};
-
-export function getDefaultThemeAccent(preset: ThemePreset, mode: ThemeMode): string {
-  return mode === 'light'
-    ? DEFAULT_LIGHT_THEME_ACCENTS[preset]
-    : DEFAULT_DARK_THEME_ACCENTS[preset];
+export function getDefaultThemeAccent(preset: ThemePreset): string {
+  return getThemePresetDefinition(preset).accent;
 }
 
 export class StarryBioConfigError extends Error {
@@ -543,13 +505,12 @@ export function isVisible(item: VisibilityConfig, now = Date.now()): boolean {
 function normalizeTheme(theme: StarryBioConfig['theme']): NormalizedThemeConfig {
   const value = typeof theme === 'string' ? { preset: theme } : theme || {};
   const preset = value.preset || 'midnight';
-  const mode = value.mode || (preset === 'minimal' ? 'light' : 'dark');
+  const definition = getThemePresetDefinition(preset);
   return {
     preset,
-    accent: value.accent || getDefaultThemeAccent(preset, mode),
-    mode,
-    buttonStyle: value.buttonStyle || (preset === 'terminal' ? 'terminal' : 'glass'),
-    background: value.background || (preset === 'minimal' ? 'minimal' : 'starfield'),
+    accent: value.accent || definition.accent,
+    buttonStyle: value.buttonStyle || definition.defaultButtonStyle || 'glass',
+    background: value.background || definition.defaultBackground || 'starfield',
     animationIntensity: value.animationIntensity || 'normal',
   };
 }

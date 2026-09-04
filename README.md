@@ -30,7 +30,7 @@ StarryBio is one static profile site per installation. It has no built-in accoun
 
 Requirements:
 
-- Node.js 24.0.0+
+- Node.js 24.x or 26.0.0+
 - pnpm 11.23.0+
 - A Cloudflare account only when deploying
 

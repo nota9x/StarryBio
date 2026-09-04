@@ -5,7 +5,7 @@
   "description": "A customizable link-in-bio page built with Astro for Cloudflare Workers.",
   "packageManager": "pnpm@11.25.0",
   "engines": {
-    "node": "^24.0.0"
+    "node": "^24.0.0 || >=26.0.0"
   },
   "scripts": {
     "dev": "pnpm run validate && pnpm run build:icons && pnpm run generate && astro dev",

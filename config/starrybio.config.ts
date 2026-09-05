@@ -3,7 +3,7 @@ import type { StarryBioConfig } from '../src/config/schema';
 // This is the only file most StarryBio users need to edit. See README.md for
 // every option, provider example, and the v2-to-v3 migration table.
 const config = {
-  pageTitle: 'StarryBio v3.0',
+  pageTitle: 'StarryBio — your corner of the internet',
   favicon: 'assets/images/favicon.svg',
 
   theme: {
@@ -26,45 +26,40 @@ const config = {
   },
 
   profile: {
-    name: 'Astronaut',
-    description: 'Exploring the Digital Universe',
+    name: 'StarryBio',
+    description: 'A beautiful, self-hosted link-in-bio for the things you make.',
     image: 'assets/images/profile.svg',
     layout: 'vertical',
   },
 
   featured: [
     {
-      title: 'StarryBio',
-      description: 'A self-hosted animated link-in-bio template for static-first sites.',
+      title: 'Make your link-in-bio unmistakably yours',
+      description:
+        'Launch a fast, animated home for your links with themes, status, QR sharing, and no platform lock-in.',
       url: 'https://github.com/nota9x/StarryBio',
       image: 'assets/images/profile.svg',
-      badge: 'Open Source',
+      badge: 'Open source · Astro',
       icon: { simpleIcon: 'GitHub' },
     },
   ],
 
   sections: [
     {
-      title: 'Socials',
-      description: 'Find me around the web.',
+      title: 'Explore StarryBio',
+      description: 'Start with the source or copy our Discord handle to say hello.',
       links: [
         {
-          label: 'GitHub',
-          subtitle: '@nota9x',
-          url: 'https://github.com/nota9x',
+          label: 'View the project on GitHub',
+          subtitle: 'Source, setup, and customization guides',
+          url: 'https://github.com/nota9x/StarryBio',
           icon: { simpleIcon: 'GitHub' },
         },
         {
           label: 'Discord',
-          subtitle: 'Join the server',
-          url: 'https://discord.gg/example',
-          icon: { simpleIcon: 'Discord' },
-        },
-        {
-          label: 'Discord Name',
-          subtitle: 'Copy: nota9x#0000',
+          subtitle: 'Copy @nota9x to clipboard',
           specialType: 'copy',
-          copyValue: 'nota9x#0000',
+          copyValue: '@nota9x',
           icon: { simpleIcon: 'Discord' },
         },
       ],
@@ -81,25 +76,25 @@ const config = {
     default: {
       text: 'Offline',
       color: '#6B7280',
-      icon: 'M20 12h-2v2h2v-2zm-4 0h-2v2h2v-2zm-4 0H8v2h4v-2zm-4 0H4v2h4v-2z',
+      icon: 'assets/images/offline.svg',
     },
     types: {
       available: {
         text: 'Available',
         color: '#10B981',
-        icon: 'assets/images/online.webp',
+        icon: 'assets/images/online.svg',
         message: 'Online and ready to chat!',
       },
       busy: {
         text: 'Busy / School',
         color: '#EF4444',
-        icon: 'assets/images/dnd.webp',
+        icon: 'assets/images/dnd.svg',
         message: 'Focused on work. Replies slow.',
       },
       sleeping: {
         text: 'Sleeping',
         color: '#6d7684',
-        icon: 'assets/images/idle.webp',
+        icon: 'assets/images/idle.svg',
         message: 'Dreaming of electric sheep.',
       },
     },
@@ -114,13 +109,13 @@ const config = {
 
   announcement: {
     enabled: true,
-    text: 'Welcome to v3.0!',
-    url: '#',
+    text: 'StarryBio is open source and ready to become yours.',
+    url: 'https://github.com/nota9x/StarryBio',
   },
 
   seo: {
-    title: 'StarryBio v3.0',
-    description: 'A premium animated link-in-bio template for builders and creators.',
+    title: 'StarryBio — your corner of the internet',
+    description: 'An open-source, animated link-in-bio built for creators who want full control.',
     image: '/assets/images/profile.svg',
     canonicalUrl: 'https://a9x.pro',
     themeColor: '#7ddf9b',
@@ -129,8 +124,8 @@ const config = {
   ogImage: {
     enabled: false,
     output: 'public/og.png',
-    title: 'StarryBio v3.0',
-    subtitle: 'A premium animated link-in-bio template.',
+    title: 'StarryBio',
+    subtitle: 'Your corner of the internet.',
   },
 
   qr: {

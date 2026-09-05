@@ -992,7 +992,13 @@ body {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  transition: background-color 0.3s ease;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  transition:
+    background-color 0.3s ease,
+    filter 0.3s ease,
+    transform 0.3s ease;
 
   -webkit-mask-size: 100%;
   mask-size: 100%;
@@ -1000,6 +1006,18 @@ body {
   mask-repeat: no-repeat;
   -webkit-mask-position: center;
   mask-position: center;
+}
+
+#status-indicator-icon.status-icon-artwork {
+  width: 36px;
+  height: 36px;
+  border-radius: 0;
+}
+
+#status-indicator-container:hover #status-indicator-icon,
+#status-indicator-container:focus-visible #status-indicator-icon {
+  filter: brightness(1.08) saturate(1.06);
+  transform: scale(1.06);
 }
 
 #status-tooltip {

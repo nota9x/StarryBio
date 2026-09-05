@@ -1,4 +1,4 @@
-import { mkdir, rm, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { createAnalyticsScript, serializeJsonAttribute } from '../../src/config/analytics';
@@ -14,6 +14,26 @@ afterEach(async () => {
 });
 
 describe('deterministic build assets', () => {
+  it('ships the status artwork as compact, native SVG assets', async () => {
+    const imageDirectory = path.resolve('public/assets/images');
+    const expectedAssets = [
+      ['online.svg', 'online.webp'],
+      ['idle.svg', 'idle.webp'],
+      ['dnd.svg', 'dnd.webp'],
+      ['offline.svg', 'offline.webp'],
+    ];
+
+    for (const [filename, legacyFilename] of expectedAssets) {
+      const svg = await readFile(path.join(imageDirectory, filename), 'utf8');
+      expect(svg).toContain('viewBox="0 0 32 32"');
+      expect(svg).toContain('<title');
+      expect(svg).toContain('<desc');
+      expect(svg).not.toContain('<image');
+      expect(Buffer.byteLength(svg)).toBeLessThan(4_096);
+      await expect(readFile(path.join(imageDirectory, legacyFilename))).rejects.toThrow();
+    }
+  });
+
   it('generates Simple Icons from the installed package with customization', async () => {
     const spec = {
       brand: 'GitHub',

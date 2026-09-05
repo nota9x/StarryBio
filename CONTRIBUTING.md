@@ -51,6 +51,8 @@ pnpm dev
 | [`wrangler.jsonc`](wrangler.jsonc)                         | Cloudflare static-assets deployment and custom 404 handling.                                                           |
 | [`tests/unit/`](tests/unit) and [`tests/e2e/`](tests/e2e)  | Vitest unit tests and Playwright release checks.                                                                       |
 
+Prefer compact SVG source artwork for simple interface graphics and status icons. Keep raster formats for photographic or texture-rich imagery that would lose quality or become excessively complex as vectors; never embed raster data inside an SVG.
+
 ## Themes, layouts, and visuals
 
 Theme presets are defined in [`src/config/themes.ts`](src/config/themes.ts). A new preset normally needs:

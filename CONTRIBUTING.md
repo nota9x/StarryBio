@@ -1,6 +1,6 @@
 # Contributing to StarryBio
 
-Thanks for contributing to StarryBio. The project is a configurable Astro link-in-bio site that builds to static assets and deploys through Cloudflare Workers. Contributions that improve the starter configuration, site experience, accessibility, reliability, themes, layouts, or integrations are welcome.
+Thanks for contributing to StarryBio. The project is a configurable Astro link-in-bio site that builds to portable static assets and supports Cloudflare Workers, Vercel, and Netlify. Contributions that improve the starter configuration, site experience, accessibility, reliability, themes, layouts, or integrations are welcome.
 
 ## Reporting issues
 
@@ -18,9 +18,9 @@ For a security vulnerability, use [private vulnerability reporting](https://gith
 
 ### Requirements
 
-- Node.js 24 or later
-- pnpm 11.23.0 or later
-- A Cloudflare account only when you need to deploy
+- Node.js 24.x or 26.0.0+ (`.node-version` selects 24.x for provider builds)
+- pnpm 11.25.0
+- A hosting-provider account only when you need to deploy
 
 Fork the repository, clone your fork, and create a focused branch. Use a descriptive branch name such as `fix/status-timezone` or `feat/solarized-theme`.
 
@@ -44,8 +44,11 @@ pnpm dev
 | [`src/scripts/`](src/scripts)                              | Browser-side behavior for links, status, and the starfield.                                                            |
 | [`src/config/analytics.ts`](src/config/analytics.ts)       | Analytics script descriptors and safe data-attribute generation.                                                       |
 | [`scripts/`](scripts)                                      | Build-time validation, asset generation, live config updates, and Simple Icons generation.                             |
-| [`public/`](public)                                        | Static assets and Cloudflare headers. Place user-facing local images here.                                             |
-| [`public/_headers`](public/_headers)                       | Content Security Policy and other static deployment headers.                                                           |
+| [`public/`](public)                                        | Static assets and Cloudflare/Netlify headers. Place user-facing local images here.                                     |
+| [`public/_headers`](public/_headers)                       | Canonical Content Security Policy and static header intent for Cloudflare and Netlify.                                 |
+| [`vercel.json`](vercel.json)                               | Vercel build/output settings and its translation of the shared header intent.                                          |
+| [`netlify.toml`](netlify.toml)                             | Netlify build and publish settings.                                                                                    |
+| [`wrangler.jsonc`](wrangler.jsonc)                         | Cloudflare static-assets deployment and custom 404 handling.                                                           |
 | [`tests/unit/`](tests/unit) and [`tests/e2e/`](tests/e2e)  | Vitest unit tests and Playwright release checks.                                                                       |
 
 ## Themes, layouts, and visuals
@@ -67,7 +70,7 @@ When adding or changing a provider:
 
 - Use external HTTPS scripts and data attributes; do not add inline initialization code.
 - Add validation and tests for all new configuration fields.
-- Update [`public/_headers`](public/_headers) with the provider’s script and collection hosts, keeping the Content Security Policy as narrow as possible.
+- Update both [`public/_headers`](public/_headers) and the catch-all headers in [`vercel.json`](vercel.json) with the provider’s script and collection hosts, keeping the Content Security Policy as narrow as possible. The deployment unit test enforces parity.
 - Document the provider and a placeholder-only configuration example in [README.md](README.md).
 - Never commit real site IDs, tokens, credentials, or analytics data.
 
@@ -89,7 +92,7 @@ For changes affecting the rendered site, also run:
 pnpm test:e2e
 ```
 
-`pnpm release:check` runs the complete local release gate, including formatting, linting, type checks, unit tests, a production build, browser tests, and a production dependency audit. Use `pnpm preview` to exercise the built static output through Wrangler before deployment.
+`pnpm release:check` runs the complete local release gate, including formatting, linting, type checks, unit tests, a production build, browser tests, and a production dependency audit. Use `pnpm preview` for a provider-neutral static preview, or `pnpm preview:cloudflare` to exercise the output through Wrangler.
 
 If you change the config schema, generated assets, status scheduling, or runtime behavior, add or update focused tests. For visual work, check narrow and wide viewports, keyboard navigation, and reduced-motion behavior.
 

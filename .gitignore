@@ -15,6 +15,10 @@ public/contact.vcf
 .wrangler/
 .mf/
 
+# Provider CLI state
+.vercel/
+.netlify/
+
 # Environment files
 .env
 .env.*

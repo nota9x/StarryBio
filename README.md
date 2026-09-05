@@ -11,7 +11,7 @@ Build your profile once. Deploy it anywhere.
 
 <br>
 
-[![Astro](https://img.shields.io/badge/Astro-5-BC52EE?logo=astro\&logoColor=white)](https://astro.build/)
+[![Astro](https://img.shields.io/badge/Astro-7-BC52EE?logo=astro\&logoColor=white)](https://astro.build/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript\&logoColor=white)](https://www.typescriptlang.org/)
 [![GitHub License](https://img.shields.io/github/license/nota9x/StarryBio)](LICENSE)
 [![GitHub Release](https://img.shields.io/github/v/release/nota9x/StarryBio?display_name=tag)](https://github.com/nota9x/StarryBio/releases)

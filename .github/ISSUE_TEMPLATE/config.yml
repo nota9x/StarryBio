@@ -3,6 +3,4 @@ contact_links:
   - name: Read the documentation
     url: https://github.com/nota9x/StarryBio/wiki
     about: Review the setup, configuration, deployment, and troubleshooting wiki before opening an issue.
-  - name: Security vulnerability
-    url: https://github.com/nota9x/StarryBio/security/advisories/new
-    about: Please report security concerns privately through GitHub Security Advisories.
+    

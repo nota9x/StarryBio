@@ -29,7 +29,7 @@
     "build": "pnpm run validate && pnpm run build:icons && pnpm run generate && astro build",
     "build:icons": "tsx ./scripts/build-simple-icons.ts",
     "release:check": "pnpm run format:check && pnpm run lint && pnpm run typecheck && pnpm run test:unit && pnpm run build && playwright test && pnpm audit --prod",
-    "update:repo": "tsx ./scripts/update-repository.ts",
+    "starrybio:update": "tsx ./scripts/update-repository.ts",
     "astro": "astro"
   },
   "devDependencies": {

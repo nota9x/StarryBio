@@ -69,18 +69,19 @@ For setup instructions, see the Wiki guides for [Cloudflare](https://github.com/
 
 ## Common commands
 
-| Command                   | Purpose                                           |
-| ------------------------- | ------------------------------------------------- |
-| `pnpm dev`                | Validate, generate assets/icons, and start Astro. |
-| `pnpm validate`           | Validate configuration and local asset paths.     |
-| `pnpm build`              | Build portable static output in `dist/`.          |
-| `pnpm preview`            | Build and serve `dist/` with Astro.               |
-| `pnpm preview:cloudflare` | Build and serve `dist/` through Wrangler.         |
-| `pnpm deploy`             | Backwards-compatible Cloudflare deployment.       |
-| `pnpm deploy:cloudflare`  | Build and deploy static assets with Wrangler.     |
-| `pnpm test:unit`          | Run Vitest unit tests.                            |
-| `pnpm test:e2e`           | Build and run Playwright browser tests.           |
-| `pnpm release:check`      | Run the complete local release gate.              |
+| Command                   | Purpose                                            |
+| ------------------------- | -------------------------------------------------- |
+| `pnpm dev`                | Validate, generate assets/icons, and start Astro.  |
+| `pnpm validate`           | Validate configuration and local asset paths.      |
+| `pnpm build`              | Build portable static output in `dist/`.           |
+| `pnpm preview`            | Build and serve `dist/` with Astro.                |
+| `pnpm preview:cloudflare` | Build and serve `dist/` through Wrangler.          |
+| `pnpm deploy`             | Backwards-compatible Cloudflare deployment.        |
+| `pnpm deploy:cloudflare`  | Build and deploy static assets with Wrangler.      |
+| `pnpm test:unit`          | Run Vitest unit tests.                             |
+| `pnpm test:e2e`           | Build and run Playwright browser tests.            |
+| `pnpm starrybio:update`   | Safely integrate updates from the main repository. |
+| `pnpm release:check`      | Run the complete local release gate.               |
 
 ## Contributing and security
 

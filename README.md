@@ -39,7 +39,7 @@ StarryBio is one static profile site per installation. It has no built-in accoun
 Requirements:
 
 - Node.js 24.x or 26.0.0+
-- pnpm 11.23.0+
+- pnpm 11.25.0
 - A hosting account only when deploying
 
 ```bash

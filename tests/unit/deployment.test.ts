@@ -21,11 +21,13 @@ function firstHeadersBlock(): Header[] {
   const source = readFileSync(resolve(root, 'public/_headers'), 'utf8');
   const lines = source.split(/\r?\n/);
   const start = lines.findIndex((line) => line.trim() === '/*');
+  if (start === -1) throw new Error('Expected a /* header block in public/_headers');
   const headers: Header[] = [];
 
   for (const line of lines.slice(start + 1)) {
     if (!/^\s/.test(line) || line.trim() === '') break;
     const separator = line.indexOf(':');
+    if (separator <= 0) throw new Error(`Malformed header line in public/_headers: ${line}`);
     headers.push({
       key: line.slice(0, separator).trim(),
       value: line.slice(separator + 1).trim(),

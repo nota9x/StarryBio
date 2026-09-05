@@ -4,6 +4,12 @@ StarryBio is a static, customizable link-in-bio site built with Astro. It combin
 
 Demo: [a9x.pro](https://a9x.pro)
 
+<p align="center">
+  <a href="https://deploy.workers.cloudflare.com/?url=https://github.com/nota9x/StarryBio"><img src="https://deploy.workers.cloudflare.com/button" alt="Deploy to Cloudflare" height="32"></a>&nbsp;&nbsp;
+  <a href="https://app.netlify.com/start/deploy?repository=https://github.com/nota9x/StarryBio"><img src="https://www.netlify.com/img/deploy/button.svg" alt="Deploy to Netlify" height="32"></a>&nbsp;&nbsp;
+  <a href="https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fnota9x%2FStarryBio"><img src="https://vercel.com/button" alt="Deploy with Vercel" height="32"></a>
+</p>
+
 ## Documentation
 
 The [StarryBio Wiki](https://github.com/nota9x/StarryBio/wiki) is the primary documentation for using, configuring, deploying, operating, and extending StarryBio.

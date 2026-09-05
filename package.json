@@ -2,7 +2,7 @@
   "name": "starry-bio",
   "version": "3.2.0",
   "type": "module",
-  "description": "A customizable link-in-bio page built with Astro for Cloudflare Workers.",
+  "description": "A fully customizable, high-performance \"link-in-bio\" website template built with Astro.",
   "packageManager": "pnpm@11.25.0",
   "engines": {
     "node": "^24.0.0 || >=26.0.0"
@@ -10,8 +10,10 @@
   "scripts": {
     "dev": "pnpm run validate && pnpm run build:icons && pnpm run generate && astro dev",
     "start": "pnpm run dev",
-    "preview": "pnpm run build && wrangler dev",
-    "deploy": "pnpm run build && wrangler deploy",
+    "preview": "pnpm run build && astro preview",
+    "preview:cloudflare": "pnpm run build && wrangler dev",
+    "deploy": "pnpm run deploy:cloudflare",
+    "deploy:cloudflare": "pnpm run build && wrangler deploy",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "fmt": "pnpm run format",

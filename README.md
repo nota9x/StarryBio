@@ -1,6 +1,6 @@
 # ✨ StarryBio v3
 
-StarryBio is a static, customizable link-in-bio site built with Astro. It combines grouped links, featured cards, availability schedules, generated downloads, optional analytics, and an animated starfield, then deploys the finished static site as Cloudflare Worker static assets.
+StarryBio is a static, customizable link-in-bio site built with Astro. It combines grouped links, featured cards, availability schedules, generated downloads, optional analytics, and an animated starfield. The normal build produces a portable `dist/` directory that can be served by Cloudflare Workers, Vercel, Netlify, or another static host.
 
 Demo: [a9x.pro](https://a9x.pro)
 
@@ -11,6 +11,8 @@ The [StarryBio Wiki](https://github.com/nota9x/StarryBio/wiki) is the primary do
 - [Getting started](https://github.com/nota9x/StarryBio/wiki/Getting-Started)
 - [Configuration reference](https://github.com/nota9x/StarryBio/wiki/Configuration-Reference)
 - [Deploy to Cloudflare](https://github.com/nota9x/StarryBio/wiki/Deploying-to-Cloudflare)
+- [Deploy to Vercel](https://github.com/nota9x/StarryBio/wiki/Deploying-to-Vercel)
+- [Deploy to Netlify](https://github.com/nota9x/StarryBio/wiki/Deploying-to-Netlify)
 - [Custom domains and DNS](https://github.com/nota9x/StarryBio/wiki/Domains-and-DNS)
 - [Security and privacy](https://github.com/nota9x/StarryBio/wiki/Security-and-Privacy)
 - [Troubleshooting](https://github.com/nota9x/StarryBio/wiki/Troubleshooting)
@@ -22,9 +24,9 @@ The [StarryBio Wiki](https://github.com/nota9x/StarryBio/wiki) is the primary do
 - Built-in theme presets, responsive layouts, configurable motion, local/remote assets, and build-time Simple Icon generation.
 - Copy-to-clipboard links, a visitor-local availability schedule, a dismissible announcement, QR-code and vCard downloads, and generated Open Graph images.
 - Optional Google Analytics 4, Cloudflare Web Analytics, Plausible, Umami, or custom HTTPS analytics script support.
-- Static Cloudflare Worker deployment with custom 404 behavior, security headers, and cache rules.
+- Portable static output with custom 404 behavior, security headers, and cache rules translated for each supported host.
 
-StarryBio is one static profile site per installation. It has no built-in accounts, admin dashboard, authentication, database, server-side API, Cloudflare data binding, or runtime environment-variable configuration. Review the [FAQ and limitations](https://github.com/nota9x/StarryBio/wiki/FAQ-and-Limitations) before planning features that need those capabilities.
+StarryBio is one static profile site per installation. It has no built-in accounts, admin dashboard, authentication, database, server-side API, provider data binding, or runtime environment-variable configuration. Review the [FAQ and limitations](https://github.com/nota9x/StarryBio/wiki/FAQ-and-Limitations) before planning features that need those capabilities.
 
 ## Quick start
 
@@ -32,7 +34,7 @@ Requirements:
 
 - Node.js 24.x or 26.0.0+
 - pnpm 11.23.0+
-- A Cloudflare account only when deploying
+- A hosting account only when deploying
 
 ```bash
 pnpm install
@@ -49,26 +51,30 @@ pnpm build
 pnpm preview
 ```
 
-Deploy with:
+`pnpm build` produces portable static output in `dist/` without hosting credentials.
+
+Deploy to Cloudflare with:
 
 ```bash
 pnpm deploy
 ```
 
-Follow the complete [Cloudflare deployment guide](https://github.com/nota9x/StarryBio/wiki/Deploying-to-Cloudflare) before your first deployment. It explains the Worker name, Wrangler authentication, static asset behavior, verification, and the fact that no D1/KV/R2/bindings or secrets are needed for the stock site.
+For setup instructions, see the Wiki guides for [Cloudflare](https://github.com/nota9x/StarryBio/wiki/Deploying-to-Cloudflare), [Vercel](https://github.com/nota9x/StarryBio/wiki/Deploying-to-Vercel), and [Netlify](https://github.com/nota9x/StarryBio/wiki/Deploying-to-Netlify).
 
 ## Common commands
 
-| Command              | Purpose                                           |
-| -------------------- | ------------------------------------------------- |
-| `pnpm dev`           | Validate, generate assets/icons, and start Astro. |
-| `pnpm validate`      | Validate configuration and local asset paths.     |
-| `pnpm build`         | Build deployable static output in `dist/`.        |
-| `pnpm preview`       | Build and serve output through Wrangler.          |
-| `pnpm deploy`        | Build and deploy static assets with Wrangler.     |
-| `pnpm test:unit`     | Run Vitest unit tests.                            |
-| `pnpm test:e2e`      | Build and run Playwright browser tests.           |
-| `pnpm release:check` | Run the complete local release gate.              |
+| Command                   | Purpose                                           |
+| ------------------------- | ------------------------------------------------- |
+| `pnpm dev`                | Validate, generate assets/icons, and start Astro. |
+| `pnpm validate`           | Validate configuration and local asset paths.     |
+| `pnpm build`              | Build portable static output in `dist/`.          |
+| `pnpm preview`            | Build and serve `dist/` with Astro.               |
+| `pnpm preview:cloudflare` | Build and serve `dist/` through Wrangler.         |
+| `pnpm deploy`             | Backwards-compatible Cloudflare deployment.       |
+| `pnpm deploy:cloudflare`  | Build and deploy static assets with Wrangler.     |
+| `pnpm test:unit`          | Run Vitest unit tests.                            |
+| `pnpm test:e2e`           | Build and run Playwright browser tests.           |
+| `pnpm release:check`      | Run the complete local release gate.              |
 
 ## Contributing and security
 

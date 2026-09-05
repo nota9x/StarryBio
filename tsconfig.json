@@ -18,6 +18,7 @@
     "config/**/*.ts",
     "scripts/**/*.ts",
     "src/**/*.ts",
-    "src/**/*.astro"
+    "src/**/*.astro",
+    "tests/**/*.ts"
   ]
 }

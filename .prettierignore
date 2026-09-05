@@ -9,6 +9,7 @@ coverage
 .wrangler
 public/assets/icons/simple-icons
 public/_headers
+netlify.toml
 
 # Git
 .git

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-labelledby="title desc">
+  <title id="title">Online</title>
+  <desc id="desc">A softly glowing green presence orb.</desc>
+  <defs>
+    <radialGradient id="online-core" cx="35%" cy="28%" r="75%">
+      <stop offset="0" stop-color="#8ce8c4" />
+      <stop offset="0.3" stop-color="#4fd7aa" />
+      <stop offset="0.7" stop-color="#20b98a" />
+      <stop offset="1" stop-color="#0b8068" />
+    </radialGradient>
+    <filter id="online-bloom" x="-35%" y="-35%" width="170%" height="170%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="1.6" />
+    </filter>
+  </defs>
+  <circle cx="16" cy="16" r="11.7" fill="#27bd90" opacity="0.24" filter="url(#online-bloom)" />
+  <circle cx="16" cy="16" r="11.25" fill="url(#online-core)" />
+</svg>

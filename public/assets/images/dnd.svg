@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-labelledby="title desc">
+  <title id="title">Do not disturb</title>
+  <desc id="desc">A glowing crimson presence orb crossed by a rounded stop bar.</desc>
+  <defs>
+    <linearGradient id="dnd-core" x1="9" y1="7" x2="23" y2="25" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ff8c9b" />
+      <stop offset="0.38" stop-color="#ff4f68" />
+      <stop offset="1" stop-color="#c51f46" />
+    </linearGradient>
+    <filter id="dnd-bloom" x="-35%" y="-35%" width="170%" height="170%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="1.55" />
+    </filter>
+    <mask id="dnd-cutout">
+      <rect width="32" height="32" fill="#000" />
+      <circle cx="16" cy="16" r="11.3" fill="#fff" />
+      <rect x="8.2" y="13.8" width="15.6" height="4.4" rx="2.2" fill="#000" />
+    </mask>
+  </defs>
+  <g filter="url(#dnd-bloom)" opacity="0.36">
+    <circle cx="16" cy="16" r="11.7" fill="#ff4f68" mask="url(#dnd-cutout)" />
+  </g>
+  <circle cx="16" cy="16" r="11.3" fill="url(#dnd-core)" mask="url(#dnd-cutout)" />
+</svg>

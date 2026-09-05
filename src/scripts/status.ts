@@ -268,8 +268,11 @@ function setMaskedIcon(element: HTMLElement, source: string, color: string): voi
     ? `data:image/svg+xml;base64,${btoa(
         `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="${pathData}"/></svg>`
       )}`
-    : toAbsoluteUrl(source);
-  element.style.backgroundColor = color;
+    : '';
+  const artworkUrl = pathData ? '' : toAbsoluteUrl(source);
+  element.classList.toggle('status-icon-artwork', Boolean(artworkUrl));
+  element.style.backgroundColor = artworkUrl ? 'transparent' : color;
+  element.style.backgroundImage = artworkUrl ? `url('${cssEscapeUrl(artworkUrl)}')` : 'none';
   const maskImage = iconUrl ? `url('${cssEscapeUrl(iconUrl)}')` : 'none';
   element.style.setProperty('-webkit-mask-image', maskImage);
   element.style.maskImage = maskImage;

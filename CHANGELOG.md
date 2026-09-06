@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.4.1](https://github.com/nota9x/StarryBio/compare/v3.4.0...v3.4.1) (2026-09-06)
+
+
+### Bug Fixes
+
+* **ci:** disable caching for dependency audit ([c80987d](https://github.com/nota9x/StarryBio/commit/c80987de1f459324b6a376054c14a492eda7f022))
+
 ## [3.4.0](https://github.com/nota9x/StarryBio/compare/v3.3.0...v3.4.0) (2026-09-06)
 
 

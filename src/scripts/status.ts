@@ -159,7 +159,7 @@ function updateStatus(config: RuntimeStatusConfig): void {
       ? `Owner: ${formatClock(new Date(), config.ownerTimeZone)}`
       : '';
   setOptionalText('#tooltip-owner-time', ownerTime);
-  document.querySelector('#tooltip-owner-time-row')?.classList.toggle('hidden', !ownerTime);
+  document.querySelector('#tooltip-owner-time-row')?.toggleAttribute('hidden', !ownerTime);
 
   const visitorTime = config.showVisitorTime ? `Your time: ${formatClock(new Date())}` : '';
   setOptionalText('#tooltip-visitor-time', visitorTime);

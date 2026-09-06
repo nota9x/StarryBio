@@ -16,16 +16,16 @@ const { status } = Astro.props;
         <button id="status-modal-close" type="button" aria-label="Close schedule">
           <X size={24} aria-hidden="true" />
         </button>
-        <h2 id="status-modal-title" class="status-modal-title text-2xl font-bold mb-6 text-center">
+        <h2 id="status-modal-title" class="status-modal-title mb-6 text-center text-2xl font-bold">
           Schedule
         </h2>
         <div class="space-y-6">
           <section>
-            <h3 class="status-modal-heading text-lg font-semibold mb-3">Weekdays</h3>
+            <h3 class="status-modal-heading mb-3 text-lg font-semibold">Weekdays</h3>
             <ul id="weekday-schedule-list" class="schedule-list rounded-lg" />
           </section>
           <section>
-            <h3 class="status-modal-heading text-lg font-semibold mb-3">Weekends</h3>
+            <h3 class="status-modal-heading mb-3 text-lg font-semibold">Weekends</h3>
             <ul id="weekend-schedule-list" class="schedule-list rounded-lg" />
           </section>
         </div>

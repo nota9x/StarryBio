@@ -15,7 +15,7 @@ export function createConfig(overrides: Record<string, unknown> = {}): StarryBio
       },
     ],
     ...overrides,
-  } as StarryBioConfig;
+  };
 }
 
 export function createStatus() {

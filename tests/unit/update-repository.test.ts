@@ -3,6 +3,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'nod
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
+import packageJson from '../../package.json';
 import { describeVersionTransition, matchesGlob, parseArgs } from '../../scripts/update-repository';
 
 const temporaryDirectories: string[] = [];
@@ -69,6 +70,18 @@ describe('repository updater options', () => {
 
     expect(() => parseArgs([], directory)).toThrow('Unknown option');
   });
+
+  it('rejects non-string conflict strategies', () => {
+    const directory = temporaryDirectory();
+    writeFileSync(
+      join(directory, '.starrybio-updater.json'),
+      JSON.stringify({ conflictStrategy: {} })
+    );
+
+    expect(() => parseArgs([], directory)).toThrow(
+      '"conflictStrategy" must be local, upstream, or abort'
+    );
+  });
 });
 
 describe('repository updater globs', () => {
@@ -119,7 +132,7 @@ describe('repository updater integration', () => {
     writeFileSync(join(upstream, '.gitignore'), 'node_modules/\n');
     writeFileSync(
       join(upstream, 'package.json'),
-      JSON.stringify({ private: true, packageManager: 'pnpm@11.25.0' })
+      JSON.stringify({ private: true, packageManager: packageJson.packageManager })
     );
     const baseLockfile = `lockfileVersion: '9.0'
 

@@ -128,6 +128,7 @@ For complete setup instructions, see the deployment guides for:
 | `pnpm deploy:cloudflare`  | Build and deploy static assets with Wrangler.      |
 | `pnpm test:unit`          | Run Vitest unit tests.                             |
 | `pnpm test:e2e`           | Build and run Playwright browser tests.            |
+| `pnpm check`              | Run formatting, lint, type, and unit-test checks.  |
 | `pnpm commitlint`         | Validate the latest commit message.                |
 | `pnpm starrybio:update`   | Safely integrate updates from the main repository. |
 | `pnpm release:check`      | Run the complete local release gate.               |

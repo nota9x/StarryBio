@@ -16,10 +16,7 @@ Closes #
 
 List the commands you ran and any manual checks performed.
 
-- [ ] `pnpm format:check`
-- [ ] `pnpm lint`
-- [ ] `pnpm typecheck`
-- [ ] `pnpm test:unit`
+- [ ] `pnpm check`
 - [ ] `pnpm build`
 - [ ] I checked the affected UI in a browser (if applicable)
 - [ ] I checked reduced-motion and responsive behavior (if applicable)

@@ -95,41 +95,39 @@ function setupCopyButtons(signal: AbortSignal): void {
         { once: true }
       );
 
-      button.addEventListener(
-        'click',
-        async () => {
-          if (button.disabled) return;
-          button.disabled = true;
-          button.classList.add('copy-feedback-changing');
-          let copied = false;
-          try {
-            await copyText(text);
-            copied = true;
-          } catch {
-            copied = false;
-          }
+      const handleClick = async (): Promise<void> => {
+        if (button.disabled) return;
+        button.disabled = true;
+        button.classList.add('copy-feedback-changing');
+        let copied = false;
+        try {
+          await copyText(text);
+          copied = true;
+        } catch {
+          copied = false;
+        }
+
+        schedule(() => {
+          feedback.textContent = copied ? 'Copied!' : 'Copy failed';
+          button.classList.toggle('show-copied-feedback', copied);
+          button.classList.remove('copy-feedback-changing');
 
           schedule(() => {
-            feedback.textContent = copied ? 'Copied!' : 'Copy failed';
-            button.classList.toggle('show-copied-feedback', copied);
-            button.classList.remove('copy-feedback-changing');
+            button.classList.add('copy-feedback-changing');
 
             schedule(() => {
-              button.classList.add('copy-feedback-changing');
+              feedback.textContent = originalText;
+              button.classList.remove('show-copied-feedback');
+              requestAnimationFrame(() => {
+                button.classList.remove('copy-feedback-changing');
+                button.disabled = false;
+              });
+            }, 180);
+          }, 1_650);
+        }, 140);
+      };
 
-              schedule(() => {
-                feedback.textContent = originalText;
-                button.classList.remove('show-copied-feedback');
-                requestAnimationFrame(() => {
-                  button.classList.remove('copy-feedback-changing');
-                  button.disabled = false;
-                });
-              }, 180);
-            }, 1_650);
-          }, 140);
-        },
-        { signal }
-      );
+      button.addEventListener('click', () => void handleClick(), { signal });
     });
 }
 

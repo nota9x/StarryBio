@@ -7,7 +7,12 @@
   "trailingComma": "es5",
   "bracketSpacing": true,
   "arrowParens": "always",
-  "plugins": ["prettier-plugin-astro", "prettier-plugin-tailwindcss"],
+  "endOfLine": "lf",
+  "plugins": [
+    "prettier-plugin-packagejson",
+    "prettier-plugin-astro",
+    "prettier-plugin-tailwindcss"
+  ],
   "overrides": [
     {
       "files": "*.astro",

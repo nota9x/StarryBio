@@ -430,14 +430,14 @@ function restoreStash(stashOid: string | undefined, strategy: ConflictStrategy, 
 function updateDependencies() {
   console.log('\nUpdating dependencies and regenerating the lockfile...');
   const activePackageManager = process.env.npm_execpath;
-  if (activePackageManager && /(?:^|[\\/])pnpm(?:\.c?js)?$/i.test(activePackageManager)) {
+  if (activePackageManager && /\.(?:c|m)?js$/i.test(activePackageManager)) {
     return (
       spawnSync(process.execPath, [activePackageManager, 'up'], { stdio: 'inherit' }).status === 0
     );
   }
-  const executable = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm';
+  const executable = activePackageManager ?? (process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm');
   const result = spawnSync(executable, ['up'], {
-    shell: process.platform === 'win32',
+    shell: process.platform === 'win32' && /\.cmd$/i.test(executable),
     stdio: 'inherit',
   });
   if (result.error) console.error(`Could not start pnpm: ${result.error.message}`);

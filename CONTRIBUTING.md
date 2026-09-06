@@ -19,7 +19,7 @@ For a security vulnerability, use [private vulnerability reporting](https://gith
 ### Requirements
 
 - Node.js 24.x or 26.0.0+ (`.node-version` selects 24.x for provider builds)
-- pnpm 11.25.0
+- pnpm 12.3.4
 - A hosting-provider account only when you need to deploy
 
 Fork the repository, clone your fork, and create a focused branch. Use a descriptive branch name such as `fix/status-timezone` or `feat/solarized-theme`.
@@ -107,7 +107,82 @@ If you change the config schema, generated assets, status scheduling, or runtime
 5. Add screenshots or a recording for visual changes, including new themes and layouts.
 6. Link the issue with `Closes #<number>` when applicable, then submit the pull request against the default branch.
 
-Write clear commit and pull request titles that describe the outcome, for example `fix: preserve overnight status schedules` or `feat: add aurora theme preset`.
+### Pull request titles
+
+Pull request titles must use [Conventional Commits](https://www.conventionalcommits.org/) syntax. A type is required, a scope is optional, and the description follows a colon:
+
+```text
+feat(deploy): add Vercel support
+fix(ui): correct mobile card spacing
+docs(readme): improve installation instructions
+```
+
+StarryBio uses squash merging, so the pull request title becomes the meaningful commit on `main` and drives release notes and version selection. CI accepts `build`, `chore`, `ci`, `docs`, `feat`, `fix`, `perf`, `refactor`, `revert`, `style`, and `test`. Renovate's `chore(deps): ...` titles follow the same convention.
+
+### Commit messages
+
+Every commit introduced by a pull request is checked with commitlint and should follow the same convention:
+
+```text
+feat: add dark mode
+fix(ui): correct mobile spacing
+perf(assets): optimize generated icons
+docs: improve installation instructions
+```
+
+Mark a breaking change with `!`:
+
+```text
+feat(config)!: redesign configuration format
+```
+
+Alternatively, describe it in a `BREAKING CHANGE:` footer in the commit body. Validate the latest local commit before pushing with:
+
+```bash
+pnpm commitlint
+```
+
+CI validates all commits in each pull request. Amend or reword invalid commits before merging. The final squash commit is derived from the separately validated pull request title.
+
+## Releases
+
+Release Please manages versions, `CHANGELOG.md`, Git tags, and GitHub Releases from the Conventional Commits on `main`:
+
+```text
+PR merged into main
+        ↓
+Release Please analyzes commits
+        ↓
+Release PR is created/updated
+        ↓
+Maintainer reviews release
+        ↓
+Release PR merged
+        ↓
+vX.Y.Z tag + GitHub Release
+```
+
+Ordinary pull request merges do not immediately publish releases. They update the pending release pull request; merging that release pull request is the manual release gate.
+
+Version changes follow Semantic Versioning:
+
+- Patch releases contain fixes and small compatible improvements (`fix:` and `perf:`).
+- Minor releases contain backward-compatible features (`feat:`).
+- Major releases contain breaking changes (`!` or a `BREAKING CHANGE:` footer).
+
+Other types normally do not independently trigger a release. Use GitHub milestones such as `v3.4`, `v3.5`, or `v4.0` to plan feature releases. Routine patch releases do not need a milestone.
+
+### Maintainer repository setup
+
+The following settings are manual GitHub repository configuration, not repository files:
+
+- Under **Settings → General → Pull Requests**, enable squash merging and select the pull request title as the default squash commit title.
+- Disable merge commits. Disable rebase merging as well if the project wants a strictly linear conventional history.
+- Enable automatic deletion of head branches after merge.
+- Protect `main`: require pull requests and require the `Release validation` and `Validate PR title` checks before merging.
+- Create a fine-grained token for `nota9x/StarryBio` with repository **Contents**, **Pull requests**, and **Issues** read/write access, save it as the Actions secret `RELEASE_PLEASE_TOKEN`, and ensure the token's owner can open pull requests. Release Please needs this separate token so its release pull requests trigger the normal CI workflow; GitHub suppresses workflow events created by the built-in `GITHUB_TOKEN`.
+
+To publish, review the version and changelog in the Release Please pull request, wait for its required checks, and squash-merge it. Release Please then creates the matching `vX.Y.Z` tag and GitHub Release. There is no npm publication step.
 
 ## Code of Conduct
 

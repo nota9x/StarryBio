@@ -25,6 +25,35 @@ type UpdaterConfig = Partial<
 >;
 type GitResult = { ok: boolean; stderr: string; stdout: string };
 
+const SEMVER_PATTERN = /^(\d+)\.(\d+)\.(\d+)(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/;
+
+export function describeVersionTransition(currentVersion: string, nextVersion: string) {
+  const current = SEMVER_PATTERN.exec(currentVersion);
+  const next = SEMVER_PATTERN.exec(nextVersion);
+  if (!current || !next || currentVersion === nextVersion) return undefined;
+
+  const currentParts = current.slice(1, 4).map(Number);
+  const nextParts = next.slice(1, 4).map(Number);
+  const firstDifference = nextParts.findIndex((part, index) => part !== currentParts[index]);
+  if (firstDifference >= 0 && nextParts[firstDifference] < currentParts[firstDifference]) {
+    return undefined;
+  }
+  const change =
+    nextParts[0] !== currentParts[0]
+      ? 'major'
+      : nextParts[1] !== currentParts[1]
+        ? 'minor'
+        : nextParts[2] !== currentParts[2]
+          ? 'patch'
+          : 'prerelease';
+  return `StarryBio ${currentVersion} → ${nextVersion}\n${nextVersion} is a ${change} update.`;
+}
+
+function parsePackageVersion(contents: string) {
+  const parsed = JSON.parse(contents) as { version?: unknown };
+  return typeof parsed.version === 'string' ? parsed.version : undefined;
+}
+
 function requireValue(args: string[], index: number) {
   const value = args[index + 1];
   if (!value || value.startsWith('--')) throw new Error(`Missing value for ${args[index]}.`);
@@ -470,6 +499,18 @@ export function main(args = process.argv.slice(2)) {
   const target = `${options.remote}/${remoteBranch}`;
   if (!git(['show-ref', '--verify', '--quiet', `refs/remotes/${target}`], true).ok) {
     throw new Error(`Remote branch ${target} does not exist.`);
+  }
+
+  try {
+    const currentVersion = parsePackageVersion(readFileSync(resolve('package.json'), 'utf8'));
+    const nextVersion = parsePackageVersion(gitOutput(['show', `${target}:package.json`]));
+    const transition =
+      currentVersion && nextVersion
+        ? describeVersionTransition(currentVersion, nextVersion)
+        : undefined;
+    if (transition) console.log(`\n${transition}`);
+  } catch {
+    // Version reporting is informational and must not prevent repository updates.
   }
 
   const originalHead = gitOutput(['rev-parse', 'HEAD']);

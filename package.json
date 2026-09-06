@@ -19,6 +19,7 @@
     "fmt": "pnpm run format",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "commitlint": "commitlint --last --verbose",
     "typecheck": "astro check && tsc --noEmit",
     "test": "pnpm run test:unit",
     "test:unit": "vitest run",
@@ -35,6 +36,8 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
     "@axe-core/playwright": "^4.13.0",
+    "@commitlint/cli": "^21.2.2",
+    "@commitlint/config-conventional": "^21.2.2",
     "@eslint/js": "^10.0.1",
     "@fontsource/inter": "^5.3.0",
     "@fontsource/nunito-sans": "^5.3.0",

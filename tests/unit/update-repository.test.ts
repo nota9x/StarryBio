@@ -3,7 +3,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'nod
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { matchesGlob, parseArgs } from '../../scripts/update-repository';
+import { describeVersionTransition, matchesGlob, parseArgs } from '../../scripts/update-repository';
 
 const temporaryDirectories: string[] = [];
 
@@ -82,6 +82,26 @@ describe('repository updater globs', () => {
     ['docs/setup.md', 'docs/', true],
   ])('matches %s against %s', (path, pattern, expected) => {
     expect(matchesGlob(path, pattern)).toBe(expected);
+  });
+});
+
+describe('repository updater version reporting', () => {
+  it.each([
+    ['3.3.0', '3.3.1', 'patch'],
+    ['3.3.0', '3.4.0', 'minor'],
+    ['3.3.0', '4.0.0', 'major'],
+  ])('describes a %s to %s update as %s', (current, next, change) => {
+    expect(describeVersionTransition(current, next)).toBe(
+      `StarryBio ${current} → ${next}\n${next} is a ${change} update.`
+    );
+  });
+
+  it('ignores unchanged or invalid versions', () => {
+    expect(describeVersionTransition('3.3.0', '3.3.0')).toBeUndefined();
+    expect(describeVersionTransition('3.3.0', '3.2.9')).toBeUndefined();
+    expect(describeVersionTransition('3.3.0-alpha.1', '3.3.0-alpha.2')).toBeUndefined();
+    expect(describeVersionTransition('3.3.0+build.1', '3.3.0+build.2')).toBeUndefined();
+    expect(describeVersionTransition('custom', '3.4.0')).toBeUndefined();
   });
 });
 

@@ -11,8 +11,8 @@ Build your profile once. Deploy it anywhere.
 
 <br>
 
-[![Astro](https://img.shields.io/badge/Astro-7-BC52EE?logo=astro\&logoColor=white)](https://astro.build/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript\&logoColor=white)](https://www.typescriptlang.org/)
+[![Astro](https://img.shields.io/badge/Astro-7-BC52EE?logo=astro&logoColor=white)](https://astro.build/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![GitHub License](https://img.shields.io/github/license/nota9x/StarryBio)](LICENSE)
 [![GitHub Release](https://img.shields.io/github/v/release/nota9x/StarryBio?display_name=tag)](https://github.com/nota9x/StarryBio/releases)
 [![GitHub Stars](https://img.shields.io/github/stars/nota9x/StarryBio?style=flat)](https://github.com/nota9x/StarryBio/stargazers)
@@ -37,38 +37,38 @@ The normal build produces a portable `dist/` directory that can be served by **C
 
 ## ✨ Highlights
 
-* 🎨 **Highly customizable** — themes, layouts, motion, profile content, grouped links, featured cards, metadata, and more from one strict TypeScript configuration.
-* 🌌 **Animated presentation** — responsive layouts, built-in theme presets, configurable motion, and StarryBio's animated starfield.
-* 🔗 **More than simple links** — copy-to-clipboard actions, visitor-local availability schedules, announcements, QR codes, and vCard downloads.
-* 🖼️ **Generated assets** — build-time Simple Icons and generated Open Graph images.
-* 📊 **Optional analytics** — Google Analytics 4, Cloudflare Web Analytics, Plausible, Umami, or custom HTTPS analytics scripts.
-* ⚡ **Static and portable** — produces a standard `dist/` directory with no required backend or database.
-* ☁️ **Deploy anywhere** — first-class support for Cloudflare Workers, Vercel, and Netlify.
-* 🔐 **Production-minded** — custom 404 behavior, security headers, cache rules, configuration validation, and automated tests.
+- 🎨 **Highly customizable** — themes, layouts, motion, profile content, grouped links, featured cards, metadata, and more from one strict TypeScript configuration.
+- 🌌 **Animated presentation** — responsive layouts, built-in theme presets, configurable motion, and StarryBio's animated starfield.
+- 🔗 **More than simple links** — copy-to-clipboard actions, visitor-local availability schedules, announcements, QR codes, and vCard downloads.
+- 🖼️ **Generated assets** — build-time Simple Icons and generated Open Graph images.
+- 📊 **Optional analytics** — Google Analytics 4, Cloudflare Web Analytics, Plausible, Umami, or custom HTTPS analytics scripts.
+- ⚡ **Static and portable** — produces a standard `dist/` directory with no required backend or database.
+- ☁️ **Deploy anywhere** — first-class support for Cloudflare Workers, Vercel, and Netlify.
+- 🔐 **Production-minded** — custom 404 behavior, security headers, cache rules, configuration validation, and automated tests.
 
 ## 📖 Documentation
 
 The **[StarryBio Wiki](https://github.com/nota9x/StarryBio/wiki)** is the primary documentation for installing, configuring, deploying, operating, and extending StarryBio.
 
-| Guide                                                                                            | Description                                       |
-| ------------------------------------------------------------------------------------------------ | ------------------------------------------------- |
-| [🚀 Getting started](https://github.com/nota9x/StarryBio/wiki/Getting-Started)                   | Install StarryBio and create your first profile.  |
-| [⚙️ Configuration reference](https://github.com/nota9x/StarryBio/wiki/Configuration-Reference)   | Explore available configuration options.          |
-| [☁️ Deploy to Cloudflare](https://github.com/nota9x/StarryBio/wiki/Deploying-to-Cloudflare)      | Deploy with Cloudflare Workers.                   |
-| [▲ Deploy to Vercel](https://github.com/nota9x/StarryBio/wiki/Deploying-to-Vercel)               | Deploy as a static Vercel project.                |
-| [◆ Deploy to Netlify](https://github.com/nota9x/StarryBio/wiki/Deploying-to-Netlify)             | Deploy through Netlify.                           |
-| [🌐 Custom domains and DNS](https://github.com/nota9x/StarryBio/wiki/Domains-and-DNS)            | Connect your own domain.                          |
-| [🔐 Security and privacy](https://github.com/nota9x/StarryBio/wiki/Security-and-Privacy)         | Understand security and analytics considerations. |
-| [🛠️ Troubleshooting](https://github.com/nota9x/StarryBio/wiki/Troubleshooting)                  | Diagnose common setup and deployment problems.    |
-| [🧑‍💻 Development and contribution](https://github.com/nota9x/StarryBio/wiki/Development-Setup) | Set up the repository for development.            |
+| Guide                                                                                          | Description                                       |
+| ---------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| [🚀 Getting started](https://github.com/nota9x/StarryBio/wiki/Getting-Started)                 | Install StarryBio and create your first profile.  |
+| [⚙️ Configuration reference](https://github.com/nota9x/StarryBio/wiki/Configuration-Reference) | Explore available configuration options.          |
+| [☁️ Deploy to Cloudflare](https://github.com/nota9x/StarryBio/wiki/Deploying-to-Cloudflare)    | Deploy with Cloudflare Workers.                   |
+| [▲ Deploy to Vercel](https://github.com/nota9x/StarryBio/wiki/Deploying-to-Vercel)             | Deploy as a static Vercel project.                |
+| [◆ Deploy to Netlify](https://github.com/nota9x/StarryBio/wiki/Deploying-to-Netlify)           | Deploy through Netlify.                           |
+| [🌐 Custom domains and DNS](https://github.com/nota9x/StarryBio/wiki/Domains-and-DNS)          | Connect your own domain.                          |
+| [🔐 Security and privacy](https://github.com/nota9x/StarryBio/wiki/Security-and-Privacy)       | Understand security and analytics considerations. |
+| [🛠️ Troubleshooting](https://github.com/nota9x/StarryBio/wiki/Troubleshooting)                 | Diagnose common setup and deployment problems.    |
+| [🧑‍💻 Development and contribution](https://github.com/nota9x/StarryBio/wiki/Development-Setup)  | Set up the repository for development.            |
 
 ## ⚡ Quick start
 
 ### Requirements
 
-* **Node.js** 24.x or 26.0.0+
-* **pnpm** 11.25.0
-* A hosting account only when deploying
+- **Node.js** 24.x or 26.0.0+
+- **pnpm** 12.3.4
+- A hosting account only when deploying
 
 Clone the repository and start the development server:
 
@@ -111,9 +111,9 @@ pnpm deploy
 
 For complete setup instructions, see the deployment guides for:
 
-* [Cloudflare](https://github.com/nota9x/StarryBio/wiki/Deploying-to-Cloudflare)
-* [Vercel](https://github.com/nota9x/StarryBio/wiki/Deploying-to-Vercel)
-* [Netlify](https://github.com/nota9x/StarryBio/wiki/Deploying-to-Netlify)
+- [Cloudflare](https://github.com/nota9x/StarryBio/wiki/Deploying-to-Cloudflare)
+- [Vercel](https://github.com/nota9x/StarryBio/wiki/Deploying-to-Vercel)
+- [Netlify](https://github.com/nota9x/StarryBio/wiki/Deploying-to-Netlify)
 
 ## 🧰 Common commands
 
@@ -128,6 +128,7 @@ For complete setup instructions, see the deployment guides for:
 | `pnpm deploy:cloudflare`  | Build and deploy static assets with Wrangler.      |
 | `pnpm test:unit`          | Run Vitest unit tests.                             |
 | `pnpm test:e2e`           | Build and run Playwright browser tests.            |
+| `pnpm commitlint`         | Validate the latest commit message.                |
 | `pnpm starrybio:update`   | Safely integrate updates from the main repository. |
 | `pnpm release:check`      | Run the complete local release gate.               |
 

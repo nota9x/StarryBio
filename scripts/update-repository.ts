@@ -35,7 +35,8 @@ export function describeVersionTransition(currentVersion: string, nextVersion: s
   const currentParts = current.slice(1, 4).map(Number);
   const nextParts = next.slice(1, 4).map(Number);
   const firstDifference = nextParts.findIndex((part, index) => part !== currentParts[index]);
-  if (firstDifference >= 0 && nextParts[firstDifference] < currentParts[firstDifference]) {
+  if (firstDifference < 0) return undefined;
+  if (nextParts[firstDifference] < currentParts[firstDifference]) {
     return undefined;
   }
   const change =
@@ -43,9 +44,7 @@ export function describeVersionTransition(currentVersion: string, nextVersion: s
       ? 'major'
       : nextParts[1] !== currentParts[1]
         ? 'minor'
-        : nextParts[2] !== currentParts[2]
-          ? 'patch'
-          : 'prerelease';
+        : 'patch';
   return `StarryBio ${currentVersion} → ${nextVersion}\n${nextVersion} is a ${change} update.`;
 }
 

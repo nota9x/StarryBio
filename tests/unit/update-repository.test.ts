@@ -99,6 +99,8 @@ describe('repository updater version reporting', () => {
   it('ignores unchanged or invalid versions', () => {
     expect(describeVersionTransition('3.3.0', '3.3.0')).toBeUndefined();
     expect(describeVersionTransition('3.3.0', '3.2.9')).toBeUndefined();
+    expect(describeVersionTransition('3.3.0-alpha.1', '3.3.0-alpha.2')).toBeUndefined();
+    expect(describeVersionTransition('3.3.0+build.1', '3.3.0+build.2')).toBeUndefined();
     expect(describeVersionTransition('custom', '3.4.0')).toBeUndefined();
   });
 });

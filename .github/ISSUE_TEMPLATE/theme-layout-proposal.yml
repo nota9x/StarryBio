@@ -4,6 +4,8 @@ title: '[Theme]: '
 labels:
   - enhancement
   - design
+assignees:
+  - nota9x
 body:
   - type: markdown
     attributes:

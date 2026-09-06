@@ -4,6 +4,8 @@ title: '[Analytics]: '
 labels:
   - enhancement
   - analytics
+assignees:
+  - nota9x
 body:
   - type: markdown
     attributes:

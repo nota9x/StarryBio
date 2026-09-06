@@ -25,7 +25,7 @@ type UpdaterConfig = Partial<
 >;
 type GitResult = { ok: boolean; stderr: string; stdout: string };
 
-const SEMVER_PATTERN = /^(\d+)\.(\d+)\.(\d+)(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/;
+const SEMVER_PATTERN = /^(\d+)\.(\d+)\.(\d+)(?:-[0-9A-Z.-]+)?(?:\+[0-9A-Z.-]+)?$/i;
 
 export function describeVersionTransition(currentVersion: string, nextVersion: string) {
   const current = SEMVER_PATTERN.exec(currentVersion);
@@ -102,7 +102,8 @@ function readConfig(configFile: string, required: boolean): UpdaterConfig {
   }
   if (
     config.conflictStrategy !== undefined &&
-    !['local', 'upstream', 'abort'].includes(String(config.conflictStrategy))
+    (typeof config.conflictStrategy !== 'string' ||
+      !['local', 'upstream', 'abort'].includes(config.conflictStrategy))
   ) {
     throw new Error(`${configFile}: "conflictStrategy" must be local, upstream, or abort.`);
   }
@@ -112,7 +113,7 @@ function readConfig(configFile: string, required: boolean): UpdaterConfig {
   ) {
     throw new Error(`${configFile}: "skip" must be an array of glob strings.`);
   }
-  return config as UpdaterConfig;
+  return config;
 }
 
 export function parseArgs(args: string[], cwd = process.cwd()): Options {

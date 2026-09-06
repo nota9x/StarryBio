@@ -1,37 +1,38 @@
 {
   "name": "starry-bio",
   "version": "3.4.0",
-  "type": "module",
+  "private": true,
   "description": "A fully customizable, high-performance \"link-in-bio\" website template built with Astro.",
-  "packageManager": "pnpm@12.3.4",
-  "engines": {
-    "node": "^24.0.0 || >=26.0.0"
-  },
+  "type": "module",
   "scripts": {
-    "dev": "pnpm run validate && pnpm run build:icons && pnpm run generate && astro dev",
-    "start": "pnpm run dev",
-    "preview": "pnpm run build && astro preview",
-    "preview:cloudflare": "pnpm run build && wrangler dev",
-    "deploy": "pnpm run deploy:cloudflare",
-    "deploy:cloudflare": "pnpm run build && wrangler deploy",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "fmt": "pnpm run format",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "commitlint": "commitlint --last --verbose",
-    "typecheck": "astro check && tsc --noEmit",
-    "test": "pnpm run test:unit",
-    "test:unit": "vitest run",
-    "test:e2e": "pnpm run build && playwright test",
-    "validate": "tsx ./scripts/validate-config.ts",
-    "icons": "pnpm run build:icons",
-    "generate": "tsx ./scripts/generate-assets.ts",
+    "astro": "astro",
     "build": "pnpm run validate && pnpm run build:icons && pnpm run generate && astro build",
     "build:icons": "tsx ./scripts/build-simple-icons.ts",
-    "release:check": "pnpm run format:check && pnpm run lint && pnpm run typecheck && pnpm run test:unit && pnpm run build && playwright test && pnpm audit --prod",
+    "check": "pnpm run format:check && pnpm run lint && pnpm run typecheck && pnpm run test:unit",
+    "commitlint": "commitlint --last --verbose",
+    "deploy": "pnpm run deploy:cloudflare",
+    "deploy:cloudflare": "pnpm run build && wrangler deploy",
+    "dev": "pnpm run validate && pnpm run build:icons && pnpm run generate && astro dev",
+    "fmt": "pnpm run format",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "generate": "tsx ./scripts/generate-assets.ts",
+    "icons": "pnpm run build:icons",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix --max-warnings 0",
+    "preview": "pnpm run build && astro preview",
+    "preview:cloudflare": "pnpm run build && wrangler dev",
+    "release:check": "pnpm run check && pnpm run test:e2e && pnpm audit --prod",
     "starrybio:update": "tsx ./scripts/update-repository.ts",
-    "astro": "astro"
+    "start": "pnpm run dev",
+    "test": "pnpm run test:unit",
+    "test:e2e": "pnpm run build && playwright test",
+    "test:unit": "vitest run",
+    "typecheck": "astro check && tsc --noEmit",
+    "validate": "tsx ./scripts/validate-config.ts"
+  },
+  "dependencies": {
+    "@lucide/astro": "^1.33.0"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
@@ -51,10 +52,16 @@
     "astro": "^7.2.6",
     "eslint": "^10.9.1",
     "eslint-config-prettier": "^10.1.8",
+    "eslint-import-resolver-typescript": "^4.4.5",
     "eslint-plugin-astro": "^3.1.0",
+    "eslint-plugin-import-x": "^4.17.1",
+    "eslint-plugin-jsx-a11y-x": "^0.2.0",
+    "eslint-plugin-regexp": "^3.3.0",
+    "eslint-plugin-unicorn": "^74.0.0",
     "globals": "^17.11.0",
     "prettier": "^3.9.6",
     "prettier-plugin-astro": "^0.14.1",
+    "prettier-plugin-packagejson": "^3.0.2",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "qrcode": "^1.5.4",
     "simple-icons": "^16.28.0",
@@ -66,8 +73,8 @@
     "wrangler": "^4.125.0",
     "zod": "^4.4.3"
   },
-  "private": true,
-  "dependencies": {
-    "@lucide/astro": "^1.33.0"
+  "packageManager": "pnpm@12.3.4",
+  "engines": {
+    "node": "^24.0.0 || >=26.0.0"
   }
 }

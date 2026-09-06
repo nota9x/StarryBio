@@ -110,7 +110,7 @@ export function getSvgPathData(icon: string): string {
 export function brandNameToSimpleIconSlug(brandName: string): string {
   return brandName
     .normalize('NFKD')
-    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[\u0300-\u036F]/g, '')
     .replace(/ı/g, 'i')
     .replace(/đ/g, 'd')
     .replace(/ħ/g, 'h')

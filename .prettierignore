@@ -1,19 +1,18 @@
 # Dependencies
-node_modules
+node_modules/
 
 # Build outputs
-dist
-build
-.output
-coverage
-.wrangler
-public/assets/icons/simple-icons
+dist/
+build/
+.output/
+coverage/
+.astro/
+.wrangler/
+public/assets/icons/simple-icons/
 public/_headers
-netlify.toml
 
 # Git
-.git
-renovate.json
+.git/
 
 # Package lock
 package-lock.json
@@ -23,7 +22,13 @@ pnpm-lock.yaml
 CHANGELOG.md
 
 # Cloudflare local state
-.mf
+.mf/
+
+# Provider and test artifacts
+.netlify/
+.vercel/
+playwright-report/
+test-results/
 
 # Logs
 *.log

@@ -81,10 +81,7 @@ When adding or changing a provider:
 Run the checks appropriate to your change before opening a pull request:
 
 ```bash
-pnpm format:check
-pnpm lint
-pnpm typecheck
-pnpm test:unit
+pnpm check
 pnpm build
 ```
 
@@ -94,7 +91,7 @@ For changes affecting the rendered site, also run:
 pnpm test:e2e
 ```
 
-`pnpm release:check` runs the complete local release gate, including formatting, linting, type checks, unit tests, a production build, browser tests, and a production dependency audit. Use `pnpm preview` for a provider-neutral static preview, or `pnpm preview:cloudflare` to exercise the output through Wrangler.
+`pnpm check` is the fast local quality gate: formatting, typed linting, type checks, and unit tests. `pnpm release:check` adds a production build, browser tests, and a production dependency audit. Use `pnpm preview` for a provider-neutral static preview, or `pnpm preview:cloudflare` to exercise the output through Wrangler.
 
 If you change the config schema, generated assets, status scheduling, or runtime behavior, add or update focused tests. For visual work, check narrow and wide viewports, keyboard navigation, and reduced-motion behavior.
 

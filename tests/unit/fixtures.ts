@@ -1,6 +1,4 @@
-import type { StarryBioConfig } from '../../src/config/schema';
-
-export function createConfig(overrides: Record<string, unknown> = {}): StarryBioConfig {
+export function createConfig(overrides: Record<string, unknown> = {}): Record<string, unknown> {
   return {
     pageTitle: 'Test profile',
     profile: {
@@ -15,7 +13,7 @@ export function createConfig(overrides: Record<string, unknown> = {}): StarryBio
       },
     ],
     ...overrides,
-  } as StarryBioConfig;
+  };
 }
 
 export function createStatus() {

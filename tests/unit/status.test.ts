@@ -18,10 +18,10 @@ describe('starter status artwork', () => {
     ];
 
     expect(icons).toEqual([
-      'assets/images/offline.svg',
-      'assets/images/online.svg',
-      'assets/images/dnd.svg',
-      'assets/images/idle.svg',
+      'assets/images/default/offline.svg',
+      'assets/images/default/online.svg',
+      'assets/images/default/dnd.svg',
+      'assets/images/default/idle.svg',
     ]);
   });
 });

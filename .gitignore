@@ -38,6 +38,9 @@ Thumbs.db
 qa-screenshots/
 test-results/
 playwright-report/
+release-artifacts/
+.starrybio/
+.starrybio-updater.json
 
 # IDE files
 .vscode/

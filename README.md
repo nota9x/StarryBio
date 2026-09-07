@@ -69,7 +69,7 @@ The **[StarryBio Wiki](https://github.com/nota9x/StarryBio/wiki)** is the primar
 
 ### Requirements
 
-- **Node.js** 24.x or 26.0.0+
+- **Node.js** 24.15.0+ or 26.0.0+
 - **pnpm** 12.3.4
 - A hosting account only when deploying
 
@@ -88,7 +88,9 @@ config/starrybio.config.ts
 
 Save your changes and the development server will reload the open page automatically.
 
-Local assets belong under `public/`.
+Put your own images under `public/assets/images/` and reference them as
+`assets/images/your-file.png`. The `public/assets/images/default/` directory contains
+StarryBio's release-managed defaults; do not place custom files or edits there because updates may replace or remove everything in that directory.
 
 ### Before publishing
 
@@ -135,7 +137,7 @@ For complete setup instructions, see the deployment guides for:
 | `pnpm test:e2e`           | Build and run Playwright browser tests.                         |
 | `pnpm check`              | Run formatting, lint, type, and unit-test checks.               |
 | `pnpm commitlint`         | Validate the latest commit message.                             |
-| `pnpm starrybio:update`   | Safely integrate updates from the main repository.              |
+| `pnpm starrybio:update`   | Updates StarryBio while preserving your configuration.          |
 | `pnpm release:check`      | Run the complete local release gate.                            |
 
 Run `pnpm headers` after changing `analytics` in `config/starrybio.config.ts`. The build

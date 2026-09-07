@@ -1,196 +1,57 @@
-import { spawnSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
-import { afterEach, describe, expect, it } from 'vitest';
-import packageJson from '../../package.json';
-import { describeVersionTransition, matchesGlob, parseArgs } from '../../scripts/update-repository';
+import { describe, expect, it } from 'vitest';
+import { parseArguments } from '../../scripts/update-repository';
+import { releaseVersion, stablePublishedReleases } from '../../scripts/updater/github';
+import type { GitHubRelease } from '../../scripts/updater/types';
 
-const temporaryDirectories: string[] = [];
-
-function temporaryDirectory() {
-  const directory = mkdtempSync(join(tmpdir(), 'starrybio-updater-'));
-  temporaryDirectories.push(directory);
-  return directory;
+function release(tag: string, overrides: Partial<GitHubRelease> = {}): GitHubRelease {
+  return {
+    assets: [],
+    draft: false,
+    id: tag.length,
+    immutable: true,
+    prerelease: false,
+    published_at: '2026-01-01T00:00:00Z',
+    tag_name: tag,
+    ...overrides,
+  };
 }
 
-function git(directory: string, ...args: string[]) {
-  const result = spawnSync('git', args, { cwd: directory, encoding: 'utf8' });
-  if (result.status !== 0) throw new Error(result.stderr || `git ${args.join(' ')} failed`);
-  return result.stdout.trim();
-}
-
-afterEach(() => {
-  for (const directory of temporaryDirectories.splice(0)) {
-    rmSync(directory, { force: true, recursive: true });
-  }
-});
-
-describe('repository updater options', () => {
-  it('preserves README.md with local conflict resolution by default', () => {
-    const options = parseArgs([], temporaryDirectory());
-
-    expect(options.conflictStrategy).toBe('local');
-    expect(options.skip).toEqual(['README.md']);
-    expect(options.help).toBe(false);
+describe('release-only updater selection', () => {
+  it('uses semantic-version precedence, including major releases', () => {
+    const selected = stablePublishedReleases([
+      release('v10.0.0'),
+      release('v3.10.0'),
+      release('v3.9.9'),
+      release('v4.0.0'),
+    ]);
+    expect(selected.map(releaseVersion)).toEqual(['3.9.9', '3.10.0', '4.0.0', '10.0.0']);
   });
 
-  it('combines persistent config with command-line overrides', () => {
-    const directory = temporaryDirectory();
-    writeFileSync(
-      join(directory, '.starrybio-updater.json'),
-      JSON.stringify({ conflictStrategy: 'upstream', skip: ['config/**'] })
-    );
-
-    const options = parseArgs(['--conflicts', 'local', '--skip', 'public/assets/**'], directory);
-
-    expect(options.conflictStrategy).toBe('local');
-    expect(options.skip).toEqual(['README.md', 'config/**', 'public/assets/**']);
+  it('ignores drafts, prereleases, and invalid tags', () => {
+    const selected = stablePublishedReleases([
+      release('not-a-version'),
+      release('v3.6.0', { draft: true }),
+      release('v3.7.0-beta.1'),
+      release('v3.8.0', { prerelease: true }),
+      release('v3.5.1'),
+    ]);
+    expect(selected.map(releaseVersion)).toEqual(['3.5.1']);
   });
 
-  it('can disable both config and default skips', () => {
-    const directory = temporaryDirectory();
-    writeFileSync(
-      join(directory, '.starrybio-updater.json'),
-      JSON.stringify({ skip: ['config/**'] })
-    );
-
-    const options = parseArgs(['--no-config', '--no-default-skips'], directory);
-
-    expect(options.skip).toEqual([]);
-    expect(options.configFile).toBeUndefined();
-  });
-
-  it('rejects unknown config options instead of silently ignoring mistakes', () => {
-    const directory = temporaryDirectory();
-    writeFileSync(
-      join(directory, '.starrybio-updater.json'),
-      JSON.stringify({ skips: ['README.md'] })
-    );
-
-    expect(() => parseArgs([], directory)).toThrow('Unknown option');
-  });
-
-  it('rejects non-string conflict strategies', () => {
-    const directory = temporaryDirectory();
-    writeFileSync(
-      join(directory, '.starrybio-updater.json'),
-      JSON.stringify({ conflictStrategy: {} })
-    );
-
-    expect(() => parseArgs([], directory)).toThrow(
-      '"conflictStrategy" must be local, upstream, or abort'
-    );
+  it('cannot react to commits or bare tags because selection accepts releases only', () => {
+    expect(stablePublishedReleases([release('v3.5.0')]).map(releaseVersion)).toEqual(['3.5.0']);
   });
 });
 
-describe('repository updater globs', () => {
-  it.each([
-    ['README.md', 'README.md', true],
-    ['config/starrybio.config.ts', 'config/**', true],
-    ['config/nested/theme.ts', 'config/**', true],
-    ['src/config/site.ts', 'config/**', false],
-    ['public/assets/profile.svg', '**/*.svg', true],
-    ['public/assets/profile.png', '**/*.svg', false],
-    ['docs/setup.md', 'docs/', true],
-  ])('matches %s against %s', (path, pattern, expected) => {
-    expect(matchesGlob(path, pattern)).toBe(expected);
-  });
-});
-
-describe('repository updater version reporting', () => {
-  it.each([
-    ['3.3.0', '3.3.1', 'patch'],
-    ['3.3.0', '3.4.0', 'minor'],
-    ['3.3.0', '4.0.0', 'major'],
-  ])('describes a %s to %s update as %s', (current, next, change) => {
-    expect(describeVersionTransition(current, next)).toBe(
-      `StarryBio ${current} → ${next}\n${next} is a ${change} update.`
-    );
+describe('updater CLI', () => {
+  it('supports the documented modes', () => {
+    expect(parseArguments(['--check'])).toMatchObject({ check: true });
+    expect(parseArguments(['--dry-run', '--yes'])).toMatchObject({ dryRun: true, yes: true });
+    expect(parseArguments(['--help'])).toMatchObject({ help: true });
   });
 
-  it('ignores unchanged or invalid versions', () => {
-    expect(describeVersionTransition('3.3.0', '3.3.0')).toBeUndefined();
-    expect(describeVersionTransition('3.3.0', '3.2.9')).toBeUndefined();
-    expect(describeVersionTransition('3.3.0-alpha.1', '3.3.0-alpha.2')).toBeUndefined();
-    expect(describeVersionTransition('3.3.0+build.1', '3.3.0+build.2')).toBeUndefined();
-    expect(describeVersionTransition('custom', '3.4.0')).toBeUndefined();
+  it('rejects obsolete Git options and incompatible modes', () => {
+    expect(() => parseArguments(['--remote', 'origin'])).toThrow('Unknown option');
+    expect(() => parseArguments(['--check', '--dry-run'])).toThrow('cannot be combined');
   });
-});
-
-describe('repository updater integration', () => {
-  it('resolves content and lockfile conflicts, preserves skips, and runs pnpm up', () => {
-    const root = temporaryDirectory();
-    const upstream = join(root, 'upstream');
-    const installation = join(root, 'installation');
-    mkdirSync(upstream);
-    git(upstream, 'init', '--initial-branch=main');
-    git(upstream, 'config', 'user.name', 'Updater Test');
-    git(upstream, 'config', 'user.email', 'updater@example.test');
-    writeFileSync(join(upstream, 'README.md'), 'base readme\n');
-    writeFileSync(join(upstream, 'app.txt'), 'base app\n');
-    writeFileSync(join(upstream, '.gitignore'), 'node_modules/\n');
-    writeFileSync(
-      join(upstream, 'package.json'),
-      JSON.stringify({ private: true, packageManager: packageJson.packageManager })
-    );
-    const baseLockfile = `lockfileVersion: '9.0'
-
-settings:
-  autoInstallPeers: false
-  excludeLinksFromLockfile: false
-
-importers:
-
-  .: {}
-
-# base
-`;
-    writeFileSync(join(upstream, 'pnpm-lock.yaml'), baseLockfile);
-    git(upstream, 'add', '.');
-    git(upstream, 'commit', '-m', 'base');
-
-    git(root, 'clone', upstream, installation);
-    git(installation, 'config', 'user.name', 'Installation Test');
-    git(installation, 'config', 'user.email', 'installation@example.test');
-    writeFileSync(join(installation, 'app.txt'), 'local app\n');
-    writeFileSync(join(installation, 'pnpm-lock.yaml'), baseLockfile.replace('# base', '# local'));
-    git(installation, 'add', '.');
-    git(installation, 'commit', '-m', 'customize installation');
-
-    writeFileSync(join(upstream, 'README.md'), 'upstream readme\n');
-    writeFileSync(join(upstream, 'app.txt'), 'upstream app\n');
-    writeFileSync(join(upstream, 'pnpm-lock.yaml'), baseLockfile.replace('# base', '# upstream'));
-    git(upstream, 'add', '.');
-    git(upstream, 'commit', '-m', 'upstream update');
-    const upstreamHead = git(upstream, 'rev-parse', 'HEAD');
-
-    const result = spawnSync(
-      process.execPath,
-      [
-        resolve('node_modules/tsx/dist/cli.mjs'),
-        resolve('scripts/update-repository.ts'),
-        '--remote',
-        'upstream',
-        '--remote-url',
-        upstream,
-        '--branch',
-        'main',
-      ],
-      { cwd: installation, encoding: 'utf8' }
-    );
-
-    expect(result.status, `${result.stdout}\n${result.stderr}`).toBe(0);
-    expect(readFileSync(join(installation, 'README.md'), 'utf8').trim()).toBe('base readme');
-    expect(readFileSync(join(installation, 'app.txt'), 'utf8').trim()).toBe('local app');
-    expect(readFileSync(join(installation, 'pnpm-lock.yaml'), 'utf8')).not.toContain('# local');
-    expect(result.stdout).toContain('Updating dependencies and regenerating the lockfile');
-    expect(git(installation, 'status', '--porcelain')).toBe('M pnpm-lock.yaml');
-    expect(() =>
-      git(installation, 'merge-base', '--is-ancestor', upstreamHead, 'HEAD')
-    ).not.toThrow();
-    expect(git(installation, 'log', '-1', '--format=%s')).toBe(
-      'chore(update): preserve skipped files'
-    );
-  }, 15_000);
 });

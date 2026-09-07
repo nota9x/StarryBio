@@ -17,7 +17,7 @@ afterEach(async () => {
 
 describe('deterministic build assets', () => {
   it('ships the status artwork as compact, native SVG assets', async () => {
-    const imageDirectory = path.resolve('public/assets/images');
+    const imageDirectory = path.resolve('public/assets/images/default');
     const expectedAssets = [
       ['online.svg', 'online.webp'],
       ['idle.svg', 'idle.webp'],

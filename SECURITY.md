@@ -1,70 +1,95 @@
 # Security Policy
 
-Thank you for your interest in the security of **StarryBio**. We take the security of our software and the privacy of our users very seriously.
+Thank you for helping keep **StarryBio** and its users secure. We appreciate responsible vulnerability reports and will work with security researchers to investigate and address valid issues.
 
 ## Supported Versions
 
-We only support the most recent stable release of the project. Please ensure you are testing against the latest version.
+Security updates are provided for the current **StarryBio v3** release series.
 
-| Version | Supported          |
-| ------- | ------------------ |
-| Latest  | :white_check_mark: |
-| Older   | :x:                |
+| Version         | Supported |
+| :-------------- | :-------: |
+| 3.x             |    ✅     |
+| 2.x and earlier |    ❌     |
+
+Security fixes are released in the latest stable v3 release and may not be backported to older v3 releases. Users should therefore update to the latest available version of StarryBio v3.
 
 ## Reporting a Vulnerability
 
-If you have discovered a security vulnerability in this project, we appreciate your help in disclosing it to us in a responsible manner.
+**Please do not report security vulnerabilities through public GitHub issues, discussions, pull requests, or other public channels.**
 
-### Method 1: GitHub Private Reporting
+### GitHub Private Vulnerability Reporting
 
-We have enabled **Private Vulnerability Reporting** for this repository. This is the fastest and most secure way to report issues, as it allows you to discuss vulnerability details privately with us without the risk of a public leak.
+The preferred reporting method is **GitHub Private Vulnerability Reporting**:
 
-1.  Navigate to the **Security** tab of this repository (under the repository name).
-2.  Click the **Report a vulnerability** button.
-3.  Fill in the advisory details (title and description).
-4.  Click **Submit report**.
+1. Open the repository's **Security** tab.
+2. Select **Report a vulnerability**.
+3. Provide the vulnerability details and submit the report.
 
-**Benefits:**
+This allows the vulnerability to be discussed and resolved privately through GitHub.
 
-- This process is fully private.
-- GitHub notifies us directly and immediately.
-- You are automatically added as a collaborator and credited user on the proposed advisory, allowing us to collaborate on a fix securely.
+### Email
 
-### Method 2: Email Reporting
+If you cannot use GitHub Private Vulnerability Reporting, email:
 
-If you are unable to use the GitHub reporting tool, please send vulnerability reports via email to **<security@a9x.pro>**.
+**[security@a9x.pro](mailto:security@a9x.pro)**
 
-To ensure your report passes our spam filters and is routed correctly, please follow these steps:
+Please include `StarryBio` and `vulnerability` in the subject line.
 
-1.  **Subject Line:** Must contain `StarryBio` and `vulnerability`.
-    - _Example:_ `StarryBio vulnerability: Possible XSS in search bar`
-2.  **Body Content:**
-    - Type of issue (e.g., buffer overflow, SQL injection, cross-site scripting).
-    - Full paths of source file(s) related to the manifestation of the issue.
-    - Location of the affected source code (tag/branch/commit or direct URL).
-    - Any special configuration required to reproduce the issue.
-    - Step-by-step instructions to reproduce the issue.
-    - Proof-of-concept or exploit code (if available).
-    - Impact of the issue, including how an attacker might exploit it.
+For example:
+
+`StarryBio vulnerability: Stored XSS in custom links`
+
+## What to Include
+
+Please provide enough information for us to understand and reproduce the issue. When possible, include:
+
+- A description of the vulnerability and its potential impact.
+- The affected StarryBio version, commit, or branch.
+- Steps to reproduce the vulnerability.
+- A minimal proof of concept, if applicable.
+- Any configuration required to reproduce the issue.
+- Suggested mitigations or fixes, if known.
+
+If you are unsure whether an issue has security implications, report it privately and we will evaluate it.
+
+## Scope
+
+This policy covers security vulnerabilities caused by code or configuration provided by **StarryBio**, including its build and deployment-related functionality.
+
+Vulnerabilities that exist solely within third-party platforms, services, dependencies, or hosting providers should generally be reported to the affected third party instead.
+
+Dependency vulnerabilities that create an exploitable security issue specifically in StarryBio are still appropriate to report.
 
 ## What to Expect
 
-1.  **Acknowledgment:** We aim to acknowledge receipt of your report within **48 hours** (or 2 business days).
-2.  **Assessment:** We will triage the vulnerability and determine its impact. We may contact you for further clarification.
-3.  **Resolution:** If confirmed, we will work on a fix. We ask that you maintain confidentiality during this time.
-4.  **Disclosure:** Once the fix is released, we will coordinate a public disclosure (if appropriate) and credit you for the discovery.
+We aim to acknowledge security reports within **48 hours or 2 business days**.
 
-### If You Don't Hear Back (Email Only)
+After acknowledgment, we will investigate the report and may contact you for additional information. If the vulnerability is confirmed, we will work toward a fix and determine the affected versions and appropriate disclosure process.
 
-If you reported via email and have not received a reply within **7 days**, please follow up with us again at <security@a9x.pro>. Please ensure the word "vulnerability" is in the subject line.
+Resolution time depends on the severity and complexity of the issue, so we cannot guarantee a specific remediation timeframe.
 
-## Responsible Disclosure Guidelines
+If you report a vulnerability by email and have not received an acknowledgment within **7 days**, please follow up at **[security@a9x.pro](mailto:security@a9x.pro)**.
 
-To encourage security research and avoid legal complications, we ask that you:
+## Coordinated Disclosure
 
-- **Do not** attempt to access or modify data that does not belong to you.
-- **Do not** execute a Denial of Service (DoS) attack.
-- **Do not** use social engineering or phishing against our employees or users.
-- **Do** give us reasonable time to correct the issue before making any information public.
+Please keep vulnerability details confidential while we investigate and address the issue.
 
-As long as you comply with these guidelines, we will never take legal action against you regarding your research.
+Once a fix is available, we may publish a **GitHub Security Advisory**, release notes, or another security notice describing the vulnerability and affected versions.
+
+We will coordinate public disclosure with the reporter when appropriate and are happy to provide credit unless the reporter prefers to remain anonymous.
+
+## Responsible Research and Safe Harbor
+
+We consider good-faith security research conducted in accordance with this policy to be authorized.
+
+When conducting security research:
+
+- Make a good-faith effort to avoid harming users, data, or services.
+- Access only the minimum data necessary to demonstrate a vulnerability.
+- Do not intentionally access, modify, retain, or disclose data belonging to others.
+- Do not perform denial-of-service, social-engineering, phishing, or other disruptive attacks.
+- Stop testing and contact us if you unexpectedly encounter sensitive data or cause unintended impact.
+
+For research conducted in good faith and consistent with this policy, we will not initiate legal action against you for the research.
+
+This authorization applies only to systems and software for which we have the authority to grant permission. It does not authorize testing of third-party services or infrastructure.

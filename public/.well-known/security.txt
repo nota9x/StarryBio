@@ -1,0 +1,5 @@
+Contact: https://github.com/nota9x/StarryBio/security/advisories/new
+Contact: mailto:security@a9x.pro
+Expires: 2027-09-01T00:00:00Z
+Preferred-Languages: en
+Policy: https://github.com/nota9x/StarryBio/security/policy

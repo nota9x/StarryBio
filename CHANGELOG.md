@@ -1,5 +1,25 @@
 # Changelog
 
+## [3.5.0](https://github.com/nota9x/StarryBio/compare/v3.4.1...v3.5.0) (2026-09-07)
+
+
+### Features
+
+* **deploy:** add GitHub Pages support ([0416743](https://github.com/nota9x/StarryBio/commit/041674309356afdad6b97c64e843b271eec24302))
+
+
+### Bug Fixes
+
+* **deploy:** update GitHub Pages actions to Node 24 ([a6aa992](https://github.com/nota9x/StarryBio/commit/a6aa9925515aa268d52c2fc3aa5e8d23cf5fcc66))
+* **security:** allow Umami Cloud gateway collection origin ([1db9a1b](https://github.com/nota9x/StarryBio/commit/1db9a1b195afcc384ebb29ffec83d4efd1acd010))
+* **security:** harden dependency checks and deployment policies ([ff8bf3f](https://github.com/nota9x/StarryBio/commit/ff8bf3ff389c5858a0153f5eb07adf2b569d6213))
+
+
+### Documentation
+
+* **security:** update vulnerability policy and add security.txt ([8256dea](https://github.com/nota9x/StarryBio/commit/8256dea19ed8021dc4edd55750952045ecf8672b))
+* update live demo and default site URLs ([70ad6f5](https://github.com/nota9x/StarryBio/commit/70ad6f5904ab9be7d450a4efae02855c47cd2d11))
+
 ## [3.4.1](https://github.com/nota9x/StarryBio/compare/v3.4.0...v3.4.1) (2026-09-06)
 
 

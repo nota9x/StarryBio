@@ -1,8 +1,5 @@
 import { toStaticAssetPath } from './urls';
 
-export function toAbsoluteAssetPath(
-  assetPath: string | undefined,
-  base = import.meta.env.BASE_URL
-): string {
+export function toAbsoluteAssetPath(assetPath: string | undefined, base?: string): string {
   return toStaticAssetPath(assetPath?.replace(/\\/g, '/'), base);
 }

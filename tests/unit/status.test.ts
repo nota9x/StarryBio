@@ -7,25 +7,6 @@ import {
 } from '../../src/scripts/status';
 import type { ScheduleItem } from '../../src/config/schema';
 
-describe('starter status artwork', () => {
-  it('uses the complete SVG presence family', async () => {
-    const { default: config } = await import('../../config/starrybio.config');
-    const icons = [
-      config.status.default.icon,
-      config.status.types.available.icon,
-      config.status.types.busy.icon,
-      config.status.types.sleeping.icon,
-    ];
-
-    expect(icons).toEqual([
-      'assets/images/default/offline.svg',
-      'assets/images/default/online.svg',
-      'assets/images/default/dnd.svg',
-      'assets/images/default/idle.svg',
-    ]);
-  });
-});
-
 function createRuntime(schedule: ScheduleItem[]): RuntimeStatusConfig {
   return {
     enabled: true,

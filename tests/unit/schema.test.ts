@@ -11,6 +11,10 @@ import {
   getThemeStyle,
 } from '../../src/config/themes';
 import { createConfig, createStatus } from './fixtures';
+import {
+  customizedDeploymentConfig,
+  minimalDeploymentConfig,
+} from '../fixtures/deployment-configs';
 
 describe('StarryBio v3 configuration', () => {
   it('requires sections and link labels', () => {
@@ -43,6 +47,39 @@ describe('StarryBio v3 configuration', () => {
     });
     expect(normalized.layout).toMatchObject({ mode: 'centered', featuredPosition: 'above-links' });
     expect(normalized.analytics).toEqual({ provider: 'none' });
+    expect(normalized.status).toBeUndefined();
+    expect(normalized.announcement).toBeUndefined();
+    expect(normalized.qr).toBeUndefined();
+    expect(normalized.contactCard).toBeUndefined();
+  });
+
+  it('accepts minimal and substantially customized deployment fixtures', () => {
+    const minimal = normalizeStarryBioConfig(validateStarryBioConfig(minimalDeploymentConfig));
+    const customized = normalizeStarryBioConfig(
+      validateStarryBioConfig(customizedDeploymentConfig)
+    );
+
+    expect(minimal.profile.name).toBe('River Example');
+    expect(minimal.theme).toMatchObject({ background: 'minimal', animationIntensity: 'none' });
+    expect(customized.profile.name).toBe('Ada Orbit');
+    expect(customized.status).toMatchObject({
+      enabled: true,
+      ownerTimeZone: 'Pacific/Auckland',
+      default: {
+        text: 'Beyond radio range',
+        icon: 'assets/images/default/idle.svg',
+      },
+      types: {
+        transmitting: {
+          text: 'Transmitting live',
+          icon: 'assets/images/default/online.svg',
+        },
+      },
+    });
+    expect(customized.sections[0]?.links[1]).toMatchObject({
+      copyValue: 'ORBIT-73',
+      specialType: 'copy',
+    });
   });
 
   it('supports the restored Classic Blue theme preset', () => {
@@ -75,6 +112,17 @@ describe('StarryBio v3 configuration', () => {
 
     expect(generatedOnly.qr).toMatchObject({ enabled: true, showButton: false });
     expect(legacyConfig.qr).toMatchObject({ enabled: true, showButton: true });
+  });
+
+  it('rejects enabled QR generation without a configured or canonical URL', () => {
+    expect(() => validateStarryBioConfig(createConfig({ qr: { enabled: true } }))).toThrow(
+      /qr\.url/
+    );
+    expect(() =>
+      validateStarryBioConfig(
+        createConfig({ qr: { enabled: true }, seo: { canonicalUrl: 'https://example.com' } })
+      )
+    ).not.toThrow();
   });
 
   it.each(THEME_PRESET_NAMES)('provides a complete first-class palette for %s', (preset) => {
@@ -115,6 +163,41 @@ describe('StarryBio v3 configuration', () => {
     expect(() =>
       validateStarryBioConfig(createConfig({ status: { ...createStatus(), showOwnerTime: false } }))
     ).not.toThrow();
+  });
+
+  it('preserves user-defined status labels and icon sources', () => {
+    const status = createStatus();
+    const normalized = normalizeStarryBioConfig(
+      validateStarryBioConfig(
+        createConfig({
+          status: {
+            ...status,
+            default: {
+              text: 'Off the grid',
+              color: '#334155',
+              icon: 'assets/images/my-offline-mark.svg',
+            },
+            types: {
+              available: {
+                text: 'Radio open',
+                color: '#10B981',
+                icon: 'https://cdn.example.com/custom-online.svg',
+              },
+              busy: status.types.busy,
+            },
+          },
+        })
+      )
+    );
+
+    expect(normalized.status?.default).toMatchObject({
+      text: 'Off the grid',
+      icon: 'assets/images/my-offline-mark.svg',
+    });
+    expect(normalized.status?.types.available).toMatchObject({
+      text: 'Radio open',
+      icon: 'https://cdn.example.com/custom-online.svg',
+    });
   });
 
   it('rejects unknown properties, unsafe assets, protocols, and output extensions', () => {

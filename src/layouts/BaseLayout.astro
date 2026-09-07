@@ -31,6 +31,7 @@ const { config, title, description, includeStatus = true } = Astro.props;
 
 const animation = config.animation;
 const statusConfig = includeStatus ? config.status : undefined;
+const showStarfield = config.theme.background === 'starfield';
 const metaContentSecurityPolicy = buildContentSecurityPolicy(config.analytics, {
   includeFrameAncestors: false,
 });
@@ -56,17 +57,20 @@ const metaContentSecurityPolicy = buildContentSecurityPolicy(config.analytics, {
   </head>
 
   <body>
-    <div
-      class="stars-container"
-      aria-hidden="true"
-      data-star-multiplier={animation?.starMultiplier ?? 1}
-      data-shooting-star-multiplier={animation?.shootingStarMultiplier ?? 1}
-      data-animation-intensity={config.theme.animationIntensity}
-      transition:name="starfield"
-      transition:animate="none"
-      transition:persist
-    >
-    </div>
+    {
+      showStarfield && (
+        <div
+          class="stars-container"
+          aria-hidden="true"
+          data-star-multiplier={animation?.starMultiplier ?? 1}
+          data-shooting-star-multiplier={animation?.shootingStarMultiplier ?? 1}
+          data-animation-intensity={config.theme.animationIntensity}
+          transition:name="starfield"
+          transition:animate="none"
+          transition:persist
+        />
+      )
+    }
 
     <slot />
 

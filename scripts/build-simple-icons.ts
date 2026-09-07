@@ -2,7 +2,7 @@ import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import config from '../config/starrybio.config';
+import { loadConfig } from './load-config';
 import {
   collectSimpleIconSpecs,
   getSimpleIconFilename,
@@ -76,6 +76,7 @@ function escapeXml(value: string): string {
 }
 
 export async function main(): Promise<void> {
+  const config = await loadConfig();
   const siteConfig = normalizeStarryBioConfig(validateStarryBioConfig(config));
   await buildSimpleIcons(siteConfig);
 }

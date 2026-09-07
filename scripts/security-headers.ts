@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import type { StarryBioConfig } from '../src/config/schema';
 import { buildSecurityHeaders, type SecurityHeader } from '../src/config/security-headers';
@@ -10,56 +10,81 @@ interface VercelConfig {
 }
 
 const root = resolve(import.meta.dirname, '..');
-const headersPath = resolve(root, 'public/_headers');
-const vercelPath = resolve(root, 'vercel.json');
 
-export function validateSecurityHeaders(config: Pick<StarryBioConfig, 'analytics'>): string[] {
+export interface SecurityHeaderTargets {
+  headersPath: string;
+  vercelPath: string;
+}
+
+function defaultTargets(): SecurityHeaderTargets {
+  return {
+    headersPath: resolve(root, 'public/_headers'),
+    vercelPath: resolve(root, 'vercel.json'),
+  };
+}
+
+export function validateSecurityHeaders(
+  config: Pick<StarryBioConfig, 'analytics'>,
+  targets: SecurityHeaderTargets = defaultTargets()
+): string[] {
   const expected = buildSecurityHeaders(config);
   const issues: string[] = [];
 
-  try {
-    if (!headersEqual(readHeadersFile(), expected)) {
-      issues.push('public/_headers is stale; run "pnpm headers" and commit the result');
+  if (existsSync(targets.headersPath)) {
+    try {
+      if (!headersEqual(readHeadersFile(targets.headersPath), expected)) {
+        issues.push('public/_headers is stale; run "pnpm headers" and commit the result');
+      }
+    } catch (error) {
+      issues.push(`could not validate public/_headers: ${errorMessage(error)}`);
     }
-  } catch (error) {
-    issues.push(`could not validate public/_headers: ${errorMessage(error)}`);
   }
 
-  try {
-    if (!headersEqual(readVercelHeaders(), expected)) {
-      issues.push(
-        'vercel.json security headers are stale; run "pnpm headers" and commit the result'
-      );
+  if (existsSync(targets.vercelPath)) {
+    try {
+      if (!headersEqual(readVercelHeaders(targets.vercelPath), expected)) {
+        issues.push(
+          'vercel.json security headers are stale; run "pnpm headers" and commit the result'
+        );
+      }
+    } catch (error) {
+      issues.push(`could not validate vercel.json security headers: ${errorMessage(error)}`);
     }
-  } catch (error) {
-    issues.push(`could not validate vercel.json security headers: ${errorMessage(error)}`);
   }
 
   return issues;
 }
 
-export function writeSecurityHeaders(config: Pick<StarryBioConfig, 'analytics'>): void {
+export function writeSecurityHeaders(
+  config: Pick<StarryBioConfig, 'analytics'>,
+  targets: SecurityHeaderTargets = defaultTargets()
+): void {
   const headers = buildSecurityHeaders(config);
-  const source = readFileSync(headersPath, 'utf8');
-  const newline = source.includes('\r\n') ? '\r\n' : '\n';
-  const lines = source.split(/\r?\n/);
-  const start = lines.findIndex((line) => line.trim() === '/*');
-  if (start === -1) throw new Error('Expected a /* header block in public/_headers');
 
-  let end = start + 1;
-  while (end < lines.length && /^\s+\S/.test(lines[end])) end += 1;
-  const block = ['/*', ...headers.map(({ key, value }) => `  ${key}: ${value}`)];
-  lines.splice(start, end - start, ...block);
-  writeFileSync(headersPath, lines.join(newline), 'utf8');
+  if (existsSync(targets.headersPath)) {
+    const source = readFileSync(targets.headersPath, 'utf8');
+    const newline = source.includes('\r\n') ? '\r\n' : '\n';
+    const lines = source.split(/\r?\n/);
+    const start = lines.findIndex((line) => line.trim() === '/*');
+    if (start === -1) throw new Error('Expected a /* header block in public/_headers');
 
-  const vercel = readVercelConfig();
-  const catchAll = vercel.headers.find(({ source: pattern }) => pattern === '/(.*)');
-  if (!catchAll) throw new Error('Expected a /(.*) header block in vercel.json');
-  catchAll.headers = headers;
-  writeFileSync(vercelPath, `${JSON.stringify(vercel, null, 2)}\n`, 'utf8');
+    let end = start + 1;
+    while (end < lines.length && /^\s+\S/.test(lines[end])) end += 1;
+    const block = ['/*', ...headers.map(({ key, value }) => `  ${key}: ${value}`)];
+    lines.splice(start, end - start, ...block);
+    writeFileSync(targets.headersPath, lines.join(newline), 'utf8');
+  }
+
+  if (existsSync(targets.vercelPath)) {
+    const vercel = readVercelConfig(targets.vercelPath);
+    const catchAll = vercel.headers.find(({ source: pattern }) => pattern === '/(.*)');
+    if (!catchAll) throw new Error('Expected a /(.*) header block in vercel.json');
+    catchAll.headers = headers;
+    writeFileSync(targets.vercelPath, `${JSON.stringify(vercel, null, 2)}\n`, 'utf8');
+  }
 }
 
-function readHeadersFile(): SecurityHeader[] {
+function readHeadersFile(headersPath: string): SecurityHeader[] {
   const source = readFileSync(headersPath, 'utf8');
   const lines = source.split(/\r?\n/);
   const start = lines.findIndex((line) => line.trim() === '/*');
@@ -79,14 +104,14 @@ function readHeadersFile(): SecurityHeader[] {
   return headers;
 }
 
-function readVercelHeaders(): SecurityHeader[] {
-  const config = readVercelConfig();
+function readVercelHeaders(vercelPath: string): SecurityHeader[] {
+  const config = readVercelConfig(vercelPath);
   const catchAll = config.headers.find(({ source }) => source === '/(.*)');
   if (!catchAll) throw new Error('Expected a /(.*) header block');
   return catchAll.headers;
 }
 
-function readVercelConfig(): VercelConfig {
+function readVercelConfig(vercelPath: string): VercelConfig {
   return JSON.parse(readFileSync(vercelPath, 'utf8')) as VercelConfig;
 }
 

@@ -1,8 +1,8 @@
 import { mkdir, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import config from '../config/starrybio.config';
 import { resolveOutputPath } from './config-utils';
+import { loadConfig } from './load-config';
 import {
   normalizeStarryBioConfig,
   type NormalizedStarryBioConfig,
@@ -207,6 +207,7 @@ function foldVCardLine(line: string): string[] {
 }
 
 export async function main(): Promise<void> {
+  const config = await loadConfig();
   const siteConfig = normalizeStarryBioConfig(validateStarryBioConfig(config));
   await generateAssets(siteConfig);
 }

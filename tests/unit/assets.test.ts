@@ -1,10 +1,10 @@
-import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { createAnalyticsScript, serializeJsonAttribute } from '../../src/config/analytics';
 import { normalizeStarryBioConfig, validateStarryBioConfig } from '../../src/config/schema';
 import { createSimpleIconSvg } from '../../scripts/build-simple-icons';
-import { createVCard, generateAssets } from '../../scripts/generate-assets';
+import { createOgSvg, createVCard, generateAssets } from '../../scripts/generate-assets';
 import { toAbsoluteAssetPath } from '../../src/config/image-assets';
 import { toGeneratedAssetUrl, toSitePath } from '../../src/config/urls';
 import { createConfig } from './fixtures';
@@ -16,26 +16,6 @@ afterEach(async () => {
 });
 
 describe('deterministic build assets', () => {
-  it('ships the status artwork as compact, native SVG assets', async () => {
-    const imageDirectory = path.resolve('public/assets/images/default');
-    const expectedAssets = [
-      ['online.svg', 'online.webp'],
-      ['idle.svg', 'idle.webp'],
-      ['dnd.svg', 'dnd.webp'],
-      ['offline.svg', 'offline.webp'],
-    ];
-
-    for (const [filename, legacyFilename] of expectedAssets) {
-      const svg = await readFile(path.join(imageDirectory, filename), 'utf8');
-      expect(svg).toContain('viewBox="0 0 32 32"');
-      expect(svg).toContain('<title');
-      expect(svg).toContain('<desc');
-      expect(svg).not.toContain('<image');
-      expect(Buffer.byteLength(svg)).toBeLessThan(4_096);
-      await expect(readFile(path.join(imageDirectory, legacyFilename))).rejects.toThrow();
-    }
-  });
-
   it('generates Simple Icons from the installed package with customization', async () => {
     const spec = {
       brand: 'GitHub',
@@ -119,6 +99,30 @@ describe('deterministic build assets', () => {
     for (const line of vcard.split('\r\n').filter(Boolean)) {
       expect(Buffer.byteLength(line, 'utf8')).toBeLessThanOrEqual(75);
     }
+  });
+
+  it('escapes customized profile content in generated SVG output', () => {
+    const config = normalizeStarryBioConfig(
+      validateStarryBioConfig(
+        createConfig({
+          profile: {
+            name: 'Ada </text><script>alert(1)</script>',
+            description: 'Safe & customized',
+            image: '/assets/images/profile.svg',
+          },
+          ogImage: {
+            enabled: true,
+            output: 'public/.vitest-output/social.svg',
+            title: '<Custom & safe>',
+          },
+        })
+      )
+    );
+
+    const svg = createOgSvg(config);
+    expect(svg).not.toContain('<script>');
+    expect(svg).toContain('&lt;Custom &amp; safe&gt;');
+    expect(svg).toContain('Ada &lt;/text&gt;&lt;script&gt;');
   });
 });
 

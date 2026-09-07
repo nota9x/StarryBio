@@ -51,6 +51,36 @@ describe('structural config migration', () => {
     expect(result.contents).not.toContain("theme: 'auto'");
   });
 
+  it('merges simultaneous user and upstream changes within the same config section', () => {
+    const result = migrateConfig(
+      wrap(`  theme: {\n    preset: 'midnight',\n    accent: '#111111',\n  },\n`),
+      wrap(`  theme: {\n    preset: 'midnight',\n    accent: '#abcdef',\n  },\n`),
+      wrap(
+        `  theme: {\n    preset: 'aurora',\n    accent: '#222222',\n    background: 'gradient',\n  },\n`
+      )
+    );
+
+    expect(result.contents).toContain("accent: '#abcdef'");
+    expect(result.contents).toContain("background: 'gradient'");
+    expect(result.contents).toContain("preset: 'midnight'");
+    expect(result.added).toEqual(['theme.background']);
+  });
+
+  it('removes an upstream-retired option while retaining unrelated custom values', () => {
+    const result = migrateConfig(
+      wrap(`  status: {\n    legacyClock: true,\n    enabled: true,\n  },\n`),
+      wrap(
+        `  status: {\n    legacyClock: false,\n    enabled: false,\n    customLabel: 'Away',\n  },\n`
+      ),
+      wrap(`  status: {\n    enabled: true,\n  },\n`)
+    );
+
+    expect(result.contents).not.toContain('legacyClock');
+    expect(result.contents).toContain('enabled: false');
+    expect(result.contents).toContain("customLabel: 'Away'");
+    expect(result.removed).toEqual(['status.legacyClock']);
+  });
+
   it('preserves arrays and performs only explicitly authorized asset rewrites', () => {
     const source = wrap(`  image: 'assets/images/profile.svg',\n  items: ['custom'],\n`);
     const result = migrateConfig(

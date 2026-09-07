@@ -345,7 +345,16 @@ export const starryBioConfigSchema = z
       .optional(),
     footer: z.object({ copyright: z.string().optional() }).strict().optional(),
   })
-  .strict();
+  .strict()
+  .superRefine((config, context) => {
+    if (config.qr?.enabled && !config.qr.url && !config.seo?.canonicalUrl) {
+      context.addIssue({
+        code: 'custom',
+        path: ['qr', 'url'],
+        message: 'is required when QR is enabled without seo.canonicalUrl',
+      });
+    }
+  });
 
 export type { ThemePreset } from './themes';
 export type ButtonStyle = (typeof BUTTON_STYLES)[number];

@@ -190,4 +190,19 @@ describe('three-way release merging', () => {
       await readFile(path.join(stagingDirectory, 'public/assets/images/custom.png'), 'utf8')
     ).toBe('user');
   });
+
+  it('updates downstream tests without restoring demo-content assertions', async () => {
+    const baseTest = "expect(profileName).toBe('StarryBio');\n";
+    const incomingTest = 'expect(profileName).toBe(config.profile.name);\n';
+    const { result, stagingDirectory } = await scenario(
+      { 'tests/e2e/deployment.spec.ts': baseTest },
+      { 'tests/e2e/deployment.spec.ts': baseTest },
+      { 'tests/e2e/deployment.spec.ts': incomingTest }
+    );
+
+    expect(result.conflicts).toEqual([]);
+    expect(
+      await readFile(path.join(stagingDirectory, 'tests/e2e/deployment.spec.ts'), 'utf8')
+    ).toBe(incomingTest);
+  });
 });

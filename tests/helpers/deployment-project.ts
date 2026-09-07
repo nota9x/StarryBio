@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { cp, mkdtemp, rm, stat, symlink } from 'node:fs/promises';
+import { cp, mkdtemp, rm } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 
@@ -15,7 +15,6 @@ export async function createDeploymentProject(
   fixture: 'minimal.config.ts' | 'customized.config.ts',
   environment: NodeJS.ProcessEnv = {}
 ): Promise<DeploymentProject> {
-  await stat(path.join(projectRoot, 'node_modules'));
   const temporaryRoot = await mkdtemp(path.join(os.tmpdir(), 'starrybio-deployment-'));
   const project = path.join(temporaryRoot, 'site');
   const excluded = new Set([
@@ -26,26 +25,28 @@ export async function createDeploymentProject(
     'playwright-report',
     'test-results',
   ]);
-  await cp(projectRoot, project, {
-    recursive: true,
-    filter(source) {
-      const relative = path.relative(projectRoot, source);
-      return relative === '' || !excluded.has(relative.split(path.sep)[0]);
-    },
-  });
-  await symlink(
-    path.join(projectRoot, 'node_modules'),
-    path.join(project, 'node_modules'),
-    process.platform === 'win32' ? 'junction' : 'dir'
-  );
-  return {
-    cleanup: () => rm(temporaryRoot, { force: true, recursive: true }),
-    environment: {
-      ...environment,
-      STARRYBIO_CONFIG_PATH: path.join(project, 'tests', 'fixtures', fixture),
-    },
-    project,
+  const deploymentEnvironment = {
+    ...environment,
+    STARRYBIO_CONFIG_PATH: path.join(project, 'tests', 'fixtures', fixture),
   };
+  try {
+    await cp(projectRoot, project, {
+      recursive: true,
+      filter(source) {
+        const relative = path.relative(projectRoot, source);
+        return relative === '' || !excluded.has(relative.split(path.sep)[0]);
+      },
+    });
+    await runPnpm(project, ['install', '--offline', '--frozen-lockfile'], deploymentEnvironment);
+    return {
+      cleanup: () => rm(temporaryRoot, { force: true, recursive: true }),
+      environment: deploymentEnvironment,
+      project,
+    };
+  } catch (error) {
+    await rm(temporaryRoot, { force: true, recursive: true });
+    throw error;
+  }
 }
 
 export async function runPnpm(

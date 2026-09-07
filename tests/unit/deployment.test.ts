@@ -89,6 +89,20 @@ describe('static deployment configuration', () => {
     expect(policy).not.toContain('/js/script.js');
   });
 
+  test('allows Umami Cloud’s separate collection endpoint', () => {
+    const headers = buildSecurityHeaders({
+      analytics: {
+        provider: 'umami',
+        websiteId: 'site-123',
+        scriptSrc: 'https://cloud.umami.is/script.js',
+      },
+    });
+    const policy = headers.find(({ key }) => key === 'Content-Security-Policy')?.value;
+
+    expect(policy).toContain("script-src 'self' https://cloud.umami.is");
+    expect(policy).toContain("connect-src 'self' https://cloud.umami.is https://gateway.umami.is");
+  });
+
   test('keeps Netlify on the canonical build and output directory', () => {
     const config = readFileSync(resolve(root, 'netlify.toml'), 'utf8');
 

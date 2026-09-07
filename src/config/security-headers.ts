@@ -38,6 +38,10 @@ export function buildContentSecurityPolicy(
     ) {
       connectSources.add(origin);
     }
+
+    if (analytics?.provider === 'umami' && origin === 'https://cloud.umami.is') {
+      connectSources.add('https://gateway.umami.is');
+    }
   }
 
   if (analytics?.provider === 'google') {

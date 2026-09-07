@@ -73,7 +73,7 @@ When adding or changing a provider:
 
 - Use external HTTPS scripts and data attributes; do not add inline initialization code.
 - Add validation and tests for all new configuration fields.
-- Update both [`public/_headers`](public/_headers) and the catch-all headers in [`vercel.json`](vercel.json) with the provider’s script and collection hosts, keeping the Content Security Policy as narrow as possible. The deployment unit test enforces parity.
+- Update the provider-specific origins in [`src/config/security-headers.ts`](src/config/security-headers.ts), then run `pnpm headers`. The generated Cloudflare/Netlify and Vercel policies stay narrow and the validation step rejects stale copies.
 - Document the provider and a placeholder-only configuration example in [README.md](README.md).
 - Never commit real site IDs, tokens, credentials, or analytics data.
 

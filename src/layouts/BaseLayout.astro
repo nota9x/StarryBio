@@ -16,6 +16,7 @@ import Analytics from '../components/Analytics.astro';
 import SEO from '../components/SEO.astro';
 import { toAbsoluteAssetPath } from '../config/image-assets';
 import type { NormalizedStarryBioConfig } from '../config/schema';
+import { buildContentSecurityPolicy } from '../config/security-headers';
 import { getThemeStyle } from '../config/themes';
 import '../styles/input.css';
 
@@ -30,6 +31,9 @@ const { config, title, description, includeStatus = true } = Astro.props;
 
 const animation = config.animation;
 const statusConfig = includeStatus ? config.status : undefined;
+const metaContentSecurityPolicy = buildContentSecurityPolicy(config.analytics, {
+  includeFrameAncestors: false,
+});
 ---
 
 <!doctype html>
@@ -41,6 +45,7 @@ const statusConfig = includeStatus ? config.status : undefined;
 >
   <head>
     <meta charset="UTF-8" />
+    <meta http-equiv="Content-Security-Policy" content={metaContentSecurityPolicy} />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <SEO config={config} title={title} description={description} />
 

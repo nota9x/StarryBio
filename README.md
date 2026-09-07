@@ -121,21 +121,27 @@ For complete setup instructions, see the deployment guides for:
 
 ## 🧰 Common commands
 
-| Command                   | Purpose                                            |
-| ------------------------- | -------------------------------------------------- |
-| `pnpm dev`                | Validate, generate assets/icons, and start Astro.  |
-| `pnpm validate`           | Validate configuration and local asset paths.      |
-| `pnpm build`              | Build portable static output in `dist/`.           |
-| `pnpm preview`            | Build and serve `dist/` with Astro.                |
-| `pnpm preview:cloudflare` | Build and serve `dist/` through Wrangler.          |
-| `pnpm deploy`             | Backwards-compatible Cloudflare deployment.        |
-| `pnpm deploy:cloudflare`  | Build and deploy static assets with Wrangler.      |
-| `pnpm test:unit`          | Run Vitest unit tests.                             |
-| `pnpm test:e2e`           | Build and run Playwright browser tests.            |
-| `pnpm check`              | Run formatting, lint, type, and unit-test checks.  |
-| `pnpm commitlint`         | Validate the latest commit message.                |
-| `pnpm starrybio:update`   | Safely integrate updates from the main repository. |
-| `pnpm release:check`      | Run the complete local release gate.               |
+| Command                   | Purpose                                                         |
+| ------------------------- | --------------------------------------------------------------- |
+| `pnpm dev`                | Validate, generate assets/icons, and start Astro.               |
+| `pnpm validate`           | Validate configuration, assets, and generated security headers. |
+| `pnpm headers`            | Regenerate CSP and other deployment security headers.           |
+| `pnpm build`              | Build portable static output in `dist/`.                        |
+| `pnpm preview`            | Build and serve `dist/` with Astro.                             |
+| `pnpm preview:cloudflare` | Build and serve `dist/` through Wrangler.                       |
+| `pnpm deploy`             | Backwards-compatible Cloudflare deployment.                     |
+| `pnpm deploy:cloudflare`  | Build and deploy static assets with Wrangler.                   |
+| `pnpm test:unit`          | Run Vitest unit tests.                                          |
+| `pnpm test:e2e`           | Build and run Playwright browser tests.                         |
+| `pnpm check`              | Run formatting, lint, type, and unit-test checks.               |
+| `pnpm commitlint`         | Validate the latest commit message.                             |
+| `pnpm starrybio:update`   | Safely integrate updates from the main repository.              |
+| `pnpm release:check`      | Run the complete local release gate.                            |
+
+Run `pnpm headers` after changing `analytics` in `config/starrybio.config.ts`. The build
+fails closed when the generated Cloudflare/Netlify and Vercel policies are stale.
+Generated pages also embed the compatible CSP directives for static hosts that cannot set
+custom response headers.
 
 ## 🤝 Contributing
 

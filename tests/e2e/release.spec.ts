@@ -132,6 +132,7 @@ test('serves release headers, hashed assets, and generated downloads', async ({
   );
 
   const html = await home.text();
+  expect(html).toContain('http-equiv="Content-Security-Policy"');
   const assetPath = html.match(/(?:src|href)="(\/_astro\/[^"]+\.(?:css|js))"/)?.[1];
   expect(assetPath).toBeTruthy();
   const asset = await request.get(assetPath!);

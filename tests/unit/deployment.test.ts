@@ -1,6 +1,9 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, test } from 'vitest';
+import starryBioConfig from '../../config/starrybio.config';
+import { buildSecurityHeaders } from '../../scripts/security-headers';
+import { validateStarryBioConfig } from '../../src/config/schema';
 
 const root = resolve(import.meta.dirname, '../..');
 
@@ -61,6 +64,31 @@ describe('static deployment configuration', () => {
     expect(catchAll?.headers).toEqual(firstHeadersBlock());
   });
 
+  test('keeps deployment security headers aligned with the analytics config', () => {
+    const expected = buildSecurityHeaders(validateStarryBioConfig(starryBioConfig));
+
+    expect(firstHeadersBlock()).toEqual(expected);
+    expect(expected).toContainEqual({
+      key: 'Strict-Transport-Security',
+      value: 'max-age=31536000',
+    });
+  });
+
+  test('adds a custom analytics origin without broadly allowing HTTPS scripts', () => {
+    const headers = buildSecurityHeaders({
+      analytics: {
+        provider: 'custom',
+        scriptSrc: 'https://analytics.example.com/js/script.js',
+      },
+    });
+    const policy = headers.find(({ key }) => key === 'Content-Security-Policy')?.value;
+
+    expect(policy).toContain("script-src 'self' https://analytics.example.com");
+    expect(policy).toContain("connect-src 'self' https://analytics.example.com");
+    expect(policy).not.toContain('script-src https:');
+    expect(policy).not.toContain('/js/script.js');
+  });
+
   test('keeps Netlify on the canonical build and output directory', () => {
     const config = readFileSync(resolve(root, 'netlify.toml'), 'utf8');
 
@@ -85,5 +113,20 @@ describe('static deployment configuration', () => {
     expect(workflow).toMatch(/name:\s*github-pages/);
     expect(workflow).toMatch(/STARRYBIO_SITE_URL:\s*\$\{\{ steps\.pages\.outputs\.origin \}\}/);
     expect(workflow).toMatch(/STARRYBIO_BASE_PATH:\s*\$\{\{ steps\.pages\.outputs\.base_path \}\}/);
+  });
+
+  test('audits all dependencies and reviews dependency changes on pull requests', () => {
+    const workflow = readFileSync(resolve(root, '.github/workflows/ci.yml'), 'utf8');
+
+    expect(workflow).toMatch(/run:\s*pnpm audit(?:\s|$)/);
+    expect(workflow).not.toContain('pnpm audit --prod');
+    expect(workflow).toMatch(/actions\/dependency-review-action@[\da-f]{40}/);
+  });
+
+  test('validates pull request titles without the privileged target event', () => {
+    const workflow = readFileSync(resolve(root, '.github/workflows/pr-title.yml'), 'utf8');
+
+    expect(workflow).toMatch(/^\s*pull_request:\s*$/m);
+    expect(workflow).not.toContain('pull_request_target:');
   });
 });

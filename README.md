@@ -6,7 +6,7 @@
 
 Build your profile once. Deploy it anywhere.
 
-[![Live Demo](https://img.shields.io/badge/✨_Live_Demo-a9x.pro-7c3aed?style=for-the-badge)](https://a9x.pro)
+[![Live Demo](https://img.shields.io/badge/✨_Live_Demo-Visit-7c3aed?style=for-the-badge)](https://nota9x.github.io/StarryBio/)
 [![Documentation](https://img.shields.io/badge/📖_Documentation-Wiki-2563eb?style=for-the-badge)](https://github.com/nota9x/StarryBio/wiki)
 
 <br>
@@ -159,6 +159,6 @@ StarryBio is licensed under the [GNU General Public License v3.0](LICENSE).
 
 <div align="center">
 
-**[✨ Live Demo](https://a9x.pro)** · **[📖 Documentation](https://github.com/nota9x/StarryBio/wiki)** · **[🐛 Report a Bug](https://github.com/nota9x/StarryBio/issues/new?template=bug-report.yml)** · **[⭐ Star StarryBio](https://github.com/nota9x/StarryBio)**
+**[✨ Live Demo](https://nota9x.github.io/StarryBio/)** · **[📖 Documentation](https://github.com/nota9x/StarryBio/wiki)** · **[🐛 Report a Bug](https://github.com/nota9x/StarryBio/issues/new?template=bug-report.yml)** · **[⭐ Star StarryBio](https://github.com/nota9x/StarryBio)**
 
 </div>

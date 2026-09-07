@@ -117,7 +117,7 @@ const config = {
     title: 'StarryBio — your corner of the internet',
     description: 'An open-source, animated link-in-bio built for creators who want full control.',
     image: '/assets/images/profile.svg',
-    canonicalUrl: 'https://a9x.pro',
+    canonicalUrl: 'https://nota9x.github.io/StarryBio/',
     themeColor: '#7ddf9b',
   },
 
@@ -131,7 +131,7 @@ const config = {
   qr: {
     enabled: true,
     showButton: true,
-    url: 'https://a9x.pro',
+    url: 'https://nota9x.github.io/StarryBio/',
     output: 'public/qr.png',
   },
 
@@ -143,7 +143,7 @@ const config = {
     enabled: false,
     output: 'public/contact.vcf',
     name: 'Astronaut',
-    website: 'https://a9x.pro',
+    website: 'https://nota9x.github.io/StarryBio/',
   },
 
   footer: {

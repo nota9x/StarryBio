@@ -1,6 +1,6 @@
 {
   "name": "starry-bio",
-  "version": "3.5.0",
+  "version": "3.6.0",
   "private": true,
   "description": "A fully customizable, high-performance \"link-in-bio\" website template built with Astro.",
   "license": "GPL-3.0-only",

@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.6.0](https://github.com/nota9x/StarryBio/compare/v3.5.0...v3.6.0) (2026-09-07)
+
+
+### Features
+
+* **updater:** add verified transactional GitHub release updates ([#63](https://github.com/nota9x/StarryBio/issues/63)) ([dc7c93f](https://github.com/nota9x/StarryBio/commit/dc7c93fd8573d5616ca833f9c200da86f524c1b3))
+
+
+### Bug Fixes
+
+* **ci:** isolate fixture project dependencies ([0e7a25c](https://github.com/nota9x/StarryBio/commit/0e7a25ca506c28a5fc136e14dd870dcbb8b24a5e))
+
 ## [3.5.0](https://github.com/nota9x/StarryBio/compare/v3.4.1...v3.5.0) (2026-09-07)
 
 

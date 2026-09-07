@@ -4,7 +4,7 @@ import type { StarryBioConfig } from '../src/config/schema';
 // every option, provider example, and the v2-to-v3 migration table.
 const config = {
   pageTitle: 'StarryBio — your corner of the internet',
-  favicon: 'assets/images/favicon.svg',
+  favicon: 'assets/images/default/favicon.svg',
 
   theme: {
     preset: 'midnight',
@@ -28,7 +28,7 @@ const config = {
   profile: {
     name: 'StarryBio',
     description: 'A beautiful, self-hosted link-in-bio for the things you make.',
-    image: 'assets/images/profile.svg',
+    image: 'assets/images/default/profile.svg',
     layout: 'vertical',
   },
 
@@ -38,7 +38,7 @@ const config = {
       description:
         'Launch a fast, animated home for your links with themes, status, QR sharing, and no platform lock-in.',
       url: 'https://github.com/nota9x/StarryBio',
-      image: 'assets/images/profile.svg',
+      image: 'assets/images/default/profile.svg',
       badge: 'Open source · Astro',
       icon: { simpleIcon: 'GitHub' },
     },
@@ -76,25 +76,25 @@ const config = {
     default: {
       text: 'Offline',
       color: '#6B7280',
-      icon: 'assets/images/offline.svg',
+      icon: 'assets/images/default/offline.svg',
     },
     types: {
       available: {
         text: 'Available',
         color: '#10B981',
-        icon: 'assets/images/online.svg',
+        icon: 'assets/images/default/online.svg',
         message: 'Online and ready to chat!',
       },
       busy: {
         text: 'Busy / School',
         color: '#EF4444',
-        icon: 'assets/images/dnd.svg',
+        icon: 'assets/images/default/dnd.svg',
         message: 'Focused on work. Replies slow.',
       },
       sleeping: {
         text: 'Sleeping',
         color: '#6d7684',
-        icon: 'assets/images/idle.svg',
+        icon: 'assets/images/default/idle.svg',
         message: 'Dreaming of electric sheep.',
       },
     },
@@ -116,7 +116,7 @@ const config = {
   seo: {
     title: 'StarryBio — your corner of the internet',
     description: 'An open-source, animated link-in-bio built for creators who want full control.',
-    image: '/assets/images/profile.svg',
+    image: '/assets/images/default/profile.svg',
     canonicalUrl: 'https://nota9x.github.io/StarryBio/',
     themeColor: '#7ddf9b',
   },

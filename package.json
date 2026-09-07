@@ -3,6 +3,7 @@
   "version": "3.4.1",
   "private": true,
   "description": "A fully customizable, high-performance \"link-in-bio\" website template built with Astro.",
+  "license": "GPL-3.0-only",
   "type": "module",
   "scripts": {
     "astro": "astro",

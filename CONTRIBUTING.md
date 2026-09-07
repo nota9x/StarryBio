@@ -1,6 +1,6 @@
 # Contributing to StarryBio
 
-Thanks for contributing to StarryBio. The project is a configurable Astro link-in-bio site that builds to portable static assets and supports Cloudflare Workers, Vercel, and Netlify. Contributions that improve the starter configuration, site experience, accessibility, reliability, themes, layouts, or integrations are welcome.
+Thanks for contributing to StarryBio. The project is a configurable Astro link-in-bio site that builds to portable static assets and supports GitHub Pages, Cloudflare Workers, Vercel, and Netlify. Contributions that improve the starter configuration, site experience, accessibility, reliability, themes, layouts, or integrations are welcome.
 
 ## Reporting issues
 
@@ -33,23 +33,24 @@ pnpm dev
 
 ## Project structure
 
-| Path                                                       | Purpose                                                                                                                |
-| ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| [`config/starrybio.config.ts`](config/starrybio.config.ts) | Complete starter configuration for profile data, links, themes, layouts, status, generated assets, and analytics.      |
-| [`src/config/schema.ts`](src/config/schema.ts)             | Zod schema and TypeScript types for the public configuration contract. Update this when adding a configuration option. |
-| [`src/config/themes.ts`](src/config/themes.ts)             | Built-in theme tokens and logic that turns a selected preset into CSS custom properties.                               |
-| [`src/styles/`](src/styles)                                | Theme, layout, component, motion, and input styles.                                                                    |
-| [`src/components/`](src/components)                        | Reusable Astro UI components, including profile, links, featured cards, SEO, status, and analytics.                    |
-| [`src/pages/`](src/pages)                                  | The homepage and static 404 page.                                                                                      |
-| [`src/scripts/`](src/scripts)                              | Browser-side behavior for links, status, and the starfield.                                                            |
-| [`src/config/analytics.ts`](src/config/analytics.ts)       | Analytics script descriptors and safe data-attribute generation.                                                       |
-| [`scripts/`](scripts)                                      | Build-time validation, asset generation, live config updates, and Simple Icons generation.                             |
-| [`public/`](public)                                        | Static assets and Cloudflare/Netlify headers. Place user-facing local images here.                                     |
-| [`public/_headers`](public/_headers)                       | Canonical Content Security Policy and static header intent for Cloudflare and Netlify.                                 |
-| [`vercel.json`](vercel.json)                               | Vercel build/output settings and its translation of the shared header intent.                                          |
-| [`netlify.toml`](netlify.toml)                             | Netlify build and publish settings.                                                                                    |
-| [`wrangler.jsonc`](wrangler.jsonc)                         | Cloudflare static-assets deployment and custom 404 handling.                                                           |
-| [`tests/unit/`](tests/unit) and [`tests/e2e/`](tests/e2e)  | Vitest unit tests and Playwright release checks.                                                                       |
+| Path                                                                                     | Purpose                                                                                                                |
+| ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| [`config/starrybio.config.ts`](config/starrybio.config.ts)                               | Complete starter configuration for profile data, links, themes, layouts, status, generated assets, and analytics.      |
+| [`src/config/schema.ts`](src/config/schema.ts)                                           | Zod schema and TypeScript types for the public configuration contract. Update this when adding a configuration option. |
+| [`src/config/themes.ts`](src/config/themes.ts)                                           | Built-in theme tokens and logic that turns a selected preset into CSS custom properties.                               |
+| [`src/styles/`](src/styles)                                                              | Theme, layout, component, motion, and input styles.                                                                    |
+| [`src/components/`](src/components)                                                      | Reusable Astro UI components, including profile, links, featured cards, SEO, status, and analytics.                    |
+| [`src/pages/`](src/pages)                                                                | The homepage and static 404 page.                                                                                      |
+| [`src/scripts/`](src/scripts)                                                            | Browser-side behavior for links, status, and the starfield.                                                            |
+| [`src/config/analytics.ts`](src/config/analytics.ts)                                     | Analytics script descriptors and safe data-attribute generation.                                                       |
+| [`scripts/`](scripts)                                                                    | Build-time validation, asset generation, live config updates, and Simple Icons generation.                             |
+| [`public/`](public)                                                                      | Static assets and Cloudflare/Netlify headers. Place user-facing local images here.                                     |
+| [`public/_headers`](public/_headers)                                                     | Canonical Content Security Policy and static header intent for Cloudflare and Netlify.                                 |
+| [`vercel.json`](vercel.json)                                                             | Vercel build/output settings and its translation of the shared header intent.                                          |
+| [`netlify.toml`](netlify.toml)                                                           | Netlify build and publish settings.                                                                                    |
+| [`wrangler.jsonc`](wrangler.jsonc)                                                       | Cloudflare static-assets deployment and custom 404 handling.                                                           |
+| [`.github/workflows/deploy-github-pages.yml`](.github/workflows/deploy-github-pages.yml) | GitHub Pages build, artifact upload, and deployment workflow.                                                          |
+| [`tests/unit/`](tests/unit) and [`tests/e2e/`](tests/e2e)                                | Vitest unit tests and Playwright release checks.                                                                       |
 
 Prefer compact SVG source artwork for simple interface graphics and status icons. Keep raster formats for photographic or texture-rich imagery that would lose quality or become excessively complex as vectors; never embed raster data inside an SVG.
 

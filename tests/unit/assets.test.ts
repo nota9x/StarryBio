@@ -5,6 +5,8 @@ import { createAnalyticsScript, serializeJsonAttribute } from '../../src/config/
 import { normalizeStarryBioConfig, validateStarryBioConfig } from '../../src/config/schema';
 import { createSimpleIconSvg } from '../../scripts/build-simple-icons';
 import { createVCard, generateAssets } from '../../scripts/generate-assets';
+import { toAbsoluteAssetPath } from '../../src/config/image-assets';
+import { toGeneratedAssetUrl, toSitePath } from '../../src/config/urls';
 import { createConfig } from './fixtures';
 
 const outputDirectory = path.resolve('public/.vitest-output');
@@ -200,5 +202,34 @@ describe('analytics serialization', () => {
     expect(descriptor?.attrs).toEqual({ 'data-provider': 'google' });
     expect(descriptor?.attrs).not.toHaveProperty('data-starrybio-provider');
     expect(descriptor?.attrs).not.toHaveProperty('data-measurement-id');
+  });
+});
+
+describe('deployment URL paths', () => {
+  it('prefixes public files and root-relative links for a project-site base path', () => {
+    expect(toAbsoluteAssetPath('assets/images/profile.svg', '/StarryBio/')).toBe(
+      '/StarryBio/assets/images/profile.svg'
+    );
+    expect(toAbsoluteAssetPath('/assets/images/profile.svg', '/StarryBio/')).toBe(
+      '/StarryBio/assets/images/profile.svg'
+    );
+    expect(toGeneratedAssetUrl('public/qr.png', 'public/qr.png', '/StarryBio/')).toBe(
+      '/StarryBio/qr.png'
+    );
+    expect(toSitePath('/about', '/StarryBio/')).toBe('/StarryBio/about');
+  });
+
+  it('keeps root deployments, external URLs, and relative links portable', () => {
+    expect(toAbsoluteAssetPath('assets/images/profile.svg', '/')).toBe(
+      '/assets/images/profile.svg'
+    );
+    expect(toSitePath('/', '/')).toBe('/');
+    expect(toSitePath('about', '/StarryBio/')).toBe('about');
+    expect(toSitePath('https://example.com/about', '/StarryBio/')).toBe(
+      'https://example.com/about'
+    );
+    expect(toAbsoluteAssetPath('data:image/svg+xml,test', '/StarryBio/')).toBe(
+      'data:image/svg+xml,test'
+    );
   });
 });

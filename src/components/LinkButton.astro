@@ -1,7 +1,7 @@
 ---
 import { Check, ChevronRight, Copy } from '@lucide/astro';
 import type { NormalizedLink } from '../config/schema';
-import { externalLinkAttributes } from '../config/urls';
+import { externalLinkAttributes, toSitePath } from '../config/urls';
 import Icon from './Icon.astro';
 
 interface Props {
@@ -16,7 +16,7 @@ const classes = ['link-button', isCopyButton ? 'copy-button-active' : ''].filter
 
 {
   isLink ? (
-    <a href={link.url} {...externalLinkAttributes(link.url)} class={classes}>
+    <a href={toSitePath(link.url)} {...externalLinkAttributes(link.url)} class={classes}>
       <Icon icon={link.icon} />
       <div class="button-text-wrapper">
         <span class="button-main-text">{link.label}</span>

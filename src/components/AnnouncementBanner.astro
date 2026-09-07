@@ -2,7 +2,7 @@
 import { createHash } from 'node:crypto';
 import { TriangleAlert, X } from '@lucide/astro';
 import type { StarryBioConfig } from '../config/schema';
-import { externalLinkAttributes } from '../config/urls';
+import { externalLinkAttributes, toSitePath } from '../config/urls';
 
 interface Props {
   announcement?: StarryBioConfig['announcement'];
@@ -23,7 +23,7 @@ const announcementKey = createHash('sha256')
         {announcement?.url ? (
           <a
             class="announcement-content"
-            href={announcement.url}
+            href={toSitePath(announcement.url)}
             {...externalLinkAttributes(announcement.url)}
           >
             <TriangleAlert class="announcement-icon" aria-hidden="true" />

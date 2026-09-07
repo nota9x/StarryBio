@@ -1,7 +1,7 @@
 ---
 import { toAbsoluteAssetPath } from '../config/image-assets';
 import type { FeaturedCard } from '../config/schema';
-import { externalLinkAttributes } from '../config/urls';
+import { externalLinkAttributes, toSitePath } from '../config/urls';
 import Icon from './Icon.astro';
 
 interface Props {
@@ -15,7 +15,7 @@ const { featured } = Astro.props;
   featured.length > 0 && (
     <section class="featured-grid" aria-label="Featured">
       {featured.map((card) => (
-        <a href={card.url} {...externalLinkAttributes(card.url)} class="featured-card">
+        <a href={toSitePath(card.url)} {...externalLinkAttributes(card.url)} class="featured-card">
           {card.image && (
             <img
               class="featured-image"

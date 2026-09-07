@@ -1,3 +1,4 @@
+import { toAbsoluteAssetPath } from '../config/image-assets';
 import { getSvgPathData, resolveIconSource } from '../config/icons';
 import type { NormalizedStatusConfig, ScheduleItem } from '../config/schema';
 
@@ -279,8 +280,7 @@ function setMaskedIcon(element: HTMLElement, source: string, color: string): voi
 }
 
 function toAbsoluteUrl(value: string): string {
-  if (!value || /^(?:data:|https?:|\/)/i.test(value)) return value;
-  return `/${value}`;
+  return toAbsoluteAssetPath(value);
 }
 
 function cssEscapeUrl(value: string): string {

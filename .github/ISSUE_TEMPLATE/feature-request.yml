@@ -1,0 +1,51 @@
+name: Feature request
+description: Suggest a new capability or improvement for StarryBio.
+title: '[FEAT] '
+labels:
+  - 'feature'
+  - 'needs triage'
+assignees:
+  - nota9x
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For analytics providers and themes or layouts, use their dedicated forms. Review the [documentation](https://github.com/nota9x/StarryBio/wiki) and existing issues first.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Configuration or content
+        - Site experience
+        - Build or generated assets
+        - Deployment
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      description: Describe the user need or limitation, including who it affects.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed experience
+      description: Describe how StarryBio should work, including any configuration or output changes you expect.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Explain how you work around this today, if applicable.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues and did not find a duplicate.
+          required: true

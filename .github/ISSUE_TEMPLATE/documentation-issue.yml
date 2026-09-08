@@ -1,0 +1,35 @@
+name: Documentation issue
+description: Report missing, unclear, or incorrect StarryBio documentation.
+title: '[DOCS] '
+labels:
+  - 'documentation'
+  - 'needs triage'
+assignees:
+  - nota9x
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The [StarryBio Wiki](https://github.com/nota9x/StarryBio/wiki) is the primary documentation for setup, configuration, deployment, and troubleshooting.
+  - type: input
+    id: location
+    attributes:
+      label: Documentation location
+      description: Link the wiki page, README section, or repository file.
+      placeholder: 'https://github.com/nota9x/StarryBio/wiki/Configuration-Reference'
+    validations:
+      required: true
+  - type: textarea
+    id: issue
+    attributes:
+      label: What is missing, unclear, or incorrect?
+      description: Include the relevant command, configuration option, deployment provider, or behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: improvement
+    attributes:
+      label: Suggested improvement
+      description: Describe the explanation, example, or correction that would make this clear.
+    validations:
+      required: true

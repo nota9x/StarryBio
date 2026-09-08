@@ -1,22 +1,21 @@
 name: Bug report
-description: Report a reproducible problem with the StarryBio site, configuration, or build.
-title: '[BUG]: '
+description: Report a reproducible problem with StarryBio's site, configuration, build, or deployment.
+title: '[BUG] '
 labels:
-  - "bug"
-  - "needs triage"
+  - 'bug'
+  - 'needs triage'
 assignees:
   - nota9x
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for helping improve StarryBio. Please remove any credentials, analytics tokens, or personal data before submitting.
+        Do not report security vulnerabilities publicly. Use [private vulnerability reporting](https://github.com/nota9x/StarryBio/security/advisories/new) instead. Remove credentials, analytics tokens, and personal data from this report.
   - type: textarea
-    id: summary
+    id: behavior
     attributes:
-      label: What happened?
-      description: Describe the unexpected behavior and what you expected instead.
-      placeholder: The profile card overlaps the first link on narrow screens, but it should remain readable.
+      label: Actual and expected behavior
+      placeholder: On a narrow viewport, the profile card overlaps the first link. It should remain readable and separate from the link.
     validations:
       required: true
   - type: textarea
@@ -30,27 +29,31 @@ body:
         4. Observe ...
     validations:
       required: true
-  - type: input
+  - type: dropdown
     id: area
     attributes:
       label: Affected area
-      description: Name the page, configuration section, generated asset, or command involved.
-      placeholder: 'e.g. theme preset, status schedule, `pnpm build`, /'
+      options:
+        - Configuration or validation
+        - Build or generated asset
+        - Rendered site or browser behavior
+        - Deployment
+        - Other
     validations:
       required: true
   - type: textarea
     id: environment
     attributes:
       label: Environment
-      description: Include OS, browser (for UI issues), Node.js version, and pnpm version.
-      placeholder: 'Windows 11; Chrome 140; Node 24.x; pnpm 11.x'
+      description: Include the relevant OS, browser and viewport, Node.js, pnpm, hosting provider, and StarryBio version or commit.
+      placeholder: 'Windows 11; Chrome 140 at 390px; Node 24.15.0; pnpm 12.3.4; GitHub Pages; v3.6.0'
     validations:
       required: true
   - type: textarea
     id: evidence
     attributes:
       label: Logs, screenshots, or configuration excerpt
-      description: Attach screenshots or paste a minimal, redacted error/configuration example.
+      description: Attach a screenshot or paste the smallest redacted log or configuration excerpt that shows the problem.
   - type: checkboxes
     id: checks
     attributes:

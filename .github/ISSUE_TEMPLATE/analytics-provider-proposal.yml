@@ -1,9 +1,10 @@
 name: Analytics provider proposal
 description: Propose support for an additional analytics provider or an improvement to an existing integration.
-title: '[Analytics]: '
+title: '[ANALYTICS]: '
 labels:
-  - enhancement
-  - analytics
+  - "feature"
+  - "area: analytics"
+  - "needs triage"
 assignees:
   - nota9x
 body:

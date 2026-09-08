@@ -1,8 +1,9 @@
 name: Bug report
 description: Report a reproducible problem with the StarryBio site, configuration, or build.
-title: '[Bug]: '
+title: '[BUG]: '
 labels:
-  - bug
+  - "bug"
+  - "needs triage"
 assignees:
   - nota9x
 body:

@@ -1,9 +1,9 @@
 name: Theme or layout proposal
 description: Suggest a new visual preset, layout mode, or improvement to an existing one.
-title: '[Theme]: '
+title: '[DESIGN]: '
 labels:
-  - enhancement
-  - design
+  - "feature"
+  - "needs triage"
 assignees:
   - nota9x
 body:

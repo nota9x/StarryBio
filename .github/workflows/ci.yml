@@ -44,8 +44,13 @@ jobs:
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: pnpm exec commitlint --from "$BASE_SHA" --to "$HEAD_SHA" --verbose
 
-      - name: Check formatting
-        run: pnpm format:check
+      - name: Generate formatting patch
+        run: |
+          pnpm format
+          echo '---FORMAT-PATCH-BEGIN---'
+          git diff -- . ':!/.github/workflows/ci.yml'
+          echo '---FORMAT-PATCH-END---'
+          exit 1
 
       - name: Lint source
         run: pnpm lint

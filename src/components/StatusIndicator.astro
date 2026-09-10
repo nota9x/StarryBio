@@ -9,35 +9,33 @@ interface Props {
 const { status } = Astro.props;
 ---
 
-{
-  status?.enabled && (
-    <button
-      id="status-indicator-container"
-      type="button"
-      aria-label="View availability schedule"
-      aria-controls="status-modal"
-      aria-describedby="status-tooltip"
-      aria-expanded="false"
-      aria-haspopup="dialog"
-    >
-      <span id="status-indicator-icon" aria-hidden="true" />
-      <span id="status-tooltip" role="tooltip">
-        <span id="tooltip-status" class="mb-1 text-center text-sm font-bold" />
-        <span
-          id="tooltip-owner-time-row"
-          class="status-time-row flex items-center justify-center gap-1.5 text-xs text-slate-300"
-          hidden
-        >
-          <Clock3 class="status-clock-icon h-3.5 w-3.5 opacity-70" size={14} aria-hidden="true" />
-          <span id="tooltip-owner-time" class="font-mono opacity-90" />
-        </span>
-        <span id="tooltip-visitor-time" class="status-visitor-time hidden" />
-        <span
-          id="tooltip-availability"
-          class="mt-1.5 hidden border-t border-white/10 pt-1.5 text-center text-[0.65rem] text-amber-300/90 italic"
-        />
-        <span id="tooltip-next-available" class="status-next-available hidden" />
+{status?.enabled && (
+  <button
+    id="status-indicator-container"
+    type="button"
+    aria-label="View availability schedule"
+    aria-controls="status-modal"
+    aria-describedby="status-tooltip"
+    aria-expanded="false"
+    aria-haspopup="dialog"
+  >
+    <span id="status-indicator-icon" aria-hidden="true" />
+    <span id="status-tooltip" role="tooltip">
+      <span id="tooltip-status" class="mb-1 text-center text-sm font-bold" />
+      <span
+        id="tooltip-owner-time-row"
+        class="status-time-row flex items-center justify-center gap-1.5 text-xs text-slate-300"
+        hidden
+      >
+        <Clock3 class="status-clock-icon h-3.5 w-3.5 opacity-70" size={14} aria-hidden="true" />
+        <span id="tooltip-owner-time" class="font-mono opacity-90" />
       </span>
-    </button>
-  )
-}
+      <span id="tooltip-visitor-time" class="status-visitor-time hidden" />
+      <span
+        id="tooltip-availability"
+        class="mt-1.5 hidden border-t border-white/10 pt-1.5 text-center text-[0.65rem] text-amber-300/90 italic"
+      />
+      <span id="tooltip-next-available" class="status-next-available hidden" />
+    </span>
+  </button>
+)}

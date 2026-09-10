@@ -57,28 +57,24 @@ const metaContentSecurityPolicy = buildContentSecurityPolicy(config.analytics, {
   </head>
 
   <body>
-    {
-      showStarfield && (
-        <div
-          class="stars-container"
-          aria-hidden="true"
-          data-star-multiplier={animation?.starMultiplier ?? 1}
-          data-shooting-star-multiplier={animation?.shootingStarMultiplier ?? 1}
-          data-animation-intensity={config.theme.animationIntensity}
-          transition:name="starfield"
-          transition:animate="none"
-          transition:persist
-        />
-      )
-    }
+    {showStarfield && (
+      <div
+        class="stars-container"
+        aria-hidden="true"
+        data-star-multiplier={animation?.starMultiplier ?? 1}
+        data-shooting-star-multiplier={animation?.shootingStarMultiplier ?? 1}
+        data-animation-intensity={config.theme.animationIntensity}
+        transition:name="starfield"
+        transition:animate="none"
+        transition:persist
+      />
+    )}
 
     <slot />
 
-    {
-      statusConfig?.enabled && (
-        <template id="starrybio-status-config">{JSON.stringify(statusConfig)}</template>
-      )
-    }
+    {statusConfig?.enabled && (
+      <template id="starrybio-status-config">{JSON.stringify(statusConfig)}</template>
+    )}
     <script>
       import '../scripts/app';
     </script>

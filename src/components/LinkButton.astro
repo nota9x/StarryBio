@@ -14,36 +14,34 @@ const isLink = Boolean(link.url && !isCopyButton);
 const classes = ['link-button', isCopyButton ? 'copy-button-active' : ''].filter(Boolean).join(' ');
 ---
 
-{
-  isLink ? (
-    <a href={toSitePath(link.url)} {...externalLinkAttributes(link.url)} class={classes}>
-      <Icon icon={link.icon} />
-      <div class="button-text-wrapper">
-        <span class="button-main-text">{link.label}</span>
-        {link.subtitle && <span class="button-subtitle">{link.subtitle}</span>}
-        {link.description && <span class="button-subtitle">{link.description}</span>}
-      </div>
-      <ChevronRight class="link-button-chevron" aria-hidden="true" />
-    </a>
-  ) : (
-    <button
-      type="button"
-      class={classes}
-      data-copy-value={isCopyButton ? link.copyValue : undefined}
-      data-original-subtitle={isCopyButton ? link.subtitle : undefined}
-    >
-      <Icon icon={link.icon} />
-      <div class="button-text-wrapper">
-        <span class="button-main-text">{link.label}</span>
-        <span class="button-subtitle" data-copy-feedback aria-live="polite">
-          {link.subtitle || 'Copy to clipboard'}
-        </span>
-        {link.description && <span class="button-subtitle">{link.description}</span>}
-      </div>
-      <span class="copy-feedback-icon" aria-hidden="true">
-        <Copy class="copy-feedback-glyph copy-feedback-glyph-copy" />
-        <Check class="copy-feedback-glyph copy-feedback-glyph-check" />
+{isLink ? (
+  <a href={toSitePath(link.url)} {...externalLinkAttributes(link.url)} class={classes}>
+    <Icon icon={link.icon} />
+    <div class="button-text-wrapper">
+      <span class="button-main-text">{link.label}</span>
+      {link.subtitle && <span class="button-subtitle">{link.subtitle}</span>}
+      {link.description && <span class="button-subtitle">{link.description}</span>}
+    </div>
+    <ChevronRight class="link-button-chevron" aria-hidden="true" />
+  </a>
+) : (
+  <button
+    type="button"
+    class={classes}
+    data-copy-value={isCopyButton ? link.copyValue : undefined}
+    data-original-subtitle={isCopyButton ? link.subtitle : undefined}
+  >
+    <Icon icon={link.icon} />
+    <div class="button-text-wrapper">
+      <span class="button-main-text">{link.label}</span>
+      <span class="button-subtitle" data-copy-feedback aria-live="polite">
+        {link.subtitle || 'Copy to clipboard'}
       </span>
-    </button>
-  )
-}
+      {link.description && <span class="button-subtitle">{link.description}</span>}
+    </div>
+    <span class="copy-feedback-icon" aria-hidden="true">
+      <Copy class="copy-feedback-glyph copy-feedback-glyph-copy" />
+      <Check class="copy-feedback-glyph copy-feedback-glyph-check" />
+    </span>
+  </button>
+)}

@@ -17,17 +17,15 @@ const escapedIconSource = iconUrl
   .replace(/'/g, "\\'");
 ---
 
-{
-  pathData ? (
-    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
-      <path d={pathData} />
-    </svg>
-  ) : iconSource ? (
-    <span class="link-button-icon-wrapper">
-      <span
-        class="link-button-icon"
-        style={`background-color: currentColor; -webkit-mask-image: url('${escapedIconSource}'); mask-image: url('${escapedIconSource}');`}
-      />
-    </span>
-  ) : null
-}
+{pathData ? (
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+    <path d={pathData} />
+  </svg>
+) : iconSource ? (
+  <span class="link-button-icon-wrapper">
+    <span
+      class="link-button-icon"
+      style={`background-color: currentColor; -webkit-mask-image: url('${escapedIconSource}'); mask-image: url('${escapedIconSource}');`}
+    />
+  </span>
+) : null}

@@ -65,28 +65,26 @@ const showProfileActions = Boolean(qrHref || contactHref);
         </div>
       </header>
 
-      {
-        showProfileActions && (
-          <div class="profile-actions" aria-label="Profile actions">
-            {qrHref && (
-              <a
-                href={qrHref}
-                class="mini-action mini-action-icon"
-                aria-label="Download QR code"
-                download
-                data-astro-reload
-              >
-                <QrCode size={20} aria-hidden="true" />
-              </a>
-            )}
-            {contactHref && (
-              <a href={contactHref} class="mini-action" download data-astro-reload>
-                Add Contact
-              </a>
-            )}
-          </div>
-        )
-      }
+      {showProfileActions && (
+        <div class="profile-actions" aria-label="Profile actions">
+          {qrHref && (
+            <a
+              href={qrHref}
+              class="mini-action mini-action-icon"
+              aria-label="Download QR code"
+              download
+              data-astro-reload
+            >
+              <QrCode size={20} aria-hidden="true" />
+            </a>
+          )}
+          {contactHref && (
+            <a href={contactHref} class="mini-action" download data-astro-reload>
+              Add Contact
+            </a>
+          )}
+        </div>
+      )}
     </div>
 
     <div class="profile-content">

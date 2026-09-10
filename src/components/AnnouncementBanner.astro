@@ -16,29 +16,27 @@ const announcementKey = createHash('sha256')
   .slice(0, 12);
 ---
 
-{
-  showAnnouncement && (
-    <div id="announcement-banner-container">
-      <aside id="announcement-banner" data-announcement-key={announcementKey}>
-        {announcement?.url ? (
-          <a
-            class="announcement-content"
-            href={toSitePath(announcement.url)}
-            {...externalLinkAttributes(announcement.url)}
-          >
-            <TriangleAlert class="announcement-icon" aria-hidden="true" />
-            <span class="announcement-text">{announcement.text}</span>
-          </a>
-        ) : (
-          <div class="announcement-content">
-            <TriangleAlert class="announcement-icon" aria-hidden="true" />
-            <span class="announcement-text">{announcement?.text}</span>
-          </div>
-        )}
-        <button id="announcement-close-btn" type="button" aria-label="Dismiss announcement">
-          <X size={18} stroke-width={2.5} aria-hidden="true" />
-        </button>
-      </aside>
-    </div>
-  )
-}
+{showAnnouncement && (
+  <div id="announcement-banner-container">
+    <aside id="announcement-banner" data-announcement-key={announcementKey}>
+      {announcement?.url ? (
+        <a
+          class="announcement-content"
+          href={toSitePath(announcement.url)}
+          {...externalLinkAttributes(announcement.url)}
+        >
+          <TriangleAlert class="announcement-icon" aria-hidden="true" />
+          <span class="announcement-text">{announcement.text}</span>
+        </a>
+      ) : (
+        <div class="announcement-content">
+          <TriangleAlert class="announcement-icon" aria-hidden="true" />
+          <span class="announcement-text">{announcement?.text}</span>
+        </div>
+      )}
+      <button id="announcement-close-btn" type="button" aria-label="Dismiss announcement">
+        <X size={18} stroke-width={2.5} aria-hidden="true" />
+      </button>
+    </aside>
+  </div>
+)}

@@ -101,7 +101,12 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Install Playwright browser
-        run: pnpm exec playwright install --with-deps chromium
+        run: |
+          # GitHub's Ubuntu image includes Chrome's apt repository, which can briefly
+          # publish mismatched metadata. Playwright uses its own Chromium build, so
+          # this unrelated repository is not needed for browser dependencies.
+          sudo rm -f /etc/apt/sources.list.d/google-chrome.list
+          pnpm exec playwright install --with-deps chromium
 
       - name: Run browser tests
         run: pnpm test:e2e

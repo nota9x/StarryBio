@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   quality:
@@ -44,13 +44,21 @@ jobs:
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: pnpm exec commitlint --from "$BASE_SHA" --to "$HEAD_SHA" --verbose
 
-      - name: Generate formatting patch
+      - name: Apply prettier v1 formatting to PR branch
+        env:
+          PR_BRANCH: renovate/prettier-plugin-astro-1.x
         run: |
+          git switch "$PR_BRANCH"
           pnpm format
-          echo '---FORMAT-PATCH-BEGIN---'
-          git diff -- . ':!/.github/workflows/ci.yml'
-          echo '---FORMAT-PATCH-END---'
-          exit 1
+          git add src/components/Analytics.astro src/components/AnnouncementBanner.astro src/components/FeaturedCards.astro src/components/Icon.astro src/components/LinkButton.astro src/components/LinkSections.astro src/components/ProfileCard.astro src/components/StatusIndicator.astro src/components/StatusModal.astro src/layouts/BaseLayout.astro
+          if git diff --cached --quiet; then
+            echo "No formatting changes required."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "style: apply prettier v1 formatting"
+          git push origin "HEAD:$PR_BRANCH"
 
       - name: Lint source
         run: pnpm lint

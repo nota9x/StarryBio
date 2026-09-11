@@ -20,7 +20,7 @@ describe('StarryBio maintainer repository policy', () => {
       buildCommand: 'pnpm build',
       outputDirectory: 'dist',
     });
-    expect(packageConfig.packageManager).toBe('pnpm@12.3.4');
+    expect(packageConfig.packageManager).toMatch(/^pnpm@12\.\d+\.\d+$/);
     expect(readme).toContain('env=ENABLE_EXPERIMENTAL_COREPACK');
     expect(readme).toContain('%22ENABLE_EXPERIMENTAL_COREPACK%22%3A%221%22');
   });

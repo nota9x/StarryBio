@@ -67,7 +67,7 @@
     "eslint-plugin-import-x": "^4.17.1",
     "eslint-plugin-jsx-a11y-x": "^0.2.0",
     "eslint-plugin-regexp": "^3.3.0",
-    "eslint-plugin-unicorn": "^74.0.0",
+    "eslint-plugin-unicorn": "^75.0.0",
     "globals": "^17.11.0",
     "node-diff3": "^3.2.1",
     "prettier": "^3.9.6",

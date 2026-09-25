@@ -219,7 +219,7 @@ importers:
         specifier: ^8.68.0
         version: 8.70.1(eslint@10.11.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
       astro:
-        specifier: ^7.2.6
+        specifier: ^7.3.4
         version: 7.3.4(@emnapi/core@1.11.3)(@emnapi/runtime@1.11.3)(@types/node@24.13.6)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
       eslint:
         specifier: ^10.9.1

@@ -22,8 +22,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command:
-      'wrangler dev --local --port 8791 --ip 127.0.0.1 --show-interactive-dev-session=false',
+    command: 'wrangler dev --local --port 8791 --ip 127.0.0.1 --show-interactive-dev-session=false',
     url: 'http://127.0.0.1:8791',
     reuseExistingServer: false,
     stdout: 'ignore',

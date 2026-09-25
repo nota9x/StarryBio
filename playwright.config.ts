@@ -22,9 +22,16 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'pnpm exec wrangler dev --port 8791 --ip 127.0.0.1',
+    command:
+      'wrangler dev --local --port 8791 --ip 127.0.0.1 --show-interactive-dev-session=false',
     url: 'http://127.0.0.1:8791',
     reuseExistingServer: false,
+    stdout: 'ignore',
+    stderr: 'ignore',
+    gracefulShutdown: {
+      signal: 'SIGTERM',
+      timeout: 5_000,
+    },
     timeout: 120_000,
   },
 });

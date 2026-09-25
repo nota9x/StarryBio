@@ -28,10 +28,7 @@ export default defineConfig({
     reuseExistingServer: false,
     stdout: 'ignore',
     stderr: 'ignore',
-    gracefulShutdown: {
-      signal: 'SIGTERM',
-      timeout: 5_000,
-    },
+    gracefulShutdown: { signal: 'SIGTERM', timeout: 5_000 },
     timeout: 120_000,
   },
 });

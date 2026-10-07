@@ -102,4 +102,27 @@ describe('structural config migration', () => {
       )
     ).toThrow('dynamic syntax');
   });
+
+  it.each([
+    ["  theme: 'andromeda',\n", "theme: 'nebula'", 'andromeda -> nebula'],
+    [
+      "  theme: { preset: 'solar-flare', accent: '#abcdef' },\n",
+      "preset: 'supernova'",
+      'solar-flare -> supernova',
+    ],
+  ])('rewrites static legacy theme presets', (body, expected, migration) => {
+    const source = wrap(body);
+    const result = migrateConfig(source, source, source);
+
+    expect(result.contents).toContain(expected);
+    expect(result.rewrittenThemes).toEqual([migration]);
+  });
+
+  it('leaves dynamic theme expressions untouched', () => {
+    const source = wrap('  theme: selectedTheme,\n');
+    const result = migrateConfig(source, source, source);
+
+    expect(result.contents).toContain('theme: selectedTheme');
+    expect(result.rewrittenThemes).toEqual([]);
+  });
 });

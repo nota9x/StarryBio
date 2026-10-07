@@ -14,5 +14,14 @@ Commands:
 - `pnpm test:e2e` — the installation's active config
 - `pnpm test:e2e:fixtures` — deterministic minimal and customized browser deployments
 - `pnpm test:upstream` — StarryBio maintainer/release integrity
+- `pnpm theme:audit` — every active theme at desktop/mobile sizes, avatar/radius variants,
+  tooltip/schedule/copy/QR/banner states, motion and reduced-motion views, Axe checks, and a
+  generated contact sheet under `test-results/theme-audit/`
+
+- `pnpm theme:audit --atmosphere` � focused Eclipse, Black Hole, and Pulsar renders,
+  continuous-field and lifecycle checks, frame timing, and a full live Pulsar revolution.
+  Produces desktop/mobile screenshots, a phase scrubber, and `report.json` under
+  `test-results/theme-audit/atmosphere/`. The audit injects its inspection bridge into
+  the served development module; no test controls enter the production bundle.
 
 Add feature-specific assertions to a controlled fixture unless the test intentionally verifies project-level behavior. Tests that use the active deployment must calculate expected names, values, paths, and feature presence from the normalized config.

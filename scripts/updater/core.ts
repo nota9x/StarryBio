@@ -53,6 +53,7 @@ const EMPTY_STATS: UpdateStats = {
   configAdded: [],
   configRemoved: [],
   configRewrittenAssets: [],
+  configRewrittenThemes: [],
   merged: [],
   removed: [],
   renamed: [],
@@ -64,6 +65,7 @@ function mergeStats(target: UpdateStats, source: UpdateStats): void {
   target.configAdded.push(...source.configAdded);
   target.configRemoved.push(...source.configRemoved);
   target.configRewrittenAssets.push(...source.configRewrittenAssets);
+  target.configRewrittenThemes.push(...source.configRewrittenThemes);
   target.merged.push(...source.merged);
   target.removed.push(...source.removed);
   target.renamed.push(...source.renamed);

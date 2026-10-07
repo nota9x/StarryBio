@@ -24,7 +24,7 @@ const { status } = Astro.props;
       <span id="tooltip-status" class="mb-1 text-center text-sm font-bold" />
       <span
         id="tooltip-owner-time-row"
-        class="status-time-row flex items-center justify-center gap-1.5 text-xs text-slate-300"
+        class="status-time-row flex items-center justify-center gap-1.5 text-xs"
         hidden
       >
         <Clock3 class="status-clock-icon h-3.5 w-3.5 opacity-70" size={14} aria-hidden="true" />
@@ -33,7 +33,7 @@ const { status } = Astro.props;
       <span id="tooltip-visitor-time" class="status-visitor-time hidden" />
       <span
         id="tooltip-availability"
-        class="mt-1.5 hidden border-t border-white/10 pt-1.5 text-center text-[0.65rem] text-amber-300/90 italic"
+        class="mt-1.5 hidden border-t pt-1.5 text-center text-[0.65rem] italic"
       />
       <span id="tooltip-next-available" class="status-next-available hidden" />
     </span>

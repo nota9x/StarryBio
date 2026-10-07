@@ -1,5 +1,33 @@
 # Changelog
 
+## Unreleased
+
+### Themes
+
+- Curated the built-in library from 28 presets to 13 visually distinct themes and expanded
+  the semantic token system for surfaces, typography, geometry, interactions, focus states,
+  overlays, icons, and responsive density.
+- Preserved `nebula`, `midnight`, `classic-blue`, `aurora`, and `eclipse`; redesigned
+  `minimal`, `supernova`, `black-hole`, `pulsar`, `mars`, `starlight`, and `voyager`; and
+  polished `terminal`.
+- Added compatibility aliases: `cosmic-gold` and `saturn` → `eclipse`; `andromeda` →
+  `nebula`; `lunar` and `deep-space` → `midnight`; `solar-flare`, `quasar`, and
+  `red-giant` → `supernova`; `event-horizon` → `black-hole`; `apollo` → `voyager`;
+  `alien` → `aurora`; `cyber-orbit` → `terminal`; `ice-moon` and `white-dwarf` →
+  `pulsar`; and `titan` → `mars`.
+- Added repeatable desktop/mobile screenshot auditing and fixed generated Open Graph artwork
+  to use solid, theme-appropriate SVG colors.
+- Added configurable card/button radii and avatar shapes, with alternating-corner support and
+  an intentional square geometry lock for `terminal`.
+- Rebuilt Eclipse, Black Hole, Pulsar, and the newer atmospheric effects as integrated,
+  reduced-motion-safe canvas treatments; restored theme-appropriate translucency and improved
+  light tooltip and copy-success contrast.
+- Refined Eclipse, Black Hole, and Pulsar into softer environmental lighting with restrained
+  cursor depth, propagated configured radii through schedule surfaces, and gave QR downloads the
+  same positive checkmark feedback as copy actions.
+- Eliminated dismissed-announcement first-paint flashing and residual layout clearance, and
+  balanced fixed-banner spacing across safe-area, desktop, and mobile layouts.
+
 ## [3.6.0](https://github.com/nota9x/StarryBio/compare/v3.5.0...v3.6.0) (2026-09-07)
 
 

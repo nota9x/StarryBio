@@ -22,7 +22,7 @@ function initializePage(): void {
 
   ensureStarfield();
   setupAnnouncement(signal);
-  setupCopyButtons(signal);
+  setupFeedbackActions(signal);
   statusCleanup = setupStatus(signal);
   initializeAnalytics();
   document.body.style.opacity = '1';
@@ -36,21 +36,42 @@ function cleanupPage(): void {
 }
 
 function setupAnnouncement(signal: AbortSignal): void {
+  const container = document.querySelector<HTMLElement>('#announcement-banner-container');
   const banner = document.querySelector<HTMLElement>('#announcement-banner');
   const closeButton = document.querySelector<HTMLButtonElement>('#announcement-close-btn');
   const key = banner?.dataset.announcementKey;
-  if (!banner || !closeButton || !key) return;
+  if (!container || !banner || !closeButton || !key) return;
+
+  const root = document.documentElement;
+  const clearAnnouncementSpace = (): void => {
+    root.dataset.announcementState = 'dismissed';
+    root.style.setProperty('--announcement-clearance', '0px');
+  };
 
   if (getCookie('starrybioAnnouncement') === key) {
-    banner.remove();
+    clearAnnouncementSpace();
+    container.remove();
     return;
   }
+
+  root.dataset.announcementState = 'visible';
+  const updateClearance = (): void => {
+    root.style.setProperty(
+      '--announcement-clearance',
+      `${Math.ceil(Math.max(0, banner.getBoundingClientRect().bottom))}px`
+    );
+  };
+  const resizeObserver = new ResizeObserver(updateClearance);
+  resizeObserver.observe(banner);
+  updateClearance();
+  window.addEventListener('resize', updateClearance, { passive: true, signal });
 
   let removeTimer: number | undefined;
   signal.addEventListener(
     'abort',
     () => {
       if (removeTimer !== undefined) window.clearTimeout(removeTimer);
+      resizeObserver.disconnect();
     },
     { once: true }
   );
@@ -63,7 +84,9 @@ function setupAnnouncement(signal: AbortSignal): void {
       banner.classList.add('closing');
       const remove = () => {
         if (removeTimer !== undefined) window.clearTimeout(removeTimer);
-        banner.remove();
+        resizeObserver.disconnect();
+        clearAnnouncementSpace();
+        container.remove();
       };
       banner.addEventListener('animationend', remove, { once: true, signal });
       removeTimer = window.setTimeout(remove, 450);
@@ -72,63 +95,129 @@ function setupAnnouncement(signal: AbortSignal): void {
   );
 }
 
-function setupCopyButtons(signal: AbortSignal): void {
+interface FeedbackActionOptions {
+  control: HTMLButtonElement | HTMLAnchorElement;
+  feedback: HTMLElement;
+  successText: string;
+  errorText: string;
+  perform: () => Promise<void>;
+}
+
+const FEEDBACK_ENTER_DELAY = 140;
+const FEEDBACK_VISIBLE_DURATION = 1_650;
+const FEEDBACK_EXIT_DURATION = 180;
+
+function setupFeedbackActions(signal: AbortSignal): void {
   document
     .querySelectorAll<HTMLButtonElement>('.copy-button-active[data-copy-value]')
     .forEach((button) => {
       const text = button.dataset.copyValue;
-      const feedback = button.querySelector<HTMLElement>('[data-copy-feedback]');
+      const feedback = button.querySelector<HTMLElement>('[data-feedback-live]');
       if (!text || !feedback) return;
-
-      const originalText = feedback.textContent || '';
-      const timers = new Set<number>();
-      const schedule = (callback: () => void, delay: number): void => {
-        const timer = window.setTimeout(() => {
-          timers.delete(timer);
-          callback();
-        }, delay);
-        timers.add(timer);
-      };
-      signal.addEventListener(
-        'abort',
-        () => timers.forEach((timer) => window.clearTimeout(timer)),
-        { once: true }
+      bindFeedbackAction(
+        {
+          control: button,
+          feedback,
+          successText: 'Copied!',
+          errorText: 'Copy failed',
+          perform: () => copyText(text),
+        },
+        signal
       );
-
-      const handleClick = async (): Promise<void> => {
-        if (button.disabled) return;
-        button.disabled = true;
-        button.classList.add('copy-feedback-changing');
-        let copied = false;
-        try {
-          await copyText(text);
-          copied = true;
-        } catch {
-          copied = false;
-        }
-
-        schedule(() => {
-          feedback.textContent = copied ? 'Copied!' : 'Copy failed';
-          button.classList.toggle('show-copied-feedback', copied);
-          button.classList.remove('copy-feedback-changing');
-
-          schedule(() => {
-            button.classList.add('copy-feedback-changing');
-
-            schedule(() => {
-              feedback.textContent = originalText;
-              button.classList.remove('show-copied-feedback');
-              requestAnimationFrame(() => {
-                button.classList.remove('copy-feedback-changing');
-                button.disabled = false;
-              });
-            }, 180);
-          }, 1_650);
-        }, 140);
-      };
-
-      button.addEventListener('click', () => void handleClick(), { signal });
     });
+
+  document.querySelectorAll<HTMLAnchorElement>('[data-download-feedback]').forEach((link) => {
+    const feedback = link.querySelector<HTMLElement>('[data-feedback-live]');
+    if (!feedback || !link.href || !link.hasAttribute('download')) return;
+    bindFeedbackAction(
+      {
+        control: link,
+        feedback,
+        successText: 'QR code downloaded',
+        errorText: 'Download failed',
+        perform: () => triggerDownload(link),
+      },
+      signal
+    );
+  });
+}
+
+function bindFeedbackAction(options: FeedbackActionOptions, signal: AbortSignal): void {
+  const { control, feedback } = options;
+  const originalText = feedback.textContent || '';
+  const timers = new Set<number>();
+  const schedule = (callback: () => void, delay: number): void => {
+    const timer = window.setTimeout(() => {
+      timers.delete(timer);
+      callback();
+    }, delay);
+    timers.add(timer);
+  };
+  signal.addEventListener('abort', () => timers.forEach((timer) => window.clearTimeout(timer)), {
+    once: true,
+  });
+
+  const activate = async (): Promise<void> => {
+    if (control.dataset.feedbackState) return;
+    control.dataset.feedbackState = 'copying';
+    control.setAttribute('aria-busy', 'true');
+    control.classList.add('feedback-changing');
+    let succeeded = false;
+    try {
+      await options.perform();
+      succeeded = true;
+    } catch {
+      succeeded = false;
+    }
+
+    schedule(() => {
+      const message = succeeded ? options.successText : options.errorText;
+      feedback.textContent = message;
+      control.classList.toggle('show-success-feedback', succeeded);
+      control.dataset.feedbackState = succeeded ? 'success' : 'error';
+      control.classList.remove('feedback-changing');
+
+      schedule(() => {
+        control.classList.add('feedback-changing');
+        schedule(() => {
+          feedback.textContent = originalText;
+          control.classList.remove('show-success-feedback');
+          requestAnimationFrame(() => {
+            control.classList.remove('feedback-changing');
+            control.removeAttribute('data-feedback-state');
+            control.removeAttribute('aria-busy');
+          });
+        }, FEEDBACK_EXIT_DURATION);
+      }, FEEDBACK_VISIBLE_DURATION);
+    }, FEEDBACK_ENTER_DELAY);
+  };
+
+  control.addEventListener(
+    'click',
+    (event) => {
+      if (control.dataset.feedbackState) {
+        if (control instanceof HTMLAnchorElement) event.preventDefault();
+        return;
+      }
+      if (control instanceof HTMLAnchorElement) event.preventDefault();
+      void activate();
+    },
+    { signal }
+  );
+}
+
+async function triggerDownload(link: HTMLAnchorElement): Promise<void> {
+  const response = await fetch(link.href, { credentials: 'same-origin' });
+  if (!response.ok) throw new Error(`Download failed with status ${response.status}`);
+  const objectUrl = URL.createObjectURL(await response.blob());
+  const download = document.createElement('a');
+  download.href = objectUrl;
+  download.download = link.download || link.href.split('/').at(-1) || 'download';
+  download.hidden = true;
+  document.body.append(download);
+  download.click();
+  download.remove();
+  window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1_000);
 }
 
 async function copyText(text: string): Promise<void> {

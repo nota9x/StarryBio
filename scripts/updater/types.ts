@@ -102,6 +102,7 @@ export interface UpdateStats {
   configAdded: string[];
   configRemoved: string[];
   configRewrittenAssets: string[];
+  configRewrittenThemes: string[];
   merged: string[];
   removed: string[];
   renamed: Array<{ from: string; to: string }>;

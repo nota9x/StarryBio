@@ -65,6 +65,11 @@ Theme presets are defined in [`src/config/themes.ts`](src/config/themes.ts). A n
 
 Keep the visual system configurable: use the CSS custom properties emitted by `getThemeStyle` instead of hard-coding one preset’s colors in a component. Layout mode rules live primarily in [`src/styles/layout.css`](src/styles/layout.css), and shared controls/cards live in [`src/styles/components.css`](src/styles/components.css).
 
+Themes must introduce a cohesive design direction across several semantic dimensions such as
+surface treatment, typography, geometry, depth, controls, and interaction states. Accent-only
+variations are not accepted. Run `pnpm theme:audit` and review its desktop/mobile contact sheet
+before submitting visual changes; generated audit images live under `test-results/theme-audit/`.
+
 ## Analytics integrations
 
 Supported providers are Google Analytics, Cloudflare Web Analytics, Plausible, Umami, and a custom external script. Their configuration shape is validated in [`src/config/schema.ts`](src/config/schema.ts), and their script descriptors are created in [`src/config/analytics.ts`](src/config/analytics.ts).

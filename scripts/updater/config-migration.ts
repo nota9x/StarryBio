@@ -1,4 +1,5 @@
 import ts from 'typescript';
+import { LEGACY_THEME_PRESET_ALIASES, isLegacyThemePreset } from '../../src/config/themes';
 
 interface SourceObject {
   node: ts.ObjectLiteralExpression;
@@ -17,6 +18,7 @@ export interface ConfigMigrationResult {
   contents: string;
   removed: string[];
   rewrittenAssets: string[];
+  rewrittenThemes: string[];
 }
 
 function unwrap(expression: ts.Expression): ts.Expression {
@@ -143,6 +145,7 @@ export function migrateConfig(
   const added: string[] = [];
   const removed: string[] = [];
   const rewrittenAssets: string[] = [];
+  const rewrittenThemes: string[] = [];
 
   const visit = (
     baseObject: ts.ObjectLiteralExpression,
@@ -242,6 +245,27 @@ export function migrateConfig(
 
   visit(base.node, local.node, incoming.node, '');
 
+  const rewriteThemeLiteral = (node: ts.Expression) => {
+    const value = unwrap(node);
+    if (!ts.isStringLiteralLike(value) || !isLegacyThemePreset(value.text)) return;
+    const start = value.getStart(local.sourceFile);
+    const quote = local.text[start];
+    const replacement = LEGACY_THEME_PRESET_ALIASES[value.text];
+    edits.push({ start, end: value.end, text: `${quote}${replacement}${quote}` });
+    rewrittenThemes.push(`${value.text} -> ${replacement}`);
+  };
+
+  const localTheme = properties(local.node).get('theme');
+  if (localTheme) {
+    const themeValue = unwrap(localTheme.initializer);
+    if (ts.isObjectLiteralExpression(themeValue)) {
+      const preset = properties(themeValue).get('preset');
+      if (preset) rewriteThemeLiteral(preset.initializer);
+    } else {
+      rewriteThemeLiteral(themeValue);
+    }
+  }
+
   const assetVisit = (node: ts.Node) => {
     if (ts.isStringLiteralLike(node)) {
       const replacement = assetRewrites.get(node.text);
@@ -274,5 +298,6 @@ export function migrateConfig(
     added,
     removed,
     rewrittenAssets,
+    rewrittenThemes,
   };
 }

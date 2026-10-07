@@ -88,6 +88,26 @@ config/starrybio.config.ts
 
 Save your changes and the development server will reload the open page automatically.
 
+### Themes
+
+StarryBio includes 13 curated themes. Each preset changes surfaces, typography, shape,
+depth, controls, focus treatment, and decoration—not only the accent color:
+
+`nebula`, `midnight`, `classic-blue`, `aurora`, `eclipse`, `minimal`, `terminal`,
+`supernova`, `black-hole`, `pulsar`, `mars`, `starlight`, and `voyager`.
+
+Older preset names remain valid and resolve to their closest curated replacement. Run
+`pnpm validate` to see the recommended replacement or `pnpm starrybio:update` to rewrite
+static preset values automatically. See the changelog for the complete migration table.
+
+Card and control geometry can be set with `theme.cardRadius` and `theme.buttonRadius` using
+pixel numbers from `0` through `999`. A two-number value such as `[28, 8]` alternates the
+radius across opposite corners. Omitted values use the shared 28px card and 16px control
+defaults, including schedule popups and their controls; the `terminal` preset intentionally stays
+square. Set `profile.imageShape` to
+`circle`, `rounded-square`, or `square`; omitting it retains the preset's intended avatar
+shape.
+
 Put your own images under `public/assets/images/` and reference them as
 `assets/images/your-file.png`. The `public/assets/images/default/` directory contains
 StarryBio's release-managed defaults; do not place custom files or edits there because updates may replace or remove everything in that directory.
@@ -135,6 +155,7 @@ For complete setup instructions, see the deployment guides for:
 | `pnpm deploy:cloudflare`  | Build and deploy static assets with Wrangler.                   |
 | `pnpm test:unit`          | Run Vitest unit tests.                                          |
 | `pnpm test:e2e`           | Build and run Playwright browser tests.                         |
+| `pnpm theme:audit`        | Capture every theme, geometry, state, and motion variant.       |
 | `pnpm check`              | Run formatting, lint, type, and unit-test checks.               |
 | `pnpm commitlint`         | Validate the latest commit message.                             |
 | `pnpm starrybio:update`   | Updates StarryBio while preserving your configuration.          |

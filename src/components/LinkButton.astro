@@ -11,7 +11,9 @@ interface Props {
 const { link } = Astro.props;
 const isCopyButton = link.specialType === 'copy';
 const isLink = Boolean(link.url && !isCopyButton);
-const classes = ['link-button', isCopyButton ? 'copy-button-active' : ''].filter(Boolean).join(' ');
+const classes = ['link-button', isCopyButton ? 'feedback-action copy-button-active' : '']
+  .filter(Boolean)
+  .join(' ');
 ---
 
 {isLink ? (
@@ -34,14 +36,14 @@ const classes = ['link-button', isCopyButton ? 'copy-button-active' : ''].filter
     <Icon icon={link.icon} />
     <div class="button-text-wrapper">
       <span class="button-main-text">{link.label}</span>
-      <span class="button-subtitle" data-copy-feedback aria-live="polite">
+      <span class="button-subtitle" data-feedback-live aria-live="polite">
         {link.subtitle || 'Copy to clipboard'}
       </span>
       {link.description && <span class="button-subtitle">{link.description}</span>}
     </div>
-    <span class="copy-feedback-icon" aria-hidden="true">
-      <Copy class="copy-feedback-glyph copy-feedback-glyph-copy" />
-      <Check class="copy-feedback-glyph copy-feedback-glyph-check" />
+    <span class="feedback-action-icon" aria-hidden="true">
+      <Copy class="feedback-action-glyph feedback-action-glyph-default" />
+      <Check class="feedback-action-glyph feedback-action-glyph-check" />
     </span>
   </button>
 )}

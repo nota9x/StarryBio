@@ -6,9 +6,11 @@ import {
   validateStarryBioConfig,
 } from '../../src/config/schema';
 import {
+  LEGACY_THEME_PRESET_ALIASES,
   THEME_PRESET_NAMES,
   getThemePresetDefinition,
   getThemeStyle,
+  resolveProfileImageShape,
 } from '../../src/config/themes';
 import { createConfig, createStatus } from './fixtures';
 import {
@@ -89,15 +91,13 @@ describe('StarryBio v3 configuration', () => {
 
     expect(normalized.theme).toMatchObject({
       preset: 'classic-blue',
-      accent: '#b0c4de',
-      background: 'starfield',
+      accent: '#9ec5ff',
+      background: 'gradient',
     });
     expect(getThemeStyle(normalized.theme)).toContain(
-      '--bg-color: linear-gradient(135deg, #0b1c36 0%, #1a2a4d 40%, #2a3b65 100%)'
+      '--bg-color: linear-gradient(135deg, #07162c 0%, #123160 48%, #234f8d 100%)'
     );
-    expect(getThemeStyle(normalized.theme)).toContain(
-      '--announcement-bg: rgba(251, 191, 36, 0.25)'
-    );
+    expect(getThemeStyle(normalized.theme)).toContain('--card-border: 2px solid');
   });
 
   it('keeps QR generation and profile-button visibility independent', () => {
@@ -139,6 +139,11 @@ describe('StarryBio v3 configuration', () => {
     expect(style).toContain('--announcement-bg:');
     expect(style).toContain('--img-border:');
     expect(style).toContain('--theme-decoration:');
+    expect(style).toContain('--card-backdrop:');
+    expect(style).toContain('--btn-hover-transform:');
+    expect(style).toContain('--heading-font-family:');
+    expect(style).toContain('--modal-border:');
+    expect(style).toContain('--divider:');
     expect(style).toContain('--star-color-5:');
   });
 
@@ -150,11 +155,117 @@ describe('StarryBio v3 configuration', () => {
     expect(getThemePresetDefinition('minimal').appearance).toBe('light');
     expect(getThemePresetDefinition('starlight').appearance).toBe('light');
     expect(getThemePresetDefinition('voyager').appearance).toBe('light');
-    expect(getThemePresetDefinition('apollo').appearance).toBe('light');
     expect(getThemePresetDefinition('midnight').appearance).toBe('dark');
     expect(custom.theme.accent).toBe('#123456');
     expect(getThemeStyle(custom.theme)).toContain('--accent-color: #123456');
+    expect(getThemeStyle(custom.theme)).toContain(
+      '--btn-border: 1px solid color-mix(in srgb, var(--accent-color)'
+    );
   });
+
+  it('normalizes shared and alternating radius overrides while keeping terminal square', () => {
+    const rounded = normalizeStarryBioConfig(
+      validateStarryBioConfig(
+        createConfig({ theme: { preset: 'eclipse', cardRadius: 40, buttonRadius: [24, 8] } })
+      )
+    );
+    const terminal = normalizeStarryBioConfig(
+      validateStarryBioConfig(
+        createConfig({ theme: { preset: 'terminal', cardRadius: 40, buttonRadius: [24, 8] } })
+      )
+    );
+
+    expect(rounded.theme).toMatchObject({ cardRadius: 40, buttonRadius: [24, 8] });
+    const roundedStyle = getThemeStyle(rounded.theme);
+    expect(roundedStyle).toContain('--card-radius: 40px');
+    expect(roundedStyle).toContain('--button-radius: 24px 8px');
+    expect(roundedStyle).toContain('--button-radius-top-left: 24px');
+    expect(roundedStyle).toContain('--button-radius-top-right: 8px');
+    expect(roundedStyle).toContain('--button-radius-bottom-right: 24px');
+    expect(roundedStyle).toContain('--modal-radius: 40px');
+    expect(roundedStyle).toContain('--tooltip-radius: 24px 8px');
+    expect(terminal.theme).toMatchObject({ cardRadius: 0, buttonRadius: 0 });
+    expect(getThemeStyle(terminal.theme)).toContain('--card-radius: 0px');
+    expect(getThemeStyle(terminal.theme)).toContain('--modal-radius: 0px');
+    expect(getThemeStyle(terminal.theme)).toContain('--tooltip-radius: 0px');
+  });
+
+  it('validates radius bounds and profile image shapes', () => {
+    expect(() =>
+      validateStarryBioConfig(createConfig({ theme: { preset: 'nebula', cardRadius: 1000 } }))
+    ).toThrow(/cardRadius/);
+    expect(() =>
+      validateStarryBioConfig(createConfig({ theme: { preset: 'nebula', buttonRadius: [12, -1] } }))
+    ).toThrow(/buttonRadius/);
+    expect(() =>
+      validateStarryBioConfig(
+        createConfig({
+          profile: {
+            name: 'A',
+            description: 'B',
+            image: 'avatar.png',
+            imageShape: 'triangle',
+          },
+        })
+      )
+    ).toThrow(/imageShape/);
+  });
+
+  it('resolves explicit image shapes without changing omitted preset defaults', () => {
+    expect(resolveProfileImageShape('aurora')).toBe('organic');
+    expect(resolveProfileImageShape('terminal')).toBe('square');
+    expect(resolveProfileImageShape('aurora', 'circle')).toBe('circle');
+
+    const config = normalizeStarryBioConfig(
+      validateStarryBioConfig(
+        createConfig({
+          theme: 'aurora',
+          profile: {
+            name: 'A',
+            description: 'B',
+            image: 'avatar.png',
+            imageShape: 'rounded-square',
+          },
+        })
+      )
+    );
+    expect(getThemeStyle(config.theme, config.profile.imageShape)).toContain('--img-radius: 18px');
+  });
+
+  it('keeps the protected themes and exposes only distinct active presets', () => {
+    expect(THEME_PRESET_NAMES).toHaveLength(13);
+    expect(THEME_PRESET_NAMES).toEqual(
+      expect.arrayContaining(['nebula', 'midnight', 'classic-blue', 'aurora', 'eclipse'])
+    );
+
+    const signatures = THEME_PRESET_NAMES.map((preset) => {
+      const theme = getThemePresetDefinition(preset);
+      return [
+        theme.bgStars,
+        theme.cardBg,
+        theme.cardRadius,
+        theme.buttonRadius,
+        theme.fontFamily,
+        theme.headingFontFamily,
+      ].join('|');
+    });
+    expect(new Set(signatures).size).toBe(THEME_PRESET_NAMES.length);
+  });
+
+  it.each(Object.entries(LEGACY_THEME_PRESET_ALIASES))(
+    'normalizes legacy theme %s to %s for string and object inputs',
+    (legacy, replacement) => {
+      const stringTheme = normalizeStarryBioConfig(
+        validateStarryBioConfig(createConfig({ theme: legacy }))
+      );
+      const objectTheme = normalizeStarryBioConfig(
+        validateStarryBioConfig(createConfig({ theme: { preset: legacy } }))
+      );
+
+      expect(stringTheme.theme.preset).toBe(replacement);
+      expect(objectTheme.theme.preset).toBe(replacement);
+    }
+  );
 
   it('requires an owner timezone only when the owner clock is enabled', () => {
     expect(() =>

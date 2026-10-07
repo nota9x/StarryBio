@@ -87,6 +87,7 @@ export async function mergeRelease(options: MergeReleaseOptions): Promise<MergeR
     configAdded: [],
     configRemoved: [],
     configRewrittenAssets: [],
+    configRewrittenThemes: [],
     merged: [],
     removed: [],
     renamed: [],
@@ -282,6 +283,7 @@ export async function mergeRelease(options: MergeReleaseOptions): Promise<MergeR
         stats.configAdded.push(...migrated.added);
         stats.configRemoved.push(...migrated.removed);
         stats.configRewrittenAssets.push(...migrated.rewrittenAssets);
+        stats.configRewrittenThemes.push(...migrated.rewrittenThemes);
       } catch (error) {
         conflict(
           configPath,

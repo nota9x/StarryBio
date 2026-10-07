@@ -7,10 +7,12 @@ const config = {
   favicon: 'assets/images/default/favicon.svg',
 
   theme: {
-    preset: 'midnight',
+    preset: 'pulsar',
     buttonStyle: 'glass',
     background: 'starfield',
     animationIntensity: 'normal',
+    cardRadius: 28,
+    buttonRadius: 16,
   },
 
   layout: {
@@ -30,6 +32,7 @@ const config = {
     description: 'A beautiful, self-hosted link-in-bio for the things you make.',
     image: 'assets/images/default/profile.svg',
     layout: 'vertical',
+    imageShape: 'circle',
   },
 
   featured: [

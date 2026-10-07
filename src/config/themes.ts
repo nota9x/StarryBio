@@ -4,41 +4,73 @@ export const THEME_PRESET_NAMES = [
   'classic-blue',
   'aurora',
   'eclipse',
-  'cosmic-gold',
   'minimal',
   'terminal',
   'supernova',
   'black-hole',
   'pulsar',
-  'andromeda',
   'mars',
-  'lunar',
-  'solar-flare',
-  'deep-space',
   'starlight',
-  'event-horizon',
-  'quasar',
   'voyager',
-  'apollo',
-  'alien',
-  'cyber-orbit',
-  'ice-moon',
-  'titan',
-  'saturn',
-  'red-giant',
-  'white-dwarf',
 ] as const;
 
+export const LEGACY_THEME_PRESET_ALIASES = {
+  'cosmic-gold': 'eclipse',
+  andromeda: 'nebula',
+  lunar: 'midnight',
+  'solar-flare': 'supernova',
+  'deep-space': 'midnight',
+  'event-horizon': 'black-hole',
+  quasar: 'supernova',
+  apollo: 'voyager',
+  alien: 'aurora',
+  'cyber-orbit': 'terminal',
+  'ice-moon': 'pulsar',
+  titan: 'mars',
+  saturn: 'eclipse',
+  'red-giant': 'supernova',
+  'white-dwarf': 'pulsar',
+} as const satisfies Record<string, ThemePreset>;
+
+export const LEGACY_THEME_PRESET_NAMES = Object.keys(
+  LEGACY_THEME_PRESET_ALIASES
+) as LegacyThemePreset[];
+
+export const THEME_INPUT_NAMES = [...THEME_PRESET_NAMES, ...LEGACY_THEME_PRESET_NAMES] as readonly [
+  ThemeInputPreset,
+  ...ThemeInputPreset[],
+];
+
 export type ThemePreset = (typeof THEME_PRESET_NAMES)[number];
+export type LegacyThemePreset = keyof typeof LEGACY_THEME_PRESET_ALIASES;
+export type ThemeInputPreset = ThemePreset | LegacyThemePreset;
 export type ThemeAppearance = 'dark' | 'light';
-type ThemeBackground = 'starfield' | 'gradient' | 'minimal';
+export type ThemeBackground = 'starfield' | 'gradient' | 'minimal';
+export type RadiusValue = number | readonly [number, number];
+export type ProfileImageShape = 'circle' | 'rounded-square' | 'square';
+export type ResolvedProfileImageShape = ProfileImageShape | 'organic';
+export type StarfieldEffectKind =
+  | 'none'
+  | 'nebula-drift'
+  | 'aurora-ribbons'
+  | 'eclipse-corona'
+  | 'terminal-scan'
+  | 'supernova-bloom'
+  | 'black-hole-lensing'
+  | 'pulsar-beams'
+  | 'mars-dust'
+  | 'starlight-glints';
 type ButtonStyle = 'glass' | 'solid' | 'outline' | 'minimal' | 'terminal';
+type ThemeLayout = 'centered' | 'terminal';
+type ThemeLinkStyle = 'cards' | 'terminal';
 type StarColors = readonly [string, string, string, string, string];
 
 export interface ThemePresetDefinition {
   appearance: ThemeAppearance;
   accent: string;
+  /** An opaque color safe for metadata, generated SVG assets, and CSS fallbacks. */
   bgColor: string;
+  /** The complete decorative page background used by gradient and starfield modes. */
   bgStars: string;
   text: string;
   muted: string;
@@ -46,27 +78,82 @@ export interface ThemePresetDefinition {
   cardBg: string;
   cardBorder: string;
   cardShadow: string;
+  cardInset: string;
+  cardBackdrop: string;
+  cardHoverTransform: string;
+  cardHoverShadow: string;
+  cardPadding: string;
+  cardPaddingWide: string;
   buttonBg: string;
   buttonBorder: string;
   buttonHoverBg: string;
+  buttonShadow: string;
+  buttonHoverShadow: string;
+  buttonHoverTransform: string;
+  buttonActiveTransform: string;
+  buttonPadding: string;
   glow: string;
   statusBg: string;
   modalBg: string;
+  modalBorder: string;
+  modalShadow: string;
+  modalBackdrop: string;
   tooltipBg: string;
-  announcementBg?: string;
-  announcementBorder?: string;
-  announcementShadow?: string;
-  imageBorder?: string;
-  imageShadow?: string;
-  decoration?: string;
-  decorationOpacity?: string;
-  decorationSize?: string;
-  cardRadius?: string;
-  buttonRadius?: string;
-  fontFamily?: string;
-  starColors?: StarColors;
+  tooltipText: string;
+  tooltipMuted: string;
+  tooltipAccent: string;
+  tooltipDivider: string;
+  tooltipBorder: string;
+  tooltipShadow: string;
+  announcementBg: string;
+  announcementBorder: string;
+  announcementShadow: string;
+  imageBorder: string;
+  imageShadow: string;
+  imageRadius: string;
+  roundedImageRadius: string;
+  defaultImageShape: ResolvedProfileImageShape;
+  imageHoverTransform: string;
+  iconBg: string;
+  iconBorder: string;
+  iconRadius: string;
+  divider: string;
+  decoration: string;
+  decorationOpacity: string;
+  decorationSize: string;
+  cardRadius: string;
+  buttonRadius: string;
+  radiusPolicy: 'configurable' | 'square';
+  badgeRadius: string;
+  fontFamily: string;
+  headingFontFamily: string;
+  headingWeight: string;
+  headingTracking: string;
+  headingTransform: string;
+  headingShadow: string;
+  sectionTracking: string;
+  sectionTransform: string;
+  linkGap: string;
+  sectionGap: string;
+  focusWidth: string;
+  focusOffset: string;
+  copySuccessBg: string;
+  copySuccessBorder: string;
+  copySuccessShadow: string;
+  copySuccessText: string;
+  copyErrorBg: string;
+  copyErrorBorder: string;
+  copyErrorText: string;
+  starfieldEffect: StarfieldEffectKind;
+  effectPrimary: string;
+  effectSecondary: string;
+  effectIntensity: string;
+  effectSpeed: string;
+  starColors: StarColors;
   defaultBackground?: ThemeBackground;
   defaultButtonStyle?: ButtonStyle;
+  defaultLayout?: ThemeLayout;
+  defaultLinkStyle?: ThemeLinkStyle;
 }
 
 type ThemeSeed = Pick<
@@ -80,7 +167,7 @@ type ThemeSeed = Pick<
     >
   >;
 
-const darkStars: StarColors = ['#ffffff', '#ffe9c4', '#d4fbff', '#d4fbff', '#b3cde0'];
+const darkStars: StarColors = ['#ffffff', '#ffe9c4', '#d4fbff', '#c4b5fd', '#b3cde0'];
 const lightStars: StarColors = ['#24476b', '#4f6f8f', '#7b8fa5', '#315f86', '#7890a8'];
 
 function defineTheme(seed: ThemeSeed): ThemePresetDefinition {
@@ -89,21 +176,113 @@ function defineTheme(seed: ThemeSeed): ThemePresetDefinition {
     ...seed,
     cardBorder:
       seed.cardBorder ||
-      `1px solid color-mix(in srgb, ${seed.accent} ${light ? '20%' : '18%'}, transparent)`,
+      `1px solid color-mix(in srgb, var(--accent-color) ${light ? '20%' : '18%'}, transparent)`,
     cardShadow:
       seed.cardShadow ||
-      (light ? '0 24px 58px rgba(29, 50, 72, 0.15)' : '0 24px 62px rgba(0, 0, 0, 0.58)'),
-    buttonBg: seed.buttonBg || `color-mix(in srgb, ${seed.cardBg} 86%, ${seed.accent})`,
+      (light ? '0 20px 50px rgba(29, 50, 72, 0.14)' : '0 24px 62px rgba(0, 0, 0, 0.58)'),
+    cardInset:
+      seed.cardInset ||
+      `0 0 0 1px color-mix(in srgb, var(--text-color) ${light ? '3%' : '5%'}, transparent) inset`,
+    cardBackdrop: seed.cardBackdrop || 'blur(16px) saturate(120%)',
+    cardHoverTransform: seed.cardHoverTransform || 'translateY(-4px)',
+    cardHoverShadow:
+      seed.cardHoverShadow ||
+      '0 12px 34px color-mix(in srgb, var(--accent-color) 18%, transparent)',
+    cardPadding: seed.cardPadding || '2rem 1.5rem',
+    cardPaddingWide: seed.cardPaddingWide || '2.5rem',
+    buttonBg: seed.buttonBg || 'color-mix(in srgb, var(--card-bg) 88%, var(--accent-color))',
     buttonBorder:
       seed.buttonBorder ||
-      `1px solid color-mix(in srgb, ${seed.accent} ${light ? '22%' : '20%'}, transparent)`,
-    buttonHoverBg: seed.buttonHoverBg || `color-mix(in srgb, ${seed.cardBg} 62%, ${seed.accent})`,
-    glow: seed.glow || `color-mix(in srgb, ${seed.accent} ${light ? '24%' : '42%'}, transparent)`,
-    statusBg: seed.statusBg || `color-mix(in srgb, ${seed.cardBg} 92%, ${seed.accent})`,
+      `1px solid color-mix(in srgb, var(--accent-color) ${light ? '24%' : '20%'}, transparent)`,
+    buttonHoverBg:
+      seed.buttonHoverBg || 'color-mix(in srgb, var(--card-bg) 68%, var(--accent-color))',
+    buttonShadow:
+      seed.buttonShadow ||
+      (light ? '0 5px 16px rgba(30, 50, 70, 0.08)' : '0 6px 18px rgba(0, 0, 0, 0.2)'),
+    buttonHoverShadow:
+      seed.buttonHoverShadow ||
+      '0 10px 24px color-mix(in srgb, var(--accent-color) 20%, transparent)',
+    buttonHoverTransform: seed.buttonHoverTransform || 'translateY(-2px)',
+    buttonActiveTransform: seed.buttonActiveTransform || 'translateY(0) scale(.99)',
+    buttonPadding: seed.buttonPadding || '1rem 1.25rem',
+    glow:
+      seed.glow || `color-mix(in srgb, var(--accent-color) ${light ? '22%' : '36%'}, transparent)`,
+    statusBg: seed.statusBg || 'color-mix(in srgb, var(--card-bg) 92%, var(--accent-color))',
     modalBg:
-      seed.modalBg || `color-mix(in srgb, ${seed.cardBg} 96%, ${light ? '#ffffff' : '#000000'})`,
+      seed.modalBg || `color-mix(in srgb, var(--card-bg) 96%, ${light ? '#ffffff' : '#000000'})`,
+    modalBorder:
+      seed.modalBorder || '1px solid color-mix(in srgb, var(--text-color) 14%, transparent)',
+    modalShadow:
+      seed.modalShadow ||
+      (light ? '0 30px 70px rgba(30, 50, 70, .2)' : '0 32px 76px rgba(0, 0, 0, .72)'),
+    modalBackdrop: seed.modalBackdrop || 'rgba(2, 4, 10, .72)',
     tooltipBg:
-      seed.tooltipBg || `color-mix(in srgb, ${seed.cardBg} 98%, ${light ? '#ffffff' : '#000000'})`,
+      seed.tooltipBg || `color-mix(in srgb, var(--card-bg) 98%, ${light ? '#ffffff' : '#000000'})`,
+    tooltipText: seed.tooltipText || seed.text,
+    tooltipMuted: seed.tooltipMuted || seed.muted,
+    tooltipAccent: seed.tooltipAccent || seed.accent,
+    tooltipDivider:
+      seed.tooltipDivider || 'color-mix(in srgb, var(--tooltip-text) 14%, transparent)',
+    tooltipBorder:
+      seed.tooltipBorder || '1px solid color-mix(in srgb, var(--text-color) 14%, transparent)',
+    tooltipShadow:
+      seed.tooltipShadow ||
+      (light ? '0 10px 30px rgba(30, 50, 70, .16)' : '0 12px 34px rgba(0, 0, 0, .46)'),
+    announcementBg:
+      seed.announcementBg || 'color-mix(in srgb, var(--card-bg) 86%, var(--accent-color))',
+    announcementBorder:
+      seed.announcementBorder || '1px solid color-mix(in srgb, var(--text-color) 14%, transparent)',
+    announcementShadow:
+      seed.announcementShadow ||
+      '0 10px 30px color-mix(in srgb, var(--accent-color) 16%, transparent)',
+    imageBorder:
+      seed.imageBorder || '2px solid color-mix(in srgb, var(--text-color) 18%, transparent)',
+    imageShadow: seed.imageShadow || '0 0 24px var(--theme-glow)',
+    imageRadius: seed.imageRadius || '50%',
+    roundedImageRadius: seed.roundedImageRadius || '18px',
+    defaultImageShape: seed.defaultImageShape || 'circle',
+    imageHoverTransform: seed.imageHoverTransform || 'scale(1.035)',
+    iconBg: seed.iconBg || 'color-mix(in srgb, var(--accent-color) 10%, transparent)',
+    iconBorder:
+      seed.iconBorder || '1px solid color-mix(in srgb, var(--accent-color) 18%, transparent)',
+    iconRadius: seed.iconRadius || '12px',
+    divider: seed.divider || '1px solid color-mix(in srgb, var(--text-color) 11%, transparent)',
+    decoration: seed.decoration || 'none',
+    decorationOpacity: seed.decorationOpacity || '0',
+    decorationSize: seed.decorationSize || 'auto',
+    cardRadius: seed.cardRadius || '28px',
+    buttonRadius: seed.buttonRadius || '16px',
+    radiusPolicy: seed.radiusPolicy || 'configurable',
+    badgeRadius: seed.badgeRadius || '999px',
+    fontFamily: seed.fontFamily || "'Inter', sans-serif",
+    headingFontFamily: seed.headingFontFamily || "'Nunito Sans', sans-serif",
+    headingWeight: seed.headingWeight || '800',
+    headingTracking: seed.headingTracking || '0',
+    headingTransform: seed.headingTransform || 'none',
+    headingShadow: seed.headingShadow || 'none',
+    sectionTracking: seed.sectionTracking || '.08em',
+    sectionTransform: seed.sectionTransform || 'uppercase',
+    linkGap: seed.linkGap || '1rem',
+    sectionGap: seed.sectionGap || '1.25rem',
+    focusWidth: seed.focusWidth || '3px',
+    focusOffset: seed.focusOffset || '3px',
+    copySuccessBg:
+      seed.copySuccessBg || 'color-mix(in srgb, var(--card-bg) 72%, var(--accent-color))',
+    copySuccessBorder:
+      seed.copySuccessBorder || '1px solid color-mix(in srgb, var(--accent-color) 72%, white)',
+    copySuccessShadow:
+      seed.copySuccessShadow ||
+      '0 0 0 1px color-mix(in srgb, var(--accent-color) 20%, transparent) inset, 0 0 24px var(--theme-glow)',
+    copySuccessText: seed.copySuccessText || seed.text,
+    copyErrorBg: seed.copyErrorBg || 'color-mix(in srgb, var(--card-bg) 78%, #dc2626)',
+    copyErrorBorder: seed.copyErrorBorder || '1px solid rgba(248,113,113,.72)',
+    copyErrorText: seed.copyErrorText || seed.text,
+    starfieldEffect: seed.starfieldEffect || 'none',
+    effectPrimary: seed.effectPrimary || seed.accent,
+    effectSecondary: seed.effectSecondary || seed.text,
+    effectIntensity: seed.effectIntensity || '1',
+    effectSpeed: seed.effectSpeed || '1',
+    starColors: seed.starColors || (light ? lightStars : darkStars),
   };
 }
 
@@ -113,145 +292,163 @@ export const THEME_PRESETS = {
     accent: '#d8b4fe',
     bgColor: '#070711',
     bgStars:
-      'radial-gradient(circle at 18% 18%, rgba(216, 180, 254, 0.24), transparent 28%), radial-gradient(circle at 82% 24%, rgba(94, 234, 212, 0.16), transparent 30%), radial-gradient(ellipse at bottom, #21172f 0%, #070711 72%)',
+      'radial-gradient(circle at 18% 18%, rgba(216,180,254,.24), transparent 28%), radial-gradient(circle at 82% 24%, rgba(94,234,212,.16), transparent 30%), radial-gradient(ellipse at bottom, #21172f 0%, #070711 72%)',
     text: '#f4f0ff',
     muted: '#c9c1dc',
     heading: 'linear-gradient(135deg, #ffffff 0%, #d8b4fe 46%, #99f6e4 100%)',
-    cardBg: 'rgba(15, 13, 25, 0.78)',
-    cardBorder: '1px solid rgba(255, 255, 255, 0.11)',
-    cardShadow: '0 24px 58px rgba(9, 7, 18, 0.68)',
-    buttonBg: 'rgba(24, 22, 35, 0.68)',
-    buttonBorder: '1px solid rgba(255, 255, 255, 0.1)',
-    buttonHoverBg: 'rgba(121, 116, 153, 0.3)',
-    glow: 'rgba(216, 180, 254, 0.34)',
-    statusBg: 'rgba(18, 16, 29, 0.9)',
-    modalBg: 'rgba(12, 10, 20, 0.93)',
-    tooltipBg: 'rgba(12, 10, 20, 0.96)',
+    cardBg: 'rgba(15,13,25,.68)',
+    cardBorder: '1px solid rgba(255,255,255,.11)',
+    cardShadow: '0 26px 64px rgba(9,7,18,.68)',
+    buttonBg: 'rgba(24,22,35,.58)',
+    buttonHoverBg: 'rgba(102,79,130,.48)',
+    glow: 'rgba(216,180,254,.3)',
+    decoration:
+      'radial-gradient(circle at 12% 8%, rgba(216,180,254,.18), transparent 26%), radial-gradient(circle at 88% 82%, rgba(94,234,212,.1), transparent 28%)',
+    decorationOpacity: '.75',
+    starfieldEffect: 'nebula-drift',
+    effectPrimary: '#d8b4fe',
+    effectSecondary: '#5eead4',
+    effectIntensity: '.7',
+    effectSpeed: '.45',
+    starColors: ['#fff', '#ead7ff', '#99f6e4', '#d8b4fe', '#b8c5ff'],
   }),
   midnight: defineTheme({
     appearance: 'dark',
-    accent: '#b0c4de',
-    bgColor: '#090a0f',
-    bgStars: 'radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%)',
-    text: '#e0e7ff',
-    muted: '#b0c4de',
-    heading: 'linear-gradient(135deg, #e0e7ff 0%, #b0c4de 50%, #ffffff 100%)',
-    cardBg: 'rgba(15, 17, 25, 0.75)',
-    cardBorder: '1px solid rgba(255, 255, 255, 0.08)',
-    cardShadow: '0 20px 40px rgba(0, 0, 0, 0.6)',
-    buttonBg: 'rgba(20, 22, 30, 0.6)',
-    buttonBorder: '1px solid rgba(255, 255, 255, 0.08)',
-    buttonHoverBg: 'rgba(176, 196, 222, 0.4)',
-    glow: 'rgba(176, 196, 222, 0.42)',
-    statusBg: 'rgba(20, 22, 30, 0.8)',
-    modalBg: 'rgba(15, 17, 25, 0.9)',
-    tooltipBg: 'rgba(15, 17, 25, 0.95)',
+    accent: '#a9bad0',
+    bgColor: '#07090d',
+    bgStars:
+      'radial-gradient(ellipse at 50% 100%, rgba(34,48,66,.72) 0%, #0b1018 42%, #07090d 82%)',
+    text: '#edf2f8',
+    muted: '#aeb9c8',
+    heading: 'linear-gradient(135deg, #ffffff 0%, #c8d4e2 70%, #91a6bf 100%)',
+    cardBg: 'rgba(11,14,20,.84)',
+    cardBorder: '1px solid rgba(197,211,227,.09)',
+    cardShadow: '0 26px 64px rgba(0,0,0,.7)',
+    cardBackdrop: 'blur(10px) saturate(108%)',
+    cardHoverTransform: 'translateY(-2px)',
+    buttonBg: 'rgba(21,25,33,.76)',
+    buttonBorder: '1px solid rgba(197,211,227,.09)',
+    buttonHoverBg: 'rgba(45,53,65,.86)',
+    buttonHoverTransform: 'translateY(-1px)',
+    glow: 'rgba(137,159,184,.18)',
+    linkGap: '.75rem',
   }),
   'classic-blue': defineTheme({
     appearance: 'dark',
-    accent: '#b0c4de',
-    bgColor: 'linear-gradient(135deg, #0b1c36 0%, #1a2a4d 40%, #2a3b65 100%)',
-    bgStars: 'transparent',
-    text: '#e0e7ff',
-    muted: '#b0c4de',
-    heading: 'linear-gradient(135deg, #e0e7ff 0%, #b0c4de 50%, #ffffff 100%)',
-    cardBg: 'rgba(11, 28, 54, 0.6)',
-    cardBorder: '1px solid rgba(176, 196, 222, 0.25)',
-    cardShadow: '0 20px 40px rgba(0, 0, 0, 0.4)',
-    buttonBg: 'rgba(42, 59, 101, 0.6)',
-    buttonBorder: '1px solid rgba(176, 196, 222, 0.3)',
-    buttonHoverBg: 'rgba(176, 196, 222, 0.4)',
-    glow: 'rgba(176, 196, 222, 0.4)',
-    statusBg: '#1a2a4d',
-    modalBg: 'rgba(11, 28, 54, 0.8)',
-    tooltipBg: '#0b1c36',
-    announcementBg: 'rgba(251, 191, 36, 0.25)',
-    announcementBorder: '1px solid rgba(251, 191, 36, 0.5)',
-    announcementShadow: '0 0 25px rgba(251, 191, 36, 0.4)',
-    imageBorder: '4px solid rgba(224, 231, 255, 0.7)',
-    imageShadow: '0 0 25px rgba(176, 196, 222, 0.4)',
+    accent: '#9ec5ff',
+    bgColor: '#0b1c36',
+    bgStars: 'linear-gradient(135deg, #07162c 0%, #123160 48%, #234f8d 100%)',
+    text: '#f2f7ff',
+    muted: '#bfd0e7',
+    heading: 'linear-gradient(135deg, #ffffff 0%, #b9d5ff 52%, #7db2ff 100%)',
+    cardBg: 'rgba(8,31,65,.72)',
+    cardBorder: '2px solid rgba(158,197,255,.28)',
+    cardShadow: '0 20px 44px rgba(2,11,28,.52)',
+    cardInset: '0 0 0 1px rgba(255,255,255,.045) inset',
+    cardBackdrop: 'blur(16px) saturate(116%)',
+    buttonBg: 'rgba(21,61,113,.68)',
+    buttonBorder: '1px solid rgba(176,207,255,.32)',
+    buttonHoverBg: 'rgba(49,101,171,.94)',
+    buttonShadow: '0 5px 0 rgba(3,18,43,.34)',
+    buttonHoverShadow: '0 7px 0 rgba(3,18,43,.3)',
+    buttonHoverTransform: 'translateY(-2px)',
+    badgeRadius: '6px',
+    imageBorder: '4px solid rgba(222,235,255,.76)',
+    imageShadow: '0 10px 28px rgba(1,17,45,.48)',
+    defaultBackground: 'gradient',
   }),
   aurora: defineTheme({
     appearance: 'dark',
-    accent: '#7ddf9b',
+    accent: '#84e1a3',
     bgColor: '#06110d',
     bgStars:
-      'linear-gradient(130deg, rgba(24,185,116,0) 0%, rgba(24,185,116,.34) 22%, rgba(190,242,100,.16) 38%, rgba(236,72,153,.2) 56%, rgba(168,85,247,.16) 72%, rgba(3,7,18,.08) 100%), radial-gradient(ellipse at bottom, #0d1f17 0%, #06110d 70%)',
-    text: '#ecfff3',
-    muted: '#b7eac7',
+      'linear-gradient(128deg, rgba(24,185,116,0) 0%, rgba(24,185,116,.34) 22%, rgba(190,242,100,.14) 38%, rgba(236,72,153,.18) 56%, rgba(168,85,247,.14) 72%, rgba(3,7,18,.06) 100%), radial-gradient(ellipse at bottom, #0d1f17 0%, #06110d 70%)',
+    text: '#effff4',
+    muted: '#b9e6c7',
     heading: 'linear-gradient(135deg, #ffffff 0%, #9cffac 34%, #f0abfc 72%, #fef7cd 100%)',
-    cardBg: 'rgba(6, 22, 15, 0.78)',
-    cardBorder: '1px solid rgba(190, 242, 100, 0.13)',
-    cardShadow: '0 24px 58px rgba(2, 44, 26, 0.5)',
-    buttonBg: 'rgba(11, 42, 28, 0.6)',
-    buttonBorder: '1px solid rgba(236, 253, 245, 0.12)',
-    buttonHoverBg: 'rgba(61, 109, 76, 0.36)',
-    glow: 'rgba(125, 223, 155, 0.4)',
-    statusBg: 'rgba(7, 38, 25, 0.9)',
-    modalBg: 'rgba(4, 22, 14, 0.93)',
-    tooltipBg: 'rgba(4, 22, 14, 0.96)',
+    cardBg: 'rgba(5,25,16,.62)',
+    cardBorder: '1px solid rgba(190,242,100,.15)',
+    cardShadow: '0 26px 66px rgba(2,44,26,.44)',
+    cardBackdrop: 'blur(22px) saturate(135%)',
+    buttonBg: 'rgba(11,42,28,.56)',
+    buttonHoverBg: 'rgba(55,105,70,.54)',
+    glow: 'rgba(125,223,155,.3)',
+    imageRadius: '44% 56% 48% 52% / 52% 44% 56% 48%',
+    defaultImageShape: 'organic',
+    decoration:
+      'linear-gradient(118deg, transparent 12%, rgba(156,255,172,.08) 38%, rgba(240,171,252,.08) 58%, transparent 82%)',
+    decorationOpacity: '.9',
+    starfieldEffect: 'aurora-ribbons',
+    effectPrimary: '#84e1a3',
+    effectSecondary: '#f0abfc',
+    effectIntensity: '.76',
+    effectSpeed: '.4',
+    starColors: ['#fff', '#bbf7d0', '#f5d0fe', '#d9f99d', '#99f6e4'],
   }),
   eclipse: defineTheme({
     appearance: 'dark',
     accent: '#f6c177',
     bgColor: '#080706',
-    bgStars:
-      'radial-gradient(circle at 50% 28%, rgba(246,193,119,.24) 0 8%, rgba(246,193,119,.08) 9% 16%, transparent 18%), radial-gradient(circle at 52% 30%, #020202 0 13%, transparent 14%), radial-gradient(ellipse at bottom, #26151a 0%, #080706 74%)',
-    text: '#fff6ea',
-    muted: '#e8c9a6',
-    heading: 'linear-gradient(135deg, #fff6ea 0%, #f6c177 48%, #f4a7a1 100%)',
-    cardBg: 'rgba(22, 14, 14, 0.78)',
-    cardBorder: '1px solid rgba(246, 193, 119, 0.12)',
-    cardShadow: '0 24px 58px rgba(0, 0, 0, 0.68)',
-    buttonBg: 'rgba(37, 24, 22, 0.62)',
-    buttonBorder: '1px solid rgba(255, 255, 255, 0.1)',
-    buttonHoverBg: 'rgba(116, 72, 57, 0.34)',
-    glow: 'rgba(246, 193, 119, 0.36)',
-    statusBg: 'rgba(31, 20, 18, 0.9)',
-    modalBg: 'rgba(17, 11, 11, 0.94)',
-    tooltipBg: 'rgba(17, 11, 11, 0.97)',
-  }),
-  'cosmic-gold': defineTheme({
-    appearance: 'dark',
-    accent: '#f7d06b',
-    bgColor: '#0a0804',
-    bgStars:
-      'radial-gradient(circle at 24% 18%, rgba(247,208,107,.22), transparent 26%), radial-gradient(circle at 86% 62%, rgba(168,139,92,.18), transparent 28%), radial-gradient(ellipse at bottom, #2a2110 0%, #0a0804 72%)',
-    text: '#fff8e7',
-    muted: '#dbc99b',
-    heading: 'linear-gradient(135deg, #fffaf0 0%, #f7d06b 45%, #ffffff 100%)',
-    cardBg: 'rgba(23, 18, 10, 0.78)',
-    cardBorder: '1px solid rgba(247, 208, 107, 0.13)',
-    cardShadow: '0 24px 58px rgba(59, 42, 8, 0.42)',
-    buttonBg: 'rgba(42, 31, 14, 0.62)',
-    buttonBorder: '1px solid rgba(255, 255, 255, 0.1)',
-    buttonHoverBg: 'rgba(112, 87, 39, 0.34)',
-    glow: 'rgba(247, 208, 107, 0.38)',
-    statusBg: 'rgba(38, 28, 12, 0.9)',
-    modalBg: 'rgba(20, 15, 8, 0.94)',
-    tooltipBg: 'rgba(20, 15, 8, 0.97)',
+    bgStars: 'linear-gradient(145deg, #100c09 0%, #080706 52%, #19100d 100%)',
+    text: '#fff7ec',
+    muted: '#e2c5a4',
+    heading: 'linear-gradient(135deg, #fffaf3 0%, #f6c177 56%, #d99867 100%)',
+    cardBg: 'rgba(18,12,10,.78)',
+    cardBorder: '1px solid rgba(246,193,119,.18)',
+    cardShadow: '0 28px 72px rgba(0,0,0,.76), 0 0 36px rgba(246,193,119,.08)',
+    cardBackdrop: 'blur(12px) saturate(110%)',
+    buttonBg: 'rgba(39,27,21,.66)',
+    buttonBorder: '1px solid rgba(246,193,119,.17)',
+    buttonHoverBg: 'rgba(89,57,37,.78)',
+    glow: 'rgba(246,193,119,.24)',
+    decoration:
+      'linear-gradient(115deg, transparent 12%, rgba(246,193,119,.045) 48%, transparent 72%)',
+    decorationOpacity: '.58',
+    starfieldEffect: 'eclipse-corona',
+    effectPrimary: '#f6c177',
+    effectSecondary: '#fff7ec',
+    effectIntensity: '.58',
+    effectSpeed: '.22',
+    starColors: ['#fff', '#fde7c2', '#f6c177', '#ffe6ba', '#d7b08a'],
   }),
   minimal: defineTheme({
     appearance: 'light',
-    accent: '#334155',
-    bgColor: '#f7f8fb',
+    accent: '#26364a',
+    bgColor: '#f3f1eb',
     bgStars:
-      'radial-gradient(circle at 20% 16%, rgba(148,163,184,.22), transparent 26%), linear-gradient(180deg, #fff 0%, #eef2f7 100%)',
-    text: '#121826',
-    muted: '#526074',
-    heading: 'linear-gradient(135deg, #111827 0%, #475569 100%)',
-    cardBg: 'rgba(255,255,255,.82)',
-    cardBorder: '1px solid rgba(15,23,42,.1)',
-    cardShadow: '0 24px 58px rgba(15,23,42,.13)',
-    buttonBg: 'rgba(255,255,255,.78)',
-    buttonBorder: '1px solid rgba(15,23,42,.12)',
-    buttonHoverBg: 'rgba(226,232,240,.84)',
-    glow: 'rgba(100,116,139,.24)',
-    statusBg: 'rgba(255,255,255,.94)',
-    modalBg: 'rgba(255,255,255,.96)',
-    tooltipBg: 'rgba(255,255,255,.98)',
+      'linear-gradient(90deg, transparent 0 12%, rgba(38,54,74,.045) 12% 12.15%, transparent 12.15% 88%, rgba(38,54,74,.045) 88% 88.15%, transparent 88.15%), #f3f1eb',
+    text: '#18202a',
+    muted: '#56606b',
+    heading: 'linear-gradient(135deg, #111820 0%, #3c4d60 100%)',
+    cardBg: '#fffdfa',
+    cardBorder: '1px solid #d8d4ca',
+    cardShadow: '0 12px 34px rgba(40,47,53,.08)',
+    cardInset: 'none',
+    cardBackdrop: 'none',
+    cardHoverTransform: 'translateY(-2px)',
+    buttonBg: '#fffdfa',
+    buttonBorder: '1px solid #d6d2c8',
+    buttonHoverBg: '#ece9e1',
+    buttonShadow: 'none',
+    buttonHoverShadow: 'none',
+    badgeRadius: '3px',
+    headingFontFamily: "'Inter', sans-serif",
+    headingWeight: '700',
+    headingTracking: '-.035em',
+    sectionTracking: '.14em',
+    linkGap: '.55rem',
+    sectionGap: '1.75rem',
+    imageBorder: '1px solid #c8c4bb',
+    imageShadow: 'none',
+    imageRadius: '4px',
+    defaultImageShape: 'rounded-square',
+    divider: '1px solid #d8d4ca',
+    copySuccessBg: '#f4fbf7',
+    copySuccessBorder: '2px solid #397058',
+    copySuccessShadow: '0 0 0 3px rgba(57,112,88,.13), 0 8px 22px rgba(57,112,88,.12)',
+    copySuccessText: '#173f2d',
     defaultBackground: 'minimal',
-    starColors: lightStars,
+    defaultButtonStyle: 'minimal',
   }),
   terminal: defineTheme({
     appearance: 'dark',
@@ -262,351 +459,251 @@ export const THEME_PRESETS = {
     text: '#dfffe6',
     muted: '#98dca5',
     heading: 'linear-gradient(135deg, #effff2 0%, #9cffac 100%)',
-    cardBg: 'rgba(1,12,7,.84)',
-    cardBorder: '1px solid rgba(156,255,172,.24)',
-    cardShadow: '0 24px 58px rgba(0,0,0,.64)',
-    buttonBg: 'rgba(5,25,13,.84)',
-    buttonBorder: '1px solid rgba(156,255,172,.18)',
-    buttonHoverBg: 'rgba(29,76,42,.42)',
-    glow: 'rgba(156,255,172,.32)',
-    statusBg: 'rgba(5,25,13,.94)',
-    modalBg: 'rgba(1,12,7,.96)',
-    tooltipBg: 'rgba(1,12,7,.98)',
+    cardBg: 'rgba(1,12,7,.92)',
+    cardBorder: '1px solid rgba(156,255,172,.34)',
+    cardShadow: '10px 10px 0 rgba(29,76,42,.24)',
+    cardInset: 'none',
+    cardBackdrop: 'none',
+    cardHoverTransform: 'translate(-2px, -2px)',
+    cardHoverShadow: '12px 12px 0 rgba(29,76,42,.28)',
+    buttonBg: '#061a0e',
+    buttonBorder: '1px solid rgba(156,255,172,.28)',
+    buttonHoverBg: '#10331d',
+    buttonShadow: 'none',
+    buttonHoverShadow: 'none',
+    buttonHoverTransform: 'translateX(3px)',
+    buttonPadding: '.9rem 1rem',
+    glow: 'rgba(156,255,172,.22)',
     decoration:
-      'linear-gradient(rgba(156,255,172,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(156,255,172,.045) 1px, transparent 1px)',
+      'linear-gradient(rgba(156,255,172,.055) 1px, transparent 1px), linear-gradient(90deg, rgba(156,255,172,.04) 1px, transparent 1px)',
     decorationSize: '22px 22px',
     decorationOpacity: '.7',
+    cardRadius: '0px',
+    buttonRadius: '0px',
+    radiusPolicy: 'square',
+    badgeRadius: '2px',
+    imageRadius: '2px',
+    defaultImageShape: 'square',
+    iconRadius: '2px',
     fontFamily: 'var(--font-mono)',
+    headingFontFamily: 'var(--font-mono)',
+    headingWeight: '700',
+    headingTracking: '-.03em',
+    sectionTracking: '.04em',
+    sectionTransform: 'none',
+    linkGap: '.55rem',
     defaultButtonStyle: 'terminal',
+    defaultLayout: 'terminal',
+    defaultLinkStyle: 'terminal',
+    starfieldEffect: 'terminal-scan',
+    effectPrimary: '#9cffac',
+    effectSecondary: '#63b974',
+    effectIntensity: '.4',
+    effectSpeed: '.65',
+    starColors: ['#eaffee', '#9cffac', '#70d982', '#c7ffd1', '#63b974'],
   }),
-
   supernova: defineTheme({
     appearance: 'dark',
-    accent: '#ff7a3d',
-    bgColor: '#050204',
+    accent: '#ff8a4c',
+    bgColor: '#090308',
     bgStars:
-      'radial-gradient(circle at 18% 18%, rgba(255,122,61,.35), transparent 22%), radial-gradient(circle at 76% 26%, rgba(236,72,153,.28), transparent 27%), radial-gradient(circle at 48% 94%, rgba(124,58,237,.26), transparent 32%), #050204',
-    text: '#fff4f8',
-    muted: '#e8b8ce',
-    heading: 'linear-gradient(120deg, #fff 0%, #ffb14e 28%, #ec4899 62%, #a78bfa 100%)',
-    cardBg: 'rgba(20,7,18,.78)',
-    cardShadow: '0 24px 62px rgba(92,8,54,.52)',
+      'radial-gradient(circle at 14% 12%, rgba(255,138,76,.42), transparent 24%), radial-gradient(circle at 82% 22%, rgba(236,72,153,.3), transparent 28%), radial-gradient(circle at 46% 96%, rgba(124,58,237,.3), transparent 34%), #090308',
+    text: '#fff5f8',
+    muted: '#e7bdcf',
+    heading: 'linear-gradient(118deg, #fff 0%, #ffc05c 28%, #f15ca7 62%, #b8a1ff 100%)',
+    cardBg: 'rgba(30,7,23,.7)',
+    cardBorder: '1px solid rgba(255,160,113,.22)',
+    cardShadow: '0 30px 76px rgba(92,8,54,.52)',
+    cardBackdrop: 'blur(18px) saturate(128%)',
+    cardHoverShadow: '0 16px 42px rgba(236,72,153,.24)',
+    buttonBg: 'linear-gradient(105deg, rgba(89,31,45,.85), rgba(61,23,71,.82))',
+    buttonBorder: '1px solid rgba(255,180,129,.22)',
+    buttonHoverBg: 'linear-gradient(105deg, rgba(135,50,48,.92), rgba(102,35,105,.9))',
+    glow: 'rgba(255,103,137,.32)',
+    headingTracking: '-.02em',
     decoration:
-      'radial-gradient(circle at 18% 16%, rgba(255,214,166,.8) 0 1px, transparent 2px), radial-gradient(circle at 78% 24%, rgba(255,128,190,.8) 0 1px, transparent 2px)',
-    decorationSize: '54px 54px, 70px 70px',
-    decorationOpacity: '.35',
+      'radial-gradient(circle at 12% 8%, rgba(255,138,76,.11), transparent 32%), radial-gradient(circle at 88% 76%, rgba(236,72,153,.1), transparent 36%)',
+    decorationOpacity: '.72',
+    starfieldEffect: 'supernova-bloom',
+    effectPrimary: '#ff8a4c',
+    effectSecondary: '#ec4899',
+    effectIntensity: '.9',
+    effectSpeed: '.5',
     starColors: ['#fff', '#ffd2a8', '#ff95c8', '#c4b5fd', '#ffe8c7'],
   }),
   'black-hole': defineTheme({
     appearance: 'dark',
-    accent: '#d6d3d1',
-    bgColor: '#020202',
-    bgStars:
-      'radial-gradient(circle at 50% 24%, #000 0 9%, rgba(0,0,0,.98) 10%, rgba(214,211,209,.18) 11%, rgba(168,85,247,.08) 13%, transparent 20%), radial-gradient(ellipse at bottom, #0b0b0d 0%, #020202 74%)',
-    text: '#f5f5f4',
-    muted: '#b4b0ad',
-    heading: 'linear-gradient(135deg, #fff 0%, #c7c4c1 58%, #8b8581 100%)',
-    cardBg: 'rgba(5,5,6,.9)',
-    cardShadow:
-      '0 0 0 1px rgba(255,255,255,.025), 0 28px 80px rgba(0,0,0,.9), 0 0 45px rgba(168,85,247,.08)',
-    decoration:
-      'repeating-radial-gradient(circle at 50% 18%, transparent 0 54px, rgba(231,229,228,.12) 55px, transparent 56px 72px)',
-    decorationOpacity: '.32',
-    buttonRadius: '10px',
+    accent: '#e7e5e4',
+    bgColor: '#010101',
+    bgStars: 'linear-gradient(125deg, #040405 0%, #090909 58%, #111112 100%)',
+    text: '#fafaf9',
+    muted: '#b6b3b0',
+    heading: 'linear-gradient(135deg, #fff 0%, #d6d3d1 58%, #8b8581 100%)',
+    cardBg: 'rgba(7,7,8,.94)',
+    cardBorder: '1px solid #292929',
+    cardShadow: '0 32px 90px rgba(0,0,0,.96), 0 0 0 1px rgba(255,255,255,.025)',
+    cardInset: 'none',
+    cardBackdrop: 'none',
+    cardHoverTransform: 'translateY(-2px)',
+    cardHoverShadow: '0 38px 100px rgba(0,0,0,1)',
+    buttonBg: '#0d0d0e',
+    buttonBorder: '1px solid #343434',
+    buttonHoverBg: '#202022',
+    buttonShadow: 'none',
+    buttonHoverShadow: '0 0 0 1px #5a5a5a',
+    glow: 'rgba(255,255,255,.1)',
+    badgeRadius: '3px',
+    imageRadius: '50%',
+    imageBorder: '2px solid #fafaf9',
+    imageShadow: '0 0 0 7px #111, 0 0 0 8px #363636',
+    headingFontFamily: "'Inter', sans-serif",
+    headingTracking: '-.055em',
+    decoration: 'linear-gradient(120deg, transparent 15%, rgba(255,255,255,.025), transparent 74%)',
+    decorationOpacity: '.7',
+    starfieldEffect: 'black-hole-lensing',
+    effectPrimary: '#e7e5e4',
+    effectSecondary: '#78716c',
+    effectIntensity: '.72',
+    effectSpeed: '.28',
+    starColors: ['#fff', '#d6d3d1', '#a8a29e', '#fafaf9', '#78716c'],
   }),
   pulsar: defineTheme({
     appearance: 'dark',
     accent: '#67e8f9',
     bgColor: '#020713',
-    bgStars:
-      'radial-gradient(circle at 50% 16%, rgba(255,255,255,.32) 0 1%, rgba(34,211,238,.28) 2%, transparent 12%), linear-gradient(110deg, transparent 35%, rgba(34,211,238,.08) 48%, rgba(255,255,255,.15) 50%, rgba(34,211,238,.08) 52%, transparent 65%), radial-gradient(ellipse at bottom, #071a35 0%, #020713 72%)',
+    bgStars: 'linear-gradient(155deg, #020713 0%, #041021 60%, #071629 100%)',
     text: '#effcff',
     muted: '#a9dbe4',
     heading: 'linear-gradient(135deg, #fff 0%, #a5f3fc 52%, #38bdf8 100%)',
-    cardBg: 'rgba(3,14,30,.8)',
-    cardShadow: '0 24px 62px rgba(0,111,145,.3)',
-    decoration:
-      'linear-gradient(90deg, transparent 0 47%, rgba(165,243,252,.12) 50%, transparent 53%), linear-gradient(transparent 0 47%, rgba(165,243,252,.08) 50%, transparent 53%)',
-    decorationOpacity: '.7',
+    cardBg: 'rgba(3,14,30,.76)',
+    cardBorder: '1px solid rgba(103,232,249,.28)',
+    cardShadow: '0 28px 68px rgba(0,111,145,.27)',
+    cardBackdrop: 'blur(10px) saturate(118%)',
+    buttonBg: 'rgba(5,29,54,.7)',
+    buttonBorder: '1px solid rgba(103,232,249,.24)',
+    buttonHoverBg: 'rgba(8,61,88,.92)',
+    buttonHoverShadow: '0 0 24px rgba(103,232,249,.2)',
+    buttonHoverTransform: 'translateX(3px)',
+    glow: 'rgba(103,232,249,.26)',
+    decoration: 'radial-gradient(ellipse at 50% 8%, rgba(165,243,252,.08), transparent 38%)',
+    decorationOpacity: '.8',
+    starfieldEffect: 'pulsar-beams',
+    effectPrimary: '#67e8f9',
+    effectSecondary: '#f0f9ff',
+    effectIntensity: '.72',
+    effectSpeed: '.62',
     starColors: ['#fff', '#cffafe', '#67e8f9', '#bae6fd', '#f0f9ff'],
-  }),
-  andromeda: defineTheme({
-    appearance: 'dark',
-    accent: '#c4b5fd',
-    bgColor: '#12101b',
-    bgStars:
-      'radial-gradient(circle at 24% 20%, rgba(244,181,205,.22), transparent 28%), radial-gradient(circle at 78% 24%, rgba(164,183,209,.22), transparent 30%), radial-gradient(ellipse at bottom, #292438 0%, #12101b 72%)',
-    text: '#fbf7ff',
-    muted: '#cfc5d8',
-    heading: 'linear-gradient(135deg, #fff 0%, #d8b4fe 46%, #f9a8d4 74%, #b9ccdf 100%)',
-    cardBg: 'rgba(29,25,42,.76)',
-    cardShadow: '0 24px 62px rgba(34,23,55,.54)',
-    decoration: 'radial-gradient(circle, rgba(255,255,255,.42) 0 1px, transparent 1.5px)',
-    decorationSize: '38px 38px',
-    decorationOpacity: '.28',
-    starColors: ['#fff', '#fbcfe8', '#ddd6fe', '#cbd5e1', '#e9d5ff'],
   }),
   mars: defineTheme({
     appearance: 'dark',
-    accent: '#e9824c',
+    accent: '#ef9461',
     bgColor: '#160b08',
     bgStars:
-      'radial-gradient(circle at 18% 20%, rgba(194,65,28,.3), transparent 30%), radial-gradient(circle at 82% 70%, rgba(217,119,6,.2), transparent 32%), linear-gradient(155deg, #35170f 0%, #1c0d09 48%, #0c0908 100%)',
+      'radial-gradient(circle at 18% 20%, rgba(194,65,28,.28), transparent 30%), radial-gradient(circle at 82% 70%, rgba(217,119,6,.18), transparent 32%), linear-gradient(155deg, #35170f 0%, #1c0d09 48%, #0c0908 100%)',
     text: '#fff1e6',
-    muted: '#d9b39c',
-    heading: 'linear-gradient(135deg, #fff3e5 0%, #f59e62 48%, #d65f35 100%)',
-    cardBg: 'rgba(40,19,13,.8)',
-    cardShadow: '0 24px 62px rgba(57,15,5,.55)',
-    decoration:
-      'linear-gradient(165deg, transparent 0 48%, rgba(231,151,104,.08) 49%, transparent 51%)',
-    decorationSize: '68px 68px',
-    decorationOpacity: '.55',
+    muted: '#dfbda7',
+    heading: 'linear-gradient(135deg, #fff3e5 0%, #f5a06d 48%, #d66a3e 100%)',
+    cardBg: '#2c1711',
+    cardBorder: '1px solid #70402f',
+    cardShadow: '10px 12px 0 rgba(8,4,3,.34), 0 24px 56px rgba(57,15,5,.32)',
+    cardInset: 'none',
+    cardBackdrop: 'none',
+    buttonBg: '#3a2018',
+    buttonBorder: '1px solid #7b4734',
+    buttonHoverBg: '#573023',
+    buttonShadow: '3px 4px 0 rgba(10,5,3,.32)',
+    buttonHoverShadow: '4px 5px 0 rgba(10,5,3,.32)',
+    badgeRadius: '5px',
+    imageRadius: '16px',
+    defaultImageShape: 'rounded-square',
+    imageBorder: '3px solid #a66345',
+    imageShadow: '6px 8px 0 rgba(9,4,3,.3)',
+    decoration: 'linear-gradient(155deg, rgba(239,148,97,.045), transparent 42%)',
+    decorationOpacity: '.7',
+    starfieldEffect: 'mars-dust',
+    effectPrimary: '#ef9461',
+    effectSecondary: '#d66a3e',
+    effectIntensity: '.66',
+    effectSpeed: '.38',
     starColors: ['#ffe8d2', '#f6c7a5', '#fff', '#edaa7c', '#d7c0ad'],
-  }),
-  lunar: defineTheme({
-    appearance: 'dark',
-    accent: '#cbd5e1',
-    bgColor: '#0b0d11',
-    bgStars:
-      'radial-gradient(circle at 22% 18%, rgba(226,232,240,.18), transparent 23%), radial-gradient(circle at 78% 80%, rgba(125,211,252,.1), transparent 30%), linear-gradient(155deg, #1b2029 0%, #0b0d11 68%)',
-    text: '#f8fafc',
-    muted: '#b8c0cc',
-    heading: 'linear-gradient(135deg, #fff 0%, #cbd5e1 56%, #a5dff8 100%)',
-    cardBg: 'rgba(20,23,29,.82)',
-    decoration:
-      'radial-gradient(circle at 25% 25%, rgba(255,255,255,.1) 0 2px, transparent 3px), radial-gradient(circle at 72% 58%, rgba(255,255,255,.07) 0 4px, transparent 5px)',
-    decorationSize: '90px 90px',
-    decorationOpacity: '.65',
-  }),
-  'solar-flare': defineTheme({
-    appearance: 'dark',
-    accent: '#fbbf24',
-    bgColor: '#080402',
-    bgStars:
-      'radial-gradient(circle at 100% 18%, rgba(255,246,163,.5) 0 2%, rgba(251,191,36,.34) 6%, rgba(239,68,68,.22) 16%, transparent 35%), radial-gradient(circle at 0 82%, rgba(249,115,22,.22), transparent 30%), #080402',
-    text: '#fff8e7',
-    muted: '#e8c59b',
-    heading: 'linear-gradient(135deg, #fffbea 0%, #facc15 40%, #fb923c 72%, #ef4444 100%)',
-    cardBg: 'rgba(28,13,5,.82)',
-    cardShadow: '0 24px 64px rgba(128,36,4,.46)',
-    decoration: 'radial-gradient(ellipse at 100% 0, rgba(253,224,71,.28), transparent 42%)',
-    decorationOpacity: '.65',
-    starColors: ['#fff', '#fef3c7', '#fdba74', '#fde68a', '#fff7ed'],
-  }),
-  'deep-space': defineTheme({
-    appearance: 'dark',
-    accent: '#93c5fd',
-    bgColor: '#01040a',
-    bgStars:
-      'radial-gradient(circle at 70% 20%, rgba(59,130,246,.1), transparent 25%), radial-gradient(ellipse at bottom, #07111f 0%, #01040a 74%)',
-    text: '#edf4ff',
-    muted: '#a8b7ca',
-    heading: 'linear-gradient(135deg, #fff 0%, #bfdbfe 58%, #7aa7d9 100%)',
-    cardBg: 'rgba(4,9,17,.84)',
-    cardBorder: '1px solid rgba(147,197,253,.1)',
-    cardShadow: '0 28px 72px rgba(0,0,0,.76)',
-    decoration: 'radial-gradient(circle, rgba(191,219,254,.32) 0 .7px, transparent 1.3px)',
-    decorationSize: '64px 64px',
-    decorationOpacity: '.22',
-    starColors: ['#fff', '#dbeafe', '#93c5fd', '#e0f2fe', '#b6cce5'],
   }),
   starlight: defineTheme({
     appearance: 'light',
     accent: '#356a9a',
     bgColor: '#edf5fc',
     bgStars:
-      'radial-gradient(circle at 18% 16%, rgba(125,177,222,.22), transparent 24%), radial-gradient(circle at 86% 24%, rgba(203,213,225,.34), transparent 28%), linear-gradient(180deg, #fff 0%, #e8f2fa 100%)',
-    text: '#15283b',
-    muted: '#52687c',
+      'radial-gradient(circle at 18% 16%, rgba(125,177,222,.2), transparent 24%), radial-gradient(circle at 86% 24%, rgba(203,213,225,.3), transparent 28%), linear-gradient(180deg, #fff 0%, #e8f2fa 100%)',
+    text: '#14283c',
+    muted: '#536a7e',
     heading: 'linear-gradient(135deg, #102a43 0%, #356a9a 55%, #71869b 100%)',
-    cardBg: 'rgba(255,255,255,.84)',
-    cardShadow: '0 24px 58px rgba(39,75,108,.15)',
-    decoration: 'radial-gradient(circle, rgba(53,106,154,.3) 0 1px, transparent 1.5px)',
-    decorationSize: '46px 46px',
-    decorationOpacity: '.28',
-    starColors: lightStars,
-  }),
-  'event-horizon': defineTheme({
-    appearance: 'dark',
-    accent: '#efb366',
-    bgColor: '#030204',
-    bgStars:
-      'radial-gradient(ellipse at 50% 18%, #000 0 9%, rgba(0,0,0,.96) 10%, rgba(239,179,102,.26) 12%, rgba(126,34,206,.18) 15%, transparent 26%), radial-gradient(ellipse at bottom, #14091c 0%, #030204 72%)',
-    text: '#fff8ee',
-    muted: '#d7c0ab',
-    heading: 'linear-gradient(135deg, #fff 0%, #f0bd78 50%, #c084fc 100%)',
-    cardBg: 'rgba(10,6,12,.86)',
-    cardShadow: '0 28px 72px rgba(0,0,0,.8), 0 0 35px rgba(126,34,206,.12)',
+    cardBg: 'rgba(255,255,255,.8)',
+    cardBorder: '1px solid rgba(53,106,154,.14)',
+    cardShadow: '0 24px 64px rgba(39,75,108,.14)',
+    cardBackdrop: 'blur(24px) saturate(112%)',
+    buttonBg: 'rgba(246,251,255,.76)',
+    buttonBorder: '1px solid rgba(53,106,154,.18)',
+    buttonHoverBg: '#e3f0fa',
+    buttonShadow: '0 7px 20px rgba(39,75,108,.08)',
+    buttonHoverShadow: '0 12px 26px rgba(39,75,108,.14)',
+    glow: 'rgba(53,106,154,.16)',
+    imageBorder: '5px solid rgba(255,255,255,.9)',
+    imageShadow: '0 14px 34px rgba(53,106,154,.2)',
     decoration:
-      'repeating-radial-gradient(ellipse at 50% 12%, transparent 0 62px, rgba(239,179,102,.11) 63px, rgba(126,34,206,.08) 65px, transparent 68px 83px)',
-    decorationOpacity: '.48',
-    starColors: ['#fff', '#fde7c2', '#d8b4fe', '#f5d0a9', '#e9d5ff'],
-  }),
-  quasar: defineTheme({
-    appearance: 'dark',
-    accent: '#60a5fa',
-    bgColor: '#070318',
-    bgStars:
-      'radial-gradient(circle at 50% 18%, rgba(255,255,255,.34) 0 1%, rgba(96,165,250,.32) 3%, rgba(217,70,239,.24) 10%, transparent 25%), radial-gradient(circle at 18% 72%, rgba(124,58,237,.3), transparent 30%), radial-gradient(circle at 86% 66%, rgba(236,72,153,.25), transparent 28%), #070318',
-    text: '#f8f5ff',
-    muted: '#c8bce0',
-    heading: 'linear-gradient(120deg, #fff 0%, #60a5fa 34%, #a78bfa 62%, #f472b6 100%)',
-    cardBg: 'rgba(14,8,39,.78)',
-    cardShadow: '0 26px 66px rgba(52,15,111,.5)',
-    decoration: 'radial-gradient(circle at 50% 8%, rgba(255,255,255,.28), transparent 18%)',
+      'radial-gradient(circle at 16% 10%, rgba(53,106,154,.08), transparent 28%), radial-gradient(circle at 86% 78%, rgba(125,177,222,.1), transparent 34%)',
     decorationOpacity: '.7',
-    starColors: ['#fff', '#bfdbfe', '#e9d5ff', '#fbcfe8', '#93c5fd'],
+    copySuccessBg: 'rgba(249,253,255,.96)',
+    copySuccessBorder: '2px solid #356a9a',
+    copySuccessShadow: '0 0 0 3px rgba(53,106,154,.13), 0 12px 28px rgba(53,106,154,.18)',
+    copySuccessText: '#173d60',
+    starfieldEffect: 'starlight-glints',
+    effectPrimary: '#7db1de',
+    effectSecondary: '#ffffff',
+    effectIntensity: '.62',
+    effectSpeed: '.35',
   }),
   voyager: defineTheme({
     appearance: 'light',
-    accent: '#b8562f',
+    accent: '#a84727',
     bgColor: '#e9dfca',
     bgStars:
       'linear-gradient(rgba(61,88,104,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(61,88,104,.08) 1px, transparent 1px), linear-gradient(145deg, #f7efdf 0%, #e4d5bc 100%)',
     text: '#222a31',
-    muted: '#59646b',
-    heading: 'linear-gradient(135deg, #202a32 0%, #456a80 48%, #b8562f 100%)',
-    cardBg: 'rgba(250,244,231,.88)',
-    cardShadow: '8px 10px 0 rgba(42,53,58,.12), 0 22px 48px rgba(49,47,38,.14)',
+    muted: '#58636a',
+    heading: 'linear-gradient(135deg, #202a32 0%, #456a80 48%, #a84727 100%)',
+    cardBg: 'rgba(250,244,231,.94)',
+    cardBorder: '2px solid #526875',
+    cardShadow: '8px 10px 0 rgba(42,53,58,.14), 0 22px 48px rgba(49,47,38,.12)',
+    cardInset: 'none',
+    cardBackdrop: 'none',
+    cardHoverTransform: 'translate(-2px, -2px)',
+    cardHoverShadow: '10px 12px 0 rgba(42,53,58,.16)',
+    buttonBg: '#f4ead7',
+    buttonBorder: '1px solid #74828a',
+    buttonHoverBg: '#e5d4b8',
+    buttonShadow: '3px 4px 0 rgba(42,53,58,.14)',
+    buttonHoverShadow: '4px 5px 0 rgba(42,53,58,.16)',
+    buttonHoverTransform: 'translate(-1px, -1px)',
+    badgeRadius: '2px',
+    imageRadius: '2px',
+    defaultImageShape: 'square',
+    iconRadius: '2px',
+    fontFamily: "'Inter', sans-serif",
+    headingFontFamily: 'var(--font-mono)',
+    headingWeight: '700',
+    headingTracking: '-.045em',
+    sectionTracking: '.12em',
+    divider: '1px solid #9b9588',
+    copySuccessBg: '#fff9ed',
+    copySuccessBorder: '2px solid #a84727',
+    copySuccessShadow: '0 0 0 3px rgba(168,71,39,.12), 4px 5px 0 rgba(42,53,58,.14)',
+    copySuccessText: '#6f2d18',
     decoration:
-      'linear-gradient(rgba(61,88,104,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(61,88,104,.1) 1px, transparent 1px)',
-    decorationSize: '24px 24px',
-    decorationOpacity: '.55',
-    cardRadius: '18px',
-    buttonRadius: '8px',
-    fontFamily: 'var(--font-mono)',
-    starColors: lightStars,
-  }),
-  apollo: defineTheme({
-    appearance: 'light',
-    accent: '#b7432d',
-    bgColor: '#ece8dd',
-    bgStars:
-      'radial-gradient(circle at 84% 14%, rgba(22,43,72,.12), transparent 23%), linear-gradient(155deg, #faf8f1 0%, #e6e1d3 100%)',
-    text: '#14243b',
-    muted: '#586577',
-    heading: 'linear-gradient(135deg, #10213a 0%, #25496f 60%, #b7432d 100%)',
-    cardBg: 'rgba(252,250,243,.9)',
-    cardShadow: '0 24px 52px rgba(20,36,59,.14)',
-    decoration:
-      'linear-gradient(115deg, transparent 0 46%, rgba(20,36,59,.08) 47%, rgba(183,67,45,.1) 49%, transparent 51%)',
-    decorationSize: '90px 90px',
-    decorationOpacity: '.5',
-    cardRadius: '20px',
-    buttonRadius: '10px',
-    starColors: lightStars,
-  }),
-  alien: defineTheme({
-    appearance: 'dark',
-    accent: '#b7ff3c',
-    bgColor: '#030504',
-    bgStars:
-      'radial-gradient(circle at 22% 22%, rgba(183,255,60,.2), transparent 27%), radial-gradient(circle at 80% 28%, rgba(168,85,247,.3), transparent 32%), radial-gradient(ellipse at bottom, #101324 0%, #030504 74%)',
-    text: '#f2ffe4',
-    muted: '#bad39e',
-    heading: 'linear-gradient(135deg, #f8ffe9 0%, #b7ff3c 42%, #c084fc 76%, #fff 100%)',
-    cardBg: 'rgba(8,15,11,.8)',
-    cardShadow: '0 25px 64px rgba(79,20,127,.42)',
-    decoration:
-      'radial-gradient(ellipse at 50% 20%, rgba(183,255,60,.14) 0 5%, transparent 6%), radial-gradient(ellipse at 50% 20%, transparent 0 12%, rgba(192,132,252,.1) 13%, transparent 15%)',
-    decorationSize: '120px 82px',
-    decorationOpacity: '.65',
-    starColors: ['#f8ffe9', '#b7ff3c', '#d8b4fe', '#fff', '#d9f99d'],
-  }),
-  'cyber-orbit': defineTheme({
-    appearance: 'dark',
-    accent: '#22d3ee',
-    bgColor: '#050711',
-    bgStars:
-      'linear-gradient(rgba(34,211,238,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(236,72,153,.04) 1px, transparent 1px), radial-gradient(circle at 20% 18%, rgba(34,211,238,.2), transparent 25%), radial-gradient(circle at 82% 74%, rgba(236,72,153,.2), transparent 28%), #050711',
-    text: '#effdff',
-    muted: '#acd2db',
-    heading: 'linear-gradient(120deg, #fff 0%, #22d3ee 44%, #f472b6 100%)',
-    cardBg: 'rgba(6,12,27,.82)',
-    cardShadow: '0 24px 62px rgba(0,166,190,.2), 0 0 30px rgba(236,72,153,.1)',
-    decoration:
-      'repeating-radial-gradient(ellipse at 50% 12%, transparent 0 52px, rgba(34,211,238,.1) 53px, transparent 54px 69px, rgba(236,72,153,.07) 70px, transparent 71px 86px)',
-    decorationOpacity: '.65',
-    fontFamily: 'var(--font-mono)',
-    starColors: ['#fff', '#67e8f9', '#f9a8d4', '#a5f3fc', '#f0abfc'],
-  }),
-  'ice-moon': defineTheme({
-    appearance: 'dark',
-    accent: '#bdf5ff',
-    bgColor: '#03101d',
-    bgStars:
-      'radial-gradient(circle at 20% 20%, rgba(189,245,255,.22), transparent 25%), linear-gradient(145deg, transparent 0 42%, rgba(125,211,252,.1) 43%, transparent 44% 58%, rgba(255,255,255,.07) 59%, transparent 60%), radial-gradient(ellipse at bottom, #0a2941 0%, #03101d 72%)',
-    text: '#f2fcff',
-    muted: '#b5d7df',
-    heading: 'linear-gradient(135deg, #fff 0%, #cffafe 46%, #7dd3fc 100%)',
-    cardBg: 'rgba(5,25,40,.79)',
-    cardShadow: '0 24px 62px rgba(0,70,105,.35)',
-    decoration:
-      'linear-gradient(140deg, transparent 0 48%, rgba(207,250,254,.1) 49%, transparent 50%), linear-gradient(40deg, transparent 0 48%, rgba(125,211,252,.08) 49%, transparent 50%)',
-    decorationSize: '74px 74px',
-    decorationOpacity: '.75',
-    starColors: ['#fff', '#cffafe', '#bae6fd', '#e0f2fe', '#a5f3fc'],
-  }),
-  titan: defineTheme({
-    appearance: 'dark',
-    accent: '#d99a55',
-    bgColor: '#0a1018',
-    bgStars:
-      'radial-gradient(ellipse at 58% 22%, rgba(217,154,85,.34), transparent 28%), radial-gradient(ellipse at 42% 48%, rgba(146,84,41,.22), transparent 36%), linear-gradient(165deg, #1c2330 0%, #21160f 52%, #0a1018 100%)',
-    text: '#fff4df',
-    muted: '#d5b99b',
-    heading: 'linear-gradient(135deg, #fff8e9 0%, #e8af70 52%, #9fb3c7 100%)',
-    cardBg: 'rgba(30,25,21,.8)',
-    cardShadow: '0 24px 62px rgba(32,19,7,.56)',
-    decoration:
-      'linear-gradient(180deg, rgba(217,154,85,.09), transparent 30%, rgba(113,81,53,.08) 65%, transparent)',
-    decorationOpacity: '.8',
-    starColors: ['#fff', '#f6d4ad', '#d6e2eb', '#e8b77e', '#c4d0dc'],
-  }),
-  saturn: defineTheme({
-    appearance: 'dark',
-    accent: '#e4cf98',
-    bgColor: '#050811',
-    bgStars:
-      'radial-gradient(ellipse at 86% 16%, transparent 0 8%, rgba(228,207,152,.13) 9% 10.5%, transparent 11.5%), radial-gradient(circle at 82% 14%, rgba(228,207,152,.08), transparent 18%), radial-gradient(ellipse at bottom, #11182a 0%, #050811 74%)',
-    text: '#fffaf0',
-    muted: '#d0c3a5',
-    heading: 'linear-gradient(135deg, #fff 0%, #ead9ad 52%, #b9c8df 100%)',
-    cardBg: 'rgba(13,17,28,.8)',
-    decoration:
-      'repeating-radial-gradient(ellipse at 50% 12%, transparent 0 56px, rgba(228,207,152,.1) 57px, transparent 59px 74px)',
-    decorationOpacity: '.45',
-    starColors: ['#fff', '#fef3c7', '#dbeafe', '#ead9ad', '#e2e8f0'],
-  }),
-  'red-giant': defineTheme({
-    appearance: 'dark',
-    accent: '#ff754c',
-    bgColor: '#100406',
-    bgStars:
-      'radial-gradient(circle at 18% 18%, rgba(239,68,68,.34), transparent 30%), radial-gradient(circle at 82% 76%, rgba(249,115,22,.2), transparent 30%), radial-gradient(ellipse at bottom, #3a0d16 0%, #100406 72%)',
-    text: '#fff1ef',
-    muted: '#e3b0aa',
-    heading: 'linear-gradient(135deg, #fff 0%, #ff8a65 48%, #dc3545 76%, #ffb16a 100%)',
-    cardBg: 'rgba(35,8,13,.8)',
-    cardShadow: '0 24px 64px rgba(93,10,20,.52)',
-    decoration: 'radial-gradient(circle at 18% 18%, rgba(255,177,106,.2), transparent 30%)',
-    decorationOpacity: '.7',
-    starColors: ['#fff', '#ffd5c7', '#ff9c7f', '#ffe4d6', '#fca5a5'],
-  }),
-  'white-dwarf': defineTheme({
-    appearance: 'dark',
-    accent: '#dff8ff',
-    bgColor: '#0b0e14',
-    bgStars:
-      'radial-gradient(circle at 50% 16%, rgba(255,255,255,.52) 0 1%, rgba(186,230,253,.3) 3%, rgba(59,130,246,.14) 10%, transparent 24%), radial-gradient(ellipse at bottom, #1a2432 0%, #0b0e14 72%)',
-    text: '#fff',
-    muted: '#c6d2df',
-    heading: 'linear-gradient(135deg, #fff 0%, #dff8ff 50%, #7dd3fc 100%)',
-    cardBg: 'rgba(20,24,31,.84)',
-    cardShadow: '0 24px 62px rgba(0,0,0,.65), 0 0 28px rgba(125,211,252,.12)',
-    decoration: 'radial-gradient(circle at 50% 5%, rgba(255,255,255,.2), transparent 24%)',
-    decorationOpacity: '.75',
-    starColors: ['#fff', '#f0f9ff', '#dff8ff', '#bae6fd', '#e2e8f0'],
+      'linear-gradient(rgba(61,88,104,.09) 1px, transparent 1px), linear-gradient(90deg, rgba(61,88,104,.09) 1px, transparent 1px)',
+    decorationSize: '28px 28px',
+    decorationOpacity: '.42',
+    defaultBackground: 'gradient',
+    defaultButtonStyle: 'outline',
+    starColors: ['#27485f', '#a84727', '#667a86', '#3d5f75', '#83624f'],
   }),
 } satisfies Record<ThemePreset, ThemePresetDefinition>;
 
@@ -614,6 +711,16 @@ export interface ThemeStyleConfig {
   preset: ThemePreset;
   accent: string;
   background: ThemeBackground;
+  cardRadius?: RadiusValue;
+  buttonRadius?: RadiusValue;
+}
+
+export function isLegacyThemePreset(value: string): value is LegacyThemePreset {
+  return Object.hasOwn(LEGACY_THEME_PRESET_ALIASES, value);
+}
+
+export function resolveThemePreset(preset: ThemeInputPreset): ThemePreset {
+  return isLegacyThemePreset(preset) ? LEGACY_THEME_PRESET_ALIASES[preset] : preset;
 }
 
 export function getThemePresetDefinition(preset: ThemePreset): ThemePresetDefinition {
@@ -625,47 +732,149 @@ export function getThemePresetTokens(theme: ThemeStyleConfig): ThemePresetDefini
   return { ...preset, accent: theme.accent || preset.accent };
 }
 
-export function getThemeStyle(theme: ThemeStyleConfig): string {
+export function resolveProfileImageShape(
+  preset: ThemePreset,
+  shape?: ProfileImageShape
+): ResolvedProfileImageShape {
+  return shape || getThemePresetDefinition(preset).defaultImageShape;
+}
+
+export function getThemeStyle(theme: ThemeStyleConfig, imageShape?: ProfileImageShape): string {
   const tokens = getThemePresetTokens(theme);
-  const background =
-    theme.background === 'minimal'
-      ? tokens.bgColor
-      : theme.background === 'gradient'
-        ? tokens.bgStars
-        : tokens.bgColor;
+  const background = theme.background === 'gradient' ? tokens.bgStars : tokens.bgColor;
   const starsBackground = theme.background === 'starfield' ? tokens.bgStars : 'transparent';
-  const starColors = tokens.starColors || (tokens.appearance === 'light' ? lightStars : darkStars);
+  const imageRadius =
+    imageShape === 'circle'
+      ? '50%'
+      : imageShape === 'square'
+        ? '0px'
+        : imageShape === 'rounded-square'
+          ? tokens.roundedImageRadius
+          : tokens.imageRadius;
+  const cardRadius =
+    tokens.radiusPolicy === 'square'
+      ? '0px'
+      : radiusValueToCss(theme.cardRadius, tokens.cardRadius);
+  const buttonRadius =
+    tokens.radiusPolicy === 'square'
+      ? '0px'
+      : radiusValueToCss(theme.buttonRadius, tokens.buttonRadius);
+  const [cardRadiusTopLeft, cardRadiusTopRight, cardRadiusBottomRight, cardRadiusBottomLeft] =
+    radiusCssToCorners(cardRadius);
+  const [
+    buttonRadiusTopLeft,
+    buttonRadiusTopRight,
+    buttonRadiusBottomRight,
+    buttonRadiusBottomLeft,
+  ] = radiusCssToCorners(buttonRadius);
+
+  const variables: Record<string, string> = {
+    '--accent-color': tokens.accent,
+    '--bg-color': background,
+    '--bg-stars': starsBackground,
+    '--text-color': tokens.text,
+    '--muted-color': tokens.muted,
+    '--heading-gradient': tokens.heading,
+    '--card-bg': tokens.cardBg,
+    '--card-border': tokens.cardBorder,
+    '--card-shadow': tokens.cardShadow,
+    '--card-inset': tokens.cardInset,
+    '--card-backdrop': tokens.cardBackdrop,
+    '--card-hover-transform': tokens.cardHoverTransform,
+    '--card-hover-shadow': tokens.cardHoverShadow,
+    '--card-padding': tokens.cardPadding,
+    '--card-padding-wide': tokens.cardPaddingWide,
+    '--btn-bg': tokens.buttonBg,
+    '--btn-border': tokens.buttonBorder,
+    '--btn-hover-bg': tokens.buttonHoverBg,
+    '--btn-shadow': tokens.buttonShadow,
+    '--btn-hover-shadow': tokens.buttonHoverShadow,
+    '--btn-hover-transform': tokens.buttonHoverTransform,
+    '--btn-active-transform': tokens.buttonActiveTransform,
+    '--btn-padding': tokens.buttonPadding,
+    '--theme-glow': tokens.glow,
+    '--status-bg': tokens.statusBg,
+    '--modal-bg': tokens.modalBg,
+    '--modal-border': tokens.modalBorder,
+    '--modal-shadow': tokens.modalShadow,
+    '--modal-backdrop': tokens.modalBackdrop,
+    '--tooltip-bg': tokens.tooltipBg,
+    '--tooltip-text': tokens.tooltipText,
+    '--tooltip-muted': tokens.tooltipMuted,
+    '--tooltip-accent': tokens.tooltipAccent,
+    '--tooltip-divider': tokens.tooltipDivider,
+    '--tooltip-border': tokens.tooltipBorder,
+    '--tooltip-shadow': tokens.tooltipShadow,
+    '--focus-color': tokens.accent,
+    '--focus-width': tokens.focusWidth,
+    '--focus-offset': tokens.focusOffset,
+    '--copy-success-bg': tokens.copySuccessBg,
+    '--copy-success-border': tokens.copySuccessBorder,
+    '--copy-success-shadow': tokens.copySuccessShadow,
+    '--copy-success-text': tokens.copySuccessText,
+    '--copy-error-bg': tokens.copyErrorBg,
+    '--copy-error-border': tokens.copyErrorBorder,
+    '--copy-error-text': tokens.copyErrorText,
+    '--announcement-bg': tokens.announcementBg,
+    '--announcement-border': tokens.announcementBorder,
+    '--announcement-shadow': tokens.announcementShadow,
+    '--img-border': tokens.imageBorder,
+    '--img-shadow': tokens.imageShadow,
+    '--img-radius': imageRadius,
+    '--img-hover-transform': tokens.imageHoverTransform,
+    '--icon-bg': tokens.iconBg,
+    '--icon-border': tokens.iconBorder,
+    '--icon-radius': tokens.iconRadius,
+    '--divider': tokens.divider,
+    '--theme-decoration': tokens.decoration,
+    '--theme-decoration-opacity': tokens.decorationOpacity,
+    '--theme-decoration-size': tokens.decorationSize,
+    '--card-radius': cardRadius,
+    '--card-radius-top-left': cardRadiusTopLeft,
+    '--card-radius-top-right': cardRadiusTopRight,
+    '--card-radius-bottom-right': cardRadiusBottomRight,
+    '--card-radius-bottom-left': cardRadiusBottomLeft,
+    '--button-radius': buttonRadius,
+    '--button-radius-top-left': buttonRadiusTopLeft,
+    '--button-radius-top-right': buttonRadiusTopRight,
+    '--button-radius-bottom-right': buttonRadiusBottomRight,
+    '--button-radius-bottom-left': buttonRadiusBottomLeft,
+    '--badge-radius': tokens.badgeRadius,
+    '--modal-radius': cardRadius,
+    '--tooltip-radius': buttonRadius,
+    '--theme-font-family': tokens.fontFamily,
+    '--heading-font-family': tokens.headingFontFamily,
+    '--heading-weight': tokens.headingWeight,
+    '--heading-tracking': tokens.headingTracking,
+    '--heading-transform': tokens.headingTransform,
+    '--heading-shadow': tokens.headingShadow,
+    '--section-tracking': tokens.sectionTracking,
+    '--section-transform': tokens.sectionTransform,
+    '--link-gap': tokens.linkGap,
+    '--section-gap': tokens.sectionGap,
+    '--effect-primary': tokens.effectPrimary,
+    '--effect-secondary': tokens.effectSecondary,
+    '--effect-intensity': tokens.effectIntensity,
+    '--effect-speed': tokens.effectSpeed,
+  };
 
   return [
     `color-scheme: ${tokens.appearance}`,
-    `--accent-color: ${tokens.accent}`,
-    `--bg-color: ${background}`,
-    `--bg-stars: ${starsBackground}`,
-    `--text-color: ${tokens.text}`,
-    `--muted-color: ${tokens.muted}`,
-    `--heading-gradient: ${tokens.heading}`,
-    `--card-bg: ${tokens.cardBg}`,
-    `--card-border: ${tokens.cardBorder}`,
-    `--card-shadow: ${tokens.cardShadow}`,
-    `--btn-bg: ${tokens.buttonBg}`,
-    `--btn-border: ${tokens.buttonBorder}`,
-    `--btn-hover-bg: ${tokens.buttonHoverBg}`,
-    `--theme-glow: ${tokens.glow}`,
-    `--status-bg: ${tokens.statusBg}`,
-    `--modal-bg: ${tokens.modalBg}`,
-    `--tooltip-bg: ${tokens.tooltipBg}`,
-    `--focus-color: ${tokens.accent}`,
-    `--announcement-bg: ${tokens.announcementBg || 'color-mix(in srgb, var(--card-bg) 88%, var(--accent-color))'}`,
-    `--announcement-border: ${tokens.announcementBorder || '1px solid color-mix(in srgb, var(--text-color) 14%, transparent)'}`,
-    `--announcement-shadow: ${tokens.announcementShadow || '0 10px 30px color-mix(in srgb, var(--accent-color) 18%, transparent)'}`,
-    `--img-border: ${tokens.imageBorder || '2px solid color-mix(in srgb, var(--text-color) 18%, transparent)'}`,
-    `--img-shadow: ${tokens.imageShadow || '0 0 25px var(--theme-glow)'}`,
-    `--theme-decoration: ${tokens.decoration || 'none'}`,
-    `--theme-decoration-opacity: ${tokens.decorationOpacity || '0'}`,
-    `--theme-decoration-size: ${tokens.decorationSize || 'auto'}`,
-    `--card-radius: ${tokens.cardRadius || '28px'}`,
-    `--button-radius: ${tokens.buttonRadius || '16px'}`,
-    `--theme-font-family: ${tokens.fontFamily || "'Inter', sans-serif"}`,
-    ...starColors.map((color, index) => `--star-color-${index + 1}: ${color}`),
+    ...Object.entries(variables).map(([name, value]) => `${name}: ${value}`),
+    ...tokens.starColors.map((color, index) => `--star-color-${index + 1}: ${color}`),
   ].join('; ');
+}
+
+export function radiusValueToCss(value: RadiusValue | undefined, fallback: string): string {
+  if (value === undefined) return fallback;
+  if (typeof value === 'number') return `${value}px`;
+  return `${value[0]}px ${value[1]}px`;
+}
+
+function radiusCssToCorners(value: string): readonly [string, string, string, string] {
+  const parts = value.trim().split(/\s+/);
+  if (parts.length === 1) return [parts[0], parts[0], parts[0], parts[0]];
+  if (parts.length === 2) return [parts[0], parts[1], parts[0], parts[1]];
+  if (parts.length === 3) return [parts[0], parts[1], parts[2], parts[1]];
+  return [parts[0], parts[1], parts[2], parts[3]];
 }

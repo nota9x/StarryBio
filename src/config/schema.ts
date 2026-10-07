@@ -1,5 +1,12 @@
 import { z } from 'zod';
-import { THEME_PRESET_NAMES, getThemePresetDefinition, type ThemePreset } from './themes';
+import {
+  THEME_INPUT_NAMES,
+  getThemePresetDefinition,
+  resolveThemePreset,
+  type RadiusValue,
+  type ThemeInputPreset,
+  type ThemePreset,
+} from './themes';
 
 const BUTTON_STYLES = ['glass', 'solid', 'outline', 'minimal', 'terminal'] as const;
 const THEME_BACKGROUNDS = ['starfield', 'gradient', 'minimal'] as const;
@@ -17,6 +24,7 @@ const LINK_STYLES = ['cards', 'buttons', 'minimal', 'terminal'] as const;
 const PROFILE_POSITIONS = ['top', 'left'] as const;
 const FEATURED_POSITIONS = ['above-links', 'below-links'] as const;
 const PROFILE_LAYOUTS = ['vertical', 'horizontal'] as const;
+const PROFILE_IMAGE_SHAPES = ['circle', 'rounded-square', 'square'] as const;
 const SCHEDULE_DAYS = ['daily', 'weekdays', 'weekends'] as const;
 const HEX_COLOR_RE = /^#(?:[0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
 const TIME_RE = /^([01]\d|2[0-3]):([0-5]\d)$/;
@@ -31,6 +39,8 @@ const RESERVED_CUSTOM_DATA_ATTRIBUTES = new Set([
 ]);
 
 const nonEmptyString = z.string().trim().min(1, 'must be a non-empty string');
+const radiusNumber = z.number().min(0).max(999);
+const radiusValueSchema = z.union([radiusNumber, z.tuple([radiusNumber, radiusNumber])]);
 const hexColor = z.string().regex(HEX_COLOR_RE, 'must be a hex color such as "#10B981"');
 const time = z.string().regex(TIME_RE, 'must use 24-hour HH:MM format');
 const isoDate = z.string().refine(isIsoDate, 'must be a valid ISO date with a time component');
@@ -140,11 +150,13 @@ const scheduleItemSchema = z
 
 const themeConfigSchema = z
   .object({
-    preset: z.enum(THEME_PRESET_NAMES).optional(),
+    preset: z.enum(THEME_INPUT_NAMES).optional(),
     accent: hexColor.optional(),
     buttonStyle: z.enum(BUTTON_STYLES).optional(),
     background: z.enum(THEME_BACKGROUNDS).optional(),
     animationIntensity: z.enum(ANIMATION_INTENSITIES).optional(),
+    cardRadius: radiusValueSchema.optional(),
+    buttonRadius: radiusValueSchema.optional(),
   })
   .strict();
 
@@ -261,7 +273,7 @@ export const starryBioConfigSchema = z
   .object({
     pageTitle: nonEmptyString,
     favicon: assetUrl.optional(),
-    theme: z.union([z.enum(THEME_PRESET_NAMES), themeConfigSchema]).optional(),
+    theme: z.union([z.enum(THEME_INPUT_NAMES), themeConfigSchema]).optional(),
     layout: layoutConfigSchema.optional(),
     animation: z
       .object({
@@ -276,6 +288,7 @@ export const starryBioConfigSchema = z
         description: nonEmptyString,
         image: assetUrl,
         layout: z.enum(PROFILE_LAYOUTS).optional(),
+        imageShape: z.enum(PROFILE_IMAGE_SHAPES).optional(),
       })
       .strict(),
     sections: z.array(sectionSchema),
@@ -356,7 +369,13 @@ export const starryBioConfigSchema = z
     }
   });
 
-export type { ThemePreset } from './themes';
+export type {
+  LegacyThemePreset,
+  ProfileImageShape,
+  RadiusValue,
+  ThemeInputPreset,
+  ThemePreset,
+} from './themes';
 export type ButtonStyle = (typeof BUTTON_STYLES)[number];
 export type ThemeBackground = (typeof THEME_BACKGROUNDS)[number];
 export type AnimationIntensity = (typeof ANIMATION_INTENSITIES)[number];
@@ -387,6 +406,8 @@ export interface NormalizedThemeConfig {
   buttonStyle: ButtonStyle;
   background: ThemeBackground;
   animationIntensity: AnimationIntensity;
+  cardRadius: RadiusValue;
+  buttonRadius: RadiusValue;
 }
 
 export interface NormalizedLayoutConfig {
@@ -514,7 +535,8 @@ export function isVisible(item: VisibilityConfig, now = Date.now()): boolean {
 
 function normalizeTheme(theme: StarryBioConfig['theme']): NormalizedThemeConfig {
   const value = typeof theme === 'string' ? { preset: theme } : theme || {};
-  const preset = value.preset || 'midnight';
+  const inputPreset: ThemeInputPreset = value.preset || 'midnight';
+  const preset = resolveThemePreset(inputPreset);
   const definition = getThemePresetDefinition(preset);
   return {
     preset,
@@ -522,6 +544,8 @@ function normalizeTheme(theme: StarryBioConfig['theme']): NormalizedThemeConfig 
     buttonStyle: value.buttonStyle || definition.defaultButtonStyle || 'glass',
     background: value.background || definition.defaultBackground || 'starfield',
     animationIntensity: value.animationIntensity || 'normal',
+    cardRadius: definition.radiusPolicy === 'square' ? 0 : (value.cardRadius ?? 28),
+    buttonRadius: definition.radiusPolicy === 'square' ? 0 : (value.buttonRadius ?? 16),
   };
 }
 
@@ -529,10 +553,14 @@ function normalizeLayout(
   layout: LayoutConfig | undefined,
   preset: ThemePreset
 ): NormalizedLayoutConfig {
-  const mode = layout?.mode || (preset === 'terminal' ? 'terminal' : 'centered');
+  const definition = getThemePresetDefinition(preset);
+  const mode = layout?.mode || definition.defaultLayout || 'centered';
   return {
     mode,
-    linkStyle: layout?.linkStyle || (mode === 'terminal' ? 'terminal' : 'cards'),
+    linkStyle:
+      layout?.linkStyle ||
+      definition.defaultLinkStyle ||
+      (mode === 'terminal' ? 'terminal' : 'cards'),
     profilePosition: layout?.profilePosition || (mode === 'split-screen' ? 'left' : 'top'),
     featuredPosition: layout?.featuredPosition || 'above-links',
   };

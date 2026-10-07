@@ -80,7 +80,7 @@
 
 .profile-card.layout-terminal {
   max-width: 760px;
-  border-radius: 8px;
+  border-radius: var(--card-radius);
   text-align: left;
   font-family: var(--font-mono);
 }

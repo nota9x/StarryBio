@@ -1,6 +1,6 @@
 ---
-import { createHash } from 'node:crypto';
 import { TriangleAlert, X } from '@lucide/astro';
+import { getAnnouncementKey } from '../config/announcement';
 import type { StarryBioConfig } from '../config/schema';
 import { externalLinkAttributes, toSitePath } from '../config/urls';
 
@@ -10,10 +10,7 @@ interface Props {
 
 const { announcement } = Astro.props;
 const showAnnouncement = Boolean(announcement?.enabled && announcement.text);
-const announcementKey = createHash('sha256')
-  .update(`${announcement?.text || ''}|${announcement?.url || ''}`)
-  .digest('hex')
-  .slice(0, 12);
+const announcementKey = getAnnouncementKey(announcement);
 ---
 
 {showAnnouncement && (

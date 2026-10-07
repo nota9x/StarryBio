@@ -36,6 +36,7 @@
     "test:integration": "vitest run --config vitest.integration.config.ts",
     "test:unit": "vitest run",
     "test:upstream": "vitest run --config vitest.upstream.config.ts",
+    "theme:audit": "tsx ./scripts/theme-audit.ts",
     "typecheck": "astro check && tsc --noEmit",
     "validate": "tsx ./scripts/validate-config.ts"
   },

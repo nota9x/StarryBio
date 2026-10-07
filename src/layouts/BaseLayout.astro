@@ -14,10 +14,16 @@ import '@fontsource/orbitron/latin-700.css';
 import '@fontsource/orbitron/latin-900.css';
 import Analytics from '../components/Analytics.astro';
 import SEO from '../components/SEO.astro';
+import { getAnnouncementKey } from '../config/announcement';
 import { toAbsoluteAssetPath } from '../config/image-assets';
 import type { NormalizedStarryBioConfig } from '../config/schema';
 import { buildContentSecurityPolicy } from '../config/security-headers';
-import { getThemeStyle } from '../config/themes';
+import {
+  getThemePresetDefinition,
+  getThemeStyle,
+  resolveProfileImageShape,
+} from '../config/themes';
+import { toStaticAssetPath } from '../config/urls';
 import '../styles/input.css';
 
 interface Props {
@@ -32,6 +38,9 @@ const { config, title, description, includeStatus = true } = Astro.props;
 const animation = config.animation;
 const statusConfig = includeStatus ? config.status : undefined;
 const showStarfield = config.theme.background === 'starfield';
+const themeDefinition = getThemePresetDefinition(config.theme.preset);
+const announcementKey = getAnnouncementKey(config.announcement);
+const profileImageShape = resolveProfileImageShape(config.theme.preset, config.profile.imageShape);
 const metaContentSecurityPolicy = buildContentSecurityPolicy(config.analytics, {
   includeFrameAncestors: false,
 });
@@ -41,14 +50,21 @@ const metaContentSecurityPolicy = buildContentSecurityPolicy(config.analytics, {
 <html
   lang="en"
   data-theme={config.theme.preset}
+  data-theme-appearance={themeDefinition.appearance}
+  data-theme-background={config.theme.background}
   data-button-style={config.theme.buttonStyle}
-  style={getThemeStyle(config.theme)}
+  data-profile-image-shape={profileImageShape}
+  data-announcement-key={announcementKey}
+  data-announcement-state={announcementKey ? 'pending' : undefined}
+  style={getThemeStyle(config.theme, config.profile.imageShape)}
 >
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="Content-Security-Policy" content={metaContentSecurityPolicy} />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <SEO config={config} title={title} description={description} />
+
+    {announcementKey && <script is:inline src={toStaticAssetPath('announcement-state.js')} />}
 
     {config.favicon && <link rel="icon" href={toAbsoluteAssetPath(config.favicon)} />}
 
@@ -64,6 +80,7 @@ const metaContentSecurityPolicy = buildContentSecurityPolicy(config.analytics, {
         data-star-multiplier={animation?.starMultiplier ?? 1}
         data-shooting-star-multiplier={animation?.shootingStarMultiplier ?? 1}
         data-animation-intensity={config.theme.animationIntensity}
+        data-starfield-effect={themeDefinition.starfieldEffect}
         transition:name="starfield"
         transition:animate="none"
         transition:persist

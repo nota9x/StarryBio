@@ -58,6 +58,9 @@ function printResult(result: UpdateResult, options: CliOptions): void {
       `Config migration: ${result.stats.configAdded.length} added, ${result.stats.configRemoved.length} removed.`
     );
   }
+  if (result.stats.configRewrittenThemes.length) {
+    console.log(`Theme migration: ${result.stats.configRewrittenThemes.join(', ')}.`);
+  }
   if (result.rollbackCompleted)
     console.log('Recovered and rolled back an interrupted prior update.');
   if (options.dryRun) console.log('Dry run complete; the live installation was not changed.');

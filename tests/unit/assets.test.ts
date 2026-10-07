@@ -5,6 +5,7 @@ import { createAnalyticsScript, serializeJsonAttribute } from '../../src/config/
 import { normalizeStarryBioConfig, validateStarryBioConfig } from '../../src/config/schema';
 import { createSimpleIconSvg } from '../../scripts/build-simple-icons';
 import { createOgSvg, createVCard, generateAssets } from '../../scripts/generate-assets';
+import { THEME_PRESET_NAMES } from '../../src/config/themes';
 import { toAbsoluteAssetPath } from '../../src/config/image-assets';
 import { toGeneratedAssetUrl, toSitePath } from '../../src/config/urls';
 import { createConfig } from './fixtures';
@@ -123,6 +124,15 @@ describe('deterministic build assets', () => {
     expect(svg).not.toContain('<script>');
     expect(svg).toContain('&lt;Custom &amp; safe&gt;');
     expect(svg).toContain('Ada &lt;/text&gt;&lt;script&gt;');
+  });
+
+  it.each(THEME_PRESET_NAMES)('uses SVG-safe colors for the %s Open Graph image', (preset) => {
+    const config = normalizeStarryBioConfig(
+      validateStarryBioConfig(createConfig({ theme: preset }))
+    );
+    const svg = createOgSvg(config);
+
+    expect(svg).not.toMatch(/(?:stop-color|fill)="(?:linear|radial)-gradient/);
   });
 });
 

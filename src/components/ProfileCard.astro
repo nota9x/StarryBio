@@ -1,5 +1,5 @@
 ---
-import { QrCode } from '@lucide/astro';
+import { Check, QrCode } from '@lucide/astro';
 import { toAbsoluteAssetPath } from '../config/image-assets';
 import type { NormalizedStarryBioConfig } from '../config/schema';
 import { STARRYBIO_VERSION } from '../config/version';
@@ -70,12 +70,17 @@ const showProfileActions = Boolean(qrHref || contactHref);
           {qrHref && (
             <a
               href={qrHref}
-              class="mini-action mini-action-icon"
+              class="mini-action mini-action-icon feedback-action qr-download-action"
               aria-label="Download QR code"
               download
               data-astro-reload
+              data-download-feedback
             >
-              <QrCode size={20} aria-hidden="true" />
+              <span class="feedback-action-icon" aria-hidden="true">
+                <QrCode class="feedback-action-glyph feedback-action-glyph-default" />
+                <Check class="feedback-action-glyph feedback-action-glyph-check" />
+              </span>
+              <span class="feedback-live-region" data-feedback-live aria-live="polite" />
             </a>
           )}
           {contactHref && (

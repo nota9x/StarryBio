@@ -98,6 +98,7 @@ async function prepareOutput(
 
 export function createOgSvg(siteConfig: NormalizedStarryBioConfig): string {
   const tokens = getThemePresetTokens(siteConfig.theme);
+  const edgeColor = tokens.appearance === 'light' ? '#d8dee6' : '#02030a';
   const title = escapeXml(siteConfig.ogImage?.title || siteConfig.seo.title);
   const subtitle = escapeXml(siteConfig.ogImage?.subtitle || siteConfig.seo.description);
   const name = escapeXml(siteConfig.profile.name);
@@ -107,11 +108,11 @@ export function createOgSvg(siteConfig: NormalizedStarryBioConfig): string {
     <radialGradient id="bg" cx="50%" cy="70%" r="85%">
       <stop offset="0%" stop-color="${tokens.accent}" stop-opacity="0.32"/>
       <stop offset="46%" stop-color="${tokens.bgColor}"/>
-      <stop offset="100%" stop-color="#02030a"/>
+      <stop offset="100%" stop-color="${edgeColor}"/>
     </radialGradient>
     <linearGradient id="line" x1="0" x2="1">
       <stop offset="0%" stop-color="${tokens.accent}"/>
-      <stop offset="100%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="${tokens.text}"/>
     </linearGradient>
   </defs>
   <rect width="1200" height="630" fill="url(#bg)"/>
@@ -120,8 +121,8 @@ export function createOgSvg(siteConfig: NormalizedStarryBioConfig): string {
   ${createStarSvg()}
   <rect x="90" y="88" width="1020" height="454" rx="36" fill="${tokens.cardBg}" stroke="${tokens.accent}" stroke-opacity="0.32"/>
   <rect x="130" y="138" width="92" height="92" rx="28" fill="${tokens.accent}" opacity="0.22"/>
-  <text x="176" y="196" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="44" font-weight="800" fill="#ffffff">*</text>
-  <text x="130" y="302" font-family="Inter, Arial, sans-serif" font-size="78" font-weight="800" fill="#ffffff">${title}</text>
+  <text x="176" y="196" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="44" font-weight="800" fill="${tokens.text}">*</text>
+  <text x="130" y="302" font-family="Inter, Arial, sans-serif" font-size="78" font-weight="800" fill="${tokens.text}">${title}</text>
   <text x="132" y="372" font-family="Inter, Arial, sans-serif" font-size="34" fill="${tokens.muted}">${subtitle}</text>
   <rect x="132" y="430" width="260" height="4" rx="2" fill="url(#line)"/>
   <text x="132" y="492" font-family="Inter, Arial, sans-serif" font-size="28" fill="${tokens.text}">${name}</text>

@@ -142,8 +142,44 @@ test('keys announcement dismissal to its configured content when enabled', async
   await expect(page.locator('#announcement-banner')).toContainText(config.announcement!.text);
   await page.locator('#announcement-close-btn').click();
   await expect(page.locator('#announcement-banner')).toHaveCount(0);
+  await expect(page.locator('#announcement-banner-container')).toHaveCount(0);
+  await page.addInitScript(() => {
+    const visibleFrames: number[] = [];
+    Object.assign(window, { __starryBioVisibleBannerFrames: visibleFrames });
+    let frames = 0;
+    const inspect = () => {
+      const banner = document.querySelector<HTMLElement>('#announcement-banner');
+      if (banner) {
+        const style = getComputedStyle(banner);
+        if (style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0') {
+          visibleFrames.push(frames);
+        }
+      }
+      frames += 1;
+      if (frames < 20) requestAnimationFrame(inspect);
+    };
+    requestAnimationFrame(inspect);
+  });
+  await page.route(/\/_astro\/BaseLayout\..*\.js(?:\?.*)?$/, async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    await route.continue();
+  });
   await page.reload();
   await expect(page.locator('#announcement-banner')).toHaveCount(0);
+  await expect(page.locator('#announcement-banner-container')).toHaveCount(0);
+  expect(
+    await page.evaluate(
+      () =>
+        (window as typeof window & { __starryBioVisibleBannerFrames?: number[] })
+          .__starryBioVisibleBannerFrames
+    )
+  ).toEqual([]);
+  await expect(page.locator('html')).toHaveAttribute('data-announcement-state', 'dismissed');
+  expect(
+    await page.evaluate(() =>
+      getComputedStyle(document.documentElement).getPropertyValue('--announcement-clearance').trim()
+    )
+  ).toBe('0px');
 });
 
 test('copies the user-defined value and reports success accessibly when a copy action exists', async ({
@@ -155,8 +191,46 @@ test('copies the user-defined value and reports success accessibly when a copy a
   await page.goto('/');
   const copyButton = page.locator('.copy-button-active').filter({ hasText: copyLink!.label });
   await copyButton.click();
-  await expect(copyButton.locator('[data-copy-feedback]')).toHaveText('Copied!');
+  await expect(copyButton.locator('[data-feedback-live]')).toHaveText('Copied!');
+  await expect(copyButton).toHaveAttribute('data-feedback-state', 'success');
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(copyLink!.copyValue);
+});
+
+test('uses the shared positive feedback after a QR download is triggered', async ({ page }) => {
+  test.skip(
+    !(config.qr?.enabled && config.qr.showButton),
+    'The active deployment has no QR action.'
+  );
+  await page.goto('/');
+  const qrButton = page.locator('[data-download-feedback]');
+  const [download] = await Promise.all([page.waitForEvent('download'), qrButton.click()]);
+
+  expect(download.suggestedFilename()).toBe(
+    (config.qr!.output || 'public/qr.png').split('/').at(-1)
+  );
+  await expect(qrButton).toHaveAttribute('data-feedback-state', 'success');
+  await expect(qrButton).toHaveClass(/show-success-feedback/);
+  await expect(qrButton.locator('[data-feedback-live]')).toHaveText('QR code downloaded');
+  await expect(qrButton.locator('.feedback-action-glyph-default')).toHaveCSS('opacity', '0');
+  await expect(qrButton.locator('.feedback-action-glyph-check')).toHaveCSS('opacity', '1');
+  await expect(qrButton).not.toHaveAttribute('data-feedback-state', 'success', { timeout: 3_000 });
+  await expect(qrButton).toHaveAttribute('aria-label', 'Download QR code');
+});
+
+test('does not show QR success when the download cannot be prepared', async ({ page }) => {
+  test.skip(
+    !(config.qr?.enabled && config.qr.showButton),
+    'The active deployment has no QR action.'
+  );
+  const qrPath = (config.qr!.output || 'public/qr.png').replace(/^public[\\/]/, '');
+  await page.route(`**/${qrPath}`, (route) => route.fulfill({ status: 500, body: 'Unavailable' }));
+  await page.goto('/');
+  const qrButton = page.locator('[data-download-feedback]');
+  await qrButton.click();
+
+  await expect(qrButton).toHaveAttribute('data-feedback-state', 'error');
+  await expect(qrButton).not.toHaveClass(/show-success-feedback/);
+  await expect(qrButton.locator('[data-feedback-live]')).toHaveText('Download failed');
 });
 
 test('serves the custom 404 and survives repeated transitions without duplicate backgrounds', async ({

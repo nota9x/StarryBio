@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.6.1](https://github.com/nota9x/StarryBio/compare/v3.6.0...v3.6.1) (2026-10-09)
+
+
+### Bug Fixes
+
+* **test:** harden Playwright Wrangler teardown ([#132](https://github.com/nota9x/StarryBio/issues/132)) ([f73254e](https://github.com/nota9x/StarryBio/commit/f73254ee17c7f860ac4ec98666a497d48dccab76))
+
+
+### Documentation
+
+* update Code of Conduct issue reporting guidelines ([061500f](https://github.com/nota9x/StarryBio/commit/061500f7395c856a42ef39a07a3fad1927c20906))
+
 ## [3.6.0](https://github.com/nota9x/StarryBio/compare/v3.5.0...v3.6.0) (2026-09-07)
 
 

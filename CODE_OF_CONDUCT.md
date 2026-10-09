@@ -43,7 +43,16 @@ We agree to restrict the following behaviors in our community. Instances, threat
 
 Tensions can occur between community members even when they are trying their best to collaborate. Not every conflict represents a code of conduct violation, and this Code of Conduct reinforces encouraged behaviors and norms that can help avoid conflicts and minimize harm.
 
-When an incident does occur, it is important to report it promptly. To report a possible violation, **email [a9x@is.perish.ing](mailto:a9x@is.perish.ing).**
+When an incident does occur, it is important to report it promptly. To report a possible violation, **please reach the project maintainers through either of the following channels:
+
+- **Email:** [a9x@is.perish.ing](mailto:a9x@is.perish.ing)
+- **Contact form:** [we.are.slowly.perish.ing/contact](https://we.are.slowly.perish.ing/contact/)
+
+Reports may be submitted anonymously through the contact form by using a pseudonym and leaving the optional email address field blank.
+
+When submitting a report, please provide as much relevant information as possible, including a description of the incident, when and where it occurred, and any supporting evidence, if available.
+
+Anonymous reports are welcome and will be taken seriously, although the inability to request additional information may limit the actions that can be taken.**
 
 Community Moderators take reports of violations seriously and will make every effort to respond in a timely manner. They will investigate all reports of code of conduct violations, reviewing messages, logs, and recordings, or interviewing witnesses and other participants. Community Moderators will keep investigation and enforcement actions as transparent as possible while prioritizing safety and confidentiality. In order to honor these values, enforcement actions are carried out in private with the involved parties, but communicating to the whole community may be part of a mutually agreed upon resolution.
 

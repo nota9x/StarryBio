@@ -8,6 +8,8 @@
     "strict": true,
     "skipLibCheck": true,
     "noEmit": true,
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true,
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
     "jsx": "preserve",

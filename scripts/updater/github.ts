@@ -6,8 +6,8 @@ import { Readable, Transform } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import semver from 'semver';
 import snappy from 'snappyjs';
-import { MAX_ARCHIVE_BYTES } from './filesystem';
-import { TRUST_POLICY, type GitHubAsset, type GitHubRelease } from './types';
+import { MAX_ARCHIVE_BYTES } from './filesystem.ts';
+import { TRUST_POLICY, type GitHubAsset, type GitHubRelease } from './types.ts';
 
 const API_ROOT = `https://api.github.com/repos/${TRUST_POLICY.repositoryFullName}`;
 const API_VERSION = '2026-03-10';

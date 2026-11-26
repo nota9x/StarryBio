@@ -1,9 +1,9 @@
 import { chmod, lstat, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { diff3Merge } from 'node-diff3';
-import { migrateConfig } from './config-migration';
-import { assertNoSymlinkAncestors, isDefaultAsset, isText, resolveInside } from './filesystem';
-import type { ConflictRecord, ManifestFile, UpdateManifest, UpdateStats } from './types';
+import { migrateConfig } from './config-migration.ts';
+import { assertNoSymlinkAncestors, isDefaultAsset, isText, resolveInside } from './filesystem.ts';
+import type { ConflictRecord, ManifestFile, UpdateManifest, UpdateStats } from './types.ts';
 
 export type BufferMergeResult =
   { kind: 'clean'; contents: Buffer; merged: boolean } | { kind: 'conflict'; reason: string };

@@ -8,7 +8,7 @@
   "scripts": {
     "astro": "astro",
     "build": "pnpm run validate && pnpm run build:icons && pnpm run generate && astro build",
-    "build:icons": "tsx ./scripts/build-simple-icons.ts",
+    "build:icons": "node ./scripts/build-simple-icons.ts",
     "check": "pnpm run format:check && pnpm run lint && pnpm run typecheck && pnpm run test:unit",
     "commitlint": "commitlint --last --verbose",
     "deploy": "pnpm run deploy:cloudflare",
@@ -17,27 +17,27 @@
     "fmt": "pnpm run format",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "generate": "tsx ./scripts/generate-assets.ts",
-    "headers": "tsx ./scripts/generate-security-headers.ts",
+    "generate": "node ./scripts/generate-assets.ts",
+    "headers": "node ./scripts/generate-security-headers.ts",
     "icons": "pnpm run build:icons",
     "lint": "eslint . --max-warnings 0",
     "lint:fix": "eslint . --fix --max-warnings 0",
     "preview": "pnpm run build && astro preview",
     "preview:cloudflare": "pnpm run build && wrangler dev",
     "release:check": "pnpm run check && pnpm run test:integration && pnpm run test:upstream && pnpm run test:e2e && pnpm run test:e2e:fixtures && pnpm audit",
-    "release:package": "tsx ./scripts/create-update-artifact.ts",
-    "release:verify-artifact": "tsx ./scripts/verify-update-artifact.ts",
-    "starrybio:update": "tsx ./scripts/update-repository.ts",
+    "release:package": "node ./scripts/create-update-artifact.ts",
+    "release:verify-artifact": "node ./scripts/verify-update-artifact.ts",
+    "starrybio:update": "node ./scripts/update-repository.ts",
     "start": "pnpm run dev",
     "test": "pnpm run test:downstream",
     "test:downstream": "pnpm run test:unit && pnpm run test:integration",
     "test:e2e": "pnpm run build && playwright test",
-    "test:e2e:fixtures": "tsx ./scripts/test-fixture-deployments.ts",
+    "test:e2e:fixtures": "node ./scripts/test-fixture-deployments.ts",
     "test:integration": "vitest run --config vitest.integration.config.ts",
     "test:unit": "vitest run",
     "test:upstream": "vitest run --config vitest.upstream.config.ts",
     "typecheck": "astro check && tsc --noEmit",
-    "validate": "tsx ./scripts/validate-config.ts"
+    "validate": "node ./scripts/validate-config.ts"
   },
   "dependencies": {
     "@lucide/astro": "^1.52.0"
@@ -54,7 +54,7 @@
     "@playwright/test": "^1.63.0",
     "@resvg/resvg-js": "^2.6.2",
     "@tailwindcss/vite": "^4.3.3",
-    "@types/node": "^24.19.1",
+    "@types/node": "^26.6.10",
     "@types/qrcode": "^1.5.6",
     "@types/semver": "^7.8.0",
     "@types/snappyjs": "^0.7.1",
@@ -81,7 +81,6 @@
     "snappyjs": "^0.7.0",
     "tailwindcss": "^4.3.3",
     "tar": "^7.5.22",
-    "tsx": "^4.23.15",
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.71.1",
     "vitest": "^5.0.3",
@@ -90,6 +89,6 @@
   },
   "packageManager": "pnpm@12.23.0",
   "engines": {
-    "node": "^24.15.0 || >=26.0.0"
+    "node": "^26.13.1"
   }
 }

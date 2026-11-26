@@ -1,9 +1,9 @@
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { validateLocalAssetPaths } from './config-utils';
-import { loadConfig } from './load-config';
-import { validateSecurityHeaders } from './security-headers';
-import { StarryBioConfigError, validateStarryBioConfig } from '../src/config/schema';
+import { validateLocalAssetPaths } from './config-utils.ts';
+import { loadConfig } from './load-config.ts';
+import { validateSecurityHeaders } from './security-headers.ts';
+import { StarryBioConfigError, validateStarryBioConfig } from '../src/config/schema.ts';
 
 export async function main(): Promise<void> {
   try {

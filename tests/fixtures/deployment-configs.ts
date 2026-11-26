@@ -1,4 +1,4 @@
-import type { StarryBioConfig } from '../../src/config/schema';
+import type { StarryBioConfig } from '../../src/config/schema.ts';
 
 export const minimalDeploymentConfig = {
   pageTitle: 'Quiet profile',

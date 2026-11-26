@@ -3,8 +3,8 @@ import { lstat, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import * as tar from 'tar';
-import { isForbiddenManagedImage, normalizeManifestPath, sha256 } from './updater/filesystem';
-import { PROJECT_ID, UPDATE_MANIFEST_SCHEMA, type UpdateManifest } from './updater/types';
+import { isForbiddenManagedImage, normalizeManifestPath, sha256 } from './updater/filesystem.ts';
+import { PROJECT_ID, UPDATE_MANIFEST_SCHEMA, type UpdateManifest } from './updater/types.ts';
 
 interface ArtifactArguments {
   commit: string;

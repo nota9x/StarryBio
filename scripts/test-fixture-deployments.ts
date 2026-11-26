@@ -1,4 +1,4 @@
-import { createDeploymentProject, runPnpm } from '../tests/helpers/deployment-project';
+import { createDeploymentProject, runPnpm } from '../tests/helpers/deployment-project.ts';
 
 for (const fixture of ['minimal.config.ts', 'customized.config.ts'] as const) {
   console.log(`\n=== Browser checks: ${fixture} ===`);

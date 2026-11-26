@@ -2,15 +2,15 @@ import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { loadConfig } from './load-config';
+import { loadConfig } from './load-config.ts';
 import {
   collectSimpleIconSpecs,
   getSimpleIconFilename,
   getSvgPathData,
   SIMPLE_ICON_OUTPUT_PREFIX,
   type SimpleIconSpec,
-} from '../src/config/icons';
-import { normalizeStarryBioConfig, validateStarryBioConfig } from '../src/config/schema';
+} from '../src/config/icons.ts';
+import { normalizeStarryBioConfig, validateStarryBioConfig } from '../src/config/schema.ts';
 
 const OUTPUT_DIR = path.resolve('public/assets/icons/simple-icons');
 const require = createRequire(import.meta.url);

@@ -292,8 +292,8 @@ importers:
         specifier: ^5.0.1
         version: 5.0.1(supports-color@10.2.2)
       simple-icons:
-        specifier: ^16.34.0
-        version: 16.34.0
+        specifier: ^16.38.1
+        version: 16.38.1
       snappyjs:
         specifier: ^0.7.0
         version: 0.7.0
@@ -3713,8 +3713,8 @@ packages:
     resolution: {integrity: sha512-LNdyRQ9ex5Nola93z1Xfm9WewHiy1v3XDH8SVizrWzPcGTuHpi3C5U6EQuCNH7Oo7G3j+16cnNf9Vd3VZxpafA==}
     engines: {node: ^22.22.2 || ^24.15.0 || >=26.0.0}
 
-  simple-icons@16.34.0:
-    resolution: {integrity: sha512-UTxKn0PVspk84B2hHF3Dqiqht1yDjJmDc/t4cO7PyCQxCMk6OjEu95pnpGjhLaGeQ4qBrGASbefTIe/+czrX7g==}
+  simple-icons@16.38.1:
+    resolution: {integrity: sha512-q4JnGp1cgeASp4jzEsmSh/7BD/e2y7aYO8XST+QBEvOJ5wzZ/9WRmKsI+QUwkfPUSiXC+sfh2+QetD38zl3N0g==}
     engines: {node: '>=0.12.18'}
 
   sisteransi@2.0.0:
@@ -7543,7 +7543,7 @@ snapshots:
       - kerberos
       - supports-color
 
-  simple-icons@16.34.0: {}
+  simple-icons@16.38.1: {}
 
   sisteransi@2.0.0: {}
 

@@ -71,7 +71,7 @@
     "globals": "^17.14.0",
     "node-diff3": "^4.0.0",
     "prettier": "^3.9.9",
-    "prettier-plugin-astro": "^1.1.0",
+    "prettier-plugin-astro": "^1.1.2",
     "prettier-plugin-packagejson": "^3.0.2",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "qrcode": "^1.5.4",

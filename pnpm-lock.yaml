@@ -186,8 +186,8 @@ importers:
   .:
     dependencies:
       '@lucide/astro':
-        specifier: ^1.52.0
-        version: 1.52.0(astro@7.4.13(@types/node@26.6.10)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
+        specifier: ^1.80.0
+        version: 1.80.0(astro@7.4.13(@types/node@26.6.10)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
     devDependencies:
       '@astrojs/check':
         specifier: ^0.9.12
@@ -1310,8 +1310,8 @@ packages:
   '@keyv/serialize@1.1.1':
     resolution: {integrity: sha512-dXn3FZhPv0US+7dtJsIi2R+c7qWYiReoEh5zUntWCf4oSpMNib8FDhSoed6m3QyZdx5hK7iLFkYk3rNxwt8vTA==}
 
-  '@lucide/astro@1.52.0':
-    resolution: {integrity: sha512-Vyo3sHYPtLvP5fbvqrMSMutcRzu8tbZXG6xFylrDnpeGVjLisokqKrWKuEm6K4IKwxkTrKK/xyXkVBE0WjxZKg==}
+  '@lucide/astro@1.80.0':
+    resolution: {integrity: sha512-oWTIdq1xnjfoKjgHHQRv11mwuzd3uFCyYqzcW7xmHB5HbgASpxbVH7KDvKvXJiwBE8fp/yl3UH0EGQQrfpc5Cg==}
     peerDependencies:
       astro: ^4 || ^5 || ^6 || ^7
 
@@ -5223,7 +5223,7 @@ snapshots:
 
   '@keyv/serialize@1.1.1': {}
 
-  '@lucide/astro@1.52.0(astro@7.4.13(@types/node@26.6.10)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))':
+  '@lucide/astro@1.80.0(astro@7.4.13(@types/node@26.6.10)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))':
     dependencies:
       astro: 7.4.13(@types/node@26.6.10)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
 

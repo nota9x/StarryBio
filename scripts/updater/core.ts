@@ -139,14 +139,16 @@ async function cloneInstallation(root: string, candidate: string): Promise<void>
   }
 }
 
-async function runCommand(command: string, arguments_: string[], cwd: string): Promise<void> {
+async function runPnpm(args: string[], cwd: string): Promise<void> {
+  const windows = process.platform === 'win32';
+  const executable = windows ? 'cmd.exe' : 'pnpm';
+  const commandArgs = windows ? ['/d', '/s', '/c', 'pnpm', ...args] : args;
   await new Promise<void>((resolve, reject) => {
-    const executable = process.platform === 'win32' ? `${command}.cmd` : command;
-    const child = spawn(executable, arguments_, { cwd, stdio: 'inherit', shell: false });
+    const child = spawn(executable, commandArgs, { cwd, stdio: 'inherit' });
     child.once('error', reject);
     child.once('exit', (code, signal) => {
       if (code === 0) resolve();
-      else reject(new Error(`${command} ${arguments_.join(' ')} failed (${signal ?? code}).`));
+      else reject(new Error(`pnpm ${args.join(' ')} failed (${signal ?? code}).`));
     });
   });
 }
@@ -377,8 +379,8 @@ export async function runUpdater(options: UpdateOptions = {}): Promise<UpdateRes
     }
 
     if (!options.skipValidationCommands) {
-      await runCommand('pnpm', ['install', '--frozen-lockfile'], candidate);
-      await runCommand('pnpm', ['run', 'build'], candidate);
+      await runPnpm(['install', '--frozen-lockfile'], candidate);
+      await runPnpm(['run', 'build'], candidate);
     }
     if (options.dryRun) {
       await rm(transactionRoot, { force: true, recursive: true });

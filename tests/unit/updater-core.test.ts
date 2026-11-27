@@ -93,6 +93,27 @@ async function prepared(
 }
 
 describe('Git-free updater integration', () => {
+  it('runs the frozen install and build in the staged checkout', async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), 'starrybio-core-validation-'));
+    temporaryDirectories.push(root);
+    const releases = [githubRelease('1.0.0', 1), githubRelease('2.0.0', 2)];
+    const lockfile = "lockfileVersion: '9.0'\n\nimporters:\n  .: {}\n";
+    const manifest = (version: string) =>
+      JSON.stringify({ version, scripts: { build: 'node --version' } });
+    await writeFile(path.join(root, 'package.json'), manifest('1.0.0'));
+    await writeFile(path.join(root, 'pnpm-lock.yaml'), lockfile);
+    mocks.prepareRelease.mockImplementation(({ release }: { release: GitHubRelease }) =>
+      prepared(root, release, {
+        'package.json': manifest(release.tag_name.slice(1)),
+        'pnpm-lock.yaml': lockfile,
+      })
+    );
+
+    const result = await runUpdater({ dryRun: true, installRoot: root, releases });
+    expect(result).toMatchObject({ availableVersion: '2.0.0', updated: false });
+    expect(await readFile(path.join(root, 'package.json'), 'utf8')).toBe(manifest('1.0.0'));
+  });
+
   it('does not commit bootstrap state during a dry run', async () => {
     const root = await mkdtemp(path.join(os.tmpdir(), 'starrybio-core-dry-'));
     temporaryDirectories.push(root);

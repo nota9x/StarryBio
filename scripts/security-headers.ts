@@ -1,9 +1,9 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import type { StarryBioConfig } from '../src/config/schema';
-import { buildSecurityHeaders, type SecurityHeader } from '../src/config/security-headers';
+import type { StarryBioConfig } from '../src/config/schema.ts';
+import { buildSecurityHeaders, type SecurityHeader } from '../src/config/security-headers.ts';
 
-export { buildSecurityHeaders } from '../src/config/security-headers';
+export { buildSecurityHeaders } from '../src/config/security-headers.ts';
 
 interface VercelConfig {
   headers: Array<{ source: string; headers: SecurityHeader[] }>;

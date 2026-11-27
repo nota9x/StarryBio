@@ -69,8 +69,8 @@ The **[StarryBio Wiki](https://github.com/nota9x/StarryBio/wiki)** is the primar
 
 ### Requirements
 
-- **Node.js** 24.15.0+ or 26.0.0+
-- **pnpm** 12.3.4
+- **Node.js** 26.13.1 or a newer 26.x LTS patch
+- **pnpm** 12.24.0
 - A hosting account only when deploying
 
 Clone the repository and start the development server:

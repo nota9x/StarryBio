@@ -1,4 +1,4 @@
-import type { StarryBioConfig } from '../src/config/schema';
+import type { StarryBioConfig } from '../src/config/schema.ts';
 
 // This is the only file most StarryBio users need to edit. See README.md for
 // every option, provider example, and the v2-to-v3 migration table.

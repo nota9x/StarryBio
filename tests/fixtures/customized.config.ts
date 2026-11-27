@@ -1,1 +1,1 @@
-export { customizedDeploymentConfig as default } from './deployment-configs';
+export { customizedDeploymentConfig as default } from './deployment-configs.ts';

@@ -1,4 +1,4 @@
-import type { IconConfig, SimpleIconConfig } from './schema';
+import type { IconConfig, SimpleIconConfig } from './schema.ts';
 
 export interface SimpleIconSpec {
   brand: string;

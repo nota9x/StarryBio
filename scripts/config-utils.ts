@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import type { IconConfig, StarryBioConfig } from '../src/config/schema';
+import type { IconConfig, StarryBioConfig } from '../src/config/schema.ts';
 
 export function validateLocalAssetPaths(config: StarryBioConfig): string[] {
   const issues: string[] = [];

@@ -1,4 +1,4 @@
-import type { AnalyticsConfig } from './schema';
+import type { AnalyticsConfig } from './schema.ts';
 
 const RESERVED_CUSTOM_DATA_ATTRIBUTES = new Set([
   'starrybio-provider',

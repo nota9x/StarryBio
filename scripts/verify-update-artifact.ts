@@ -1,10 +1,10 @@
 import { mkdtemp, rm } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { extractAndValidateArchive } from './updater/archive';
+import { extractAndValidateArchive } from './updater/archive.ts';
 
 const archive = process.argv[2];
-if (!archive) throw new Error('Usage: tsx scripts/verify-update-artifact.ts <archive>');
+if (!archive) throw new Error('Usage: node scripts/verify-update-artifact.ts <archive>');
 const temporary = await mkdtemp(path.join(os.tmpdir(), 'starrybio-artifact-'));
 try {
   const result = await extractAndValidateArchive(path.resolve(archive), temporary);

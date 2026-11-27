@@ -1,9 +1,9 @@
 import { cp, lstat, mkdir, readdir } from 'node:fs/promises';
 import path from 'node:path';
-import { extractAndValidateArchive } from './archive';
-import { verifyReleaseAttestations } from './attestations';
-import { downloadFile, findReleaseAsset, releaseVersion, resolveReleaseCommit } from './github';
-import type { GitHubRelease, PreparedRelease } from './types';
+import { extractAndValidateArchive } from './archive.ts';
+import { verifyReleaseAttestations } from './attestations.ts';
+import { downloadFile, findReleaseAsset, releaseVersion, resolveReleaseCommit } from './github.ts';
+import type { GitHubRelease, PreparedRelease } from './types.ts';
 
 async function assertSafeCacheTree(directory: string): Promise<void> {
   for (const entry of await readdir(directory, { withFileTypes: true })) {

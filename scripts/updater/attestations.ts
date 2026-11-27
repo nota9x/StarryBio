@@ -1,13 +1,13 @@
 import path from 'node:path';
 import { verify, type Bundle } from 'sigstore';
-import { sha256 } from './filesystem';
-import { fetchAttestationBundle, listAttestations, type AttestationReference } from './github';
+import { sha256 } from './filesystem.ts';
+import { fetchAttestationBundle, listAttestations, type AttestationReference } from './github.ts';
 import {
   TRUST_POLICY,
   type GitHubAsset,
   type GitHubRelease,
   type VerificationEvidence,
-} from './types';
+} from './types.ts';
 
 interface StatementSubject {
   digest?: Record<string, string>;

@@ -1,6 +1,6 @@
-import { loadConfig } from './load-config';
-import { validateStarryBioConfig } from '../src/config/schema';
-import { writeSecurityHeaders } from './security-headers';
+import { loadConfig } from './load-config.ts';
+import { validateStarryBioConfig } from '../src/config/schema.ts';
+import { writeSecurityHeaders } from './security-headers.ts';
 
 const config = await loadConfig();
 const validatedConfig = validateStarryBioConfig(config);

@@ -1,7 +1,7 @@
 import { cp, lstat, mkdir, readFile, rename, rm } from 'node:fs/promises';
 import path from 'node:path';
-import { assertNoSymlinkAncestors, resolveInside } from './filesystem';
-import { type UpdaterPaths, writeJsonAtomic } from './state';
+import { assertNoSymlinkAncestors, resolveInside } from './filesystem.ts';
+import { type UpdaterPaths, writeJsonAtomic } from './state.ts';
 
 interface JournalEntry {
   hadOriginal: boolean;

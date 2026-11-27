@@ -1,7 +1,7 @@
 import { mkdir, open, readFile, rename, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import semver from 'semver';
-import { TRUST_POLICY, UPDATE_STATE_SCHEMA, type UpdaterState } from './types';
+import { TRUST_POLICY, UPDATE_STATE_SCHEMA, type UpdaterState } from './types.ts';
 
 export interface UpdaterPaths {
   baseline: string;

@@ -10,8 +10,8 @@ import {
   normalizeManifestPath,
   resolveInside,
   sha256,
-} from './filesystem';
-import { PROJECT_ID, UPDATE_MANIFEST_SCHEMA, type UpdateManifest } from './types';
+} from './filesystem.ts';
+import { PROJECT_ID, UPDATE_MANIFEST_SCHEMA, type UpdateManifest } from './types.ts';
 
 const SHA256_PATTERN = /^[a-f0-9]{64}$/;
 const LEGACY_DEFAULT_ASSETS = new Set(

@@ -1,5 +1,5 @@
 import { pathToFileURL } from 'node:url';
-import { runUpdater, type UpdateResult } from './updater/core';
+import { runUpdater, type UpdateResult } from './updater/core.ts';
 
 interface CliOptions {
   check: boolean;

@@ -1,14 +1,14 @@
 import { mkdir, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { resolveOutputPath } from './config-utils';
-import { loadConfig } from './load-config';
+import { resolveOutputPath } from './config-utils.ts';
+import { loadConfig } from './load-config.ts';
 import {
   normalizeStarryBioConfig,
   type NormalizedStarryBioConfig,
   validateStarryBioConfig,
-} from '../src/config/schema';
-import { getThemePresetTokens } from '../src/config/themes';
+} from '../src/config/schema.ts';
+import { getThemePresetTokens } from '../src/config/themes.ts';
 
 export async function generateAssets(siteConfig: NormalizedStarryBioConfig): Promise<void> {
   await Promise.all([

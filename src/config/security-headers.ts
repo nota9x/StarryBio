@@ -1,5 +1,5 @@
-import { createAnalyticsScript } from './analytics';
-import type { AnalyticsConfig, StarryBioConfig } from './schema';
+import { createAnalyticsScript } from './analytics.ts';
+import type { AnalyticsConfig, StarryBioConfig } from './schema.ts';
 
 export interface SecurityHeader {
   key: string;

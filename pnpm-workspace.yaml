@@ -1,7 +1,11 @@
 autoInstallPeers: false
+minimumReleaseAge: 1440
 allowBuilds:
-  '@parcel/watcher': true
   esbuild: true
   sharp: true
   unrs-resolver: true
   workerd: true
+
+overrides:
+  # Remove when the accessibility plugin supports minimatch 11 (GHSA-g3hv-75wg-m249).
+  'eslint-plugin-jsx-a11y-x@0.2.0>minimatch': 11.0.9

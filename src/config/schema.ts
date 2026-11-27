@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { THEME_PRESET_NAMES, getThemePresetDefinition, type ThemePreset } from './themes';
+import { THEME_PRESET_NAMES, getThemePresetDefinition, type ThemePreset } from './themes.ts';
 
 const BUTTON_STYLES = ['glass', 'solid', 'outline', 'minimal', 'terminal'] as const;
 const THEME_BACKGROUNDS = ['starfield', 'gradient', 'minimal'] as const;
@@ -356,7 +356,7 @@ export const starryBioConfigSchema = z
     }
   });
 
-export type { ThemePreset } from './themes';
+export type { ThemePreset } from './themes.ts';
 export type ButtonStyle = (typeof BUTTON_STYLES)[number];
 export type ThemeBackground = (typeof THEME_BACKGROUNDS)[number];
 export type AnimationIntensity = (typeof ANIMATION_INTENSITIES)[number];
@@ -443,9 +443,12 @@ export function getDefaultThemeAccent(preset: ThemePreset): string {
 }
 
 export class StarryBioConfigError extends Error {
-  constructor(public readonly issues: string[]) {
+  readonly issues: string[];
+
+  constructor(issues: string[]) {
     super(`Invalid StarryBio config:\n${issues.map((issue) => `  - ${issue}`).join('\n')}`);
     this.name = 'StarryBioConfigError';
+    this.issues = issues;
   }
 }
 

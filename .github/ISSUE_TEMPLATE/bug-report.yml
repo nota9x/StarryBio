@@ -46,7 +46,7 @@ body:
     attributes:
       label: Environment
       description: Include the relevant OS, browser and viewport, Node.js, pnpm, hosting provider, and StarryBio version or commit.
-      placeholder: 'Windows 11; Chrome 140 at 390px; Node 26.13.1; pnpm 12.23.0; GitHub Pages; v3.6.0'
+      placeholder: 'Windows 11; Chrome 140 at 390px; Node 26.13.1; pnpm 12.24.0; GitHub Pages; v3.6.0'
     validations:
       required: true
   - type: textarea

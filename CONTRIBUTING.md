@@ -19,7 +19,7 @@ For a security vulnerability, use [private vulnerability reporting](https://gith
 ### Requirements
 
 - Node.js 26.13.1 or a newer 26.x LTS patch (`.node-version` pins provider builds)
-- pnpm 12.23.0
+- pnpm 12.24.0
 - A hosting-provider account only when you need to deploy
 
 Fork the repository, clone your fork, and create a focused branch. Use a descriptive branch name such as `fix/status-timezone` or `feat/solarized-theme`.

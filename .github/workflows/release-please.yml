@@ -85,10 +85,12 @@ jobs:
 
       - name: Build deterministic update payload
         shell: bash
+        env:
+          PREVIOUS_TAG: ${{ steps.previous.outputs.tag }}
         run: |
           args=(--tag "${RELEASE_TAG}" --commit "${GITHUB_SHA}" --output release-artifacts)
-          if test -n "${{ steps.previous.outputs.tag }}"; then
-            args+=(--previous-tag "${{ steps.previous.outputs.tag }}")
+          if test -n "${PREVIOUS_TAG}"; then
+            args+=(--previous-tag "${PREVIOUS_TAG}")
           fi
           pnpm run release:package "${args[@]}"
           pnpm run release:verify-artifact "release-artifacts/starrybio-update-${RELEASE_TAG}.tgz"
